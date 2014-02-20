@@ -1,0 +1,7 @@
+#!/bin/sh
+
+{% include "procstub" %}
+
+echo "starting mesh..."
+
+register_node mesh

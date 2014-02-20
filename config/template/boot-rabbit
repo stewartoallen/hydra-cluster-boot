@@ -1,0 +1,7 @@
+#!/bin/sh
+
+{% include "procstub" %}
+
+[ ! $(which rabbitmq-server) ] && fail "missing rabbitmq-server executable"
+startProcess rabbit rabbitmq-server
+register_node rabbit

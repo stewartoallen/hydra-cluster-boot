@@ -1,0 +1,10 @@
+#!/bin/sh
+
+{% include "procstub" %}
+
+echo "starting qmaster..."
+
+export zookeeper=$(wait_nodes zookeeper)
+export rabbit=$(wait_nodes rabbit)
+export spawn=$(wait_nodes spawn)
+register_node qmaster

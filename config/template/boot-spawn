@@ -1,0 +1,9 @@
+#!/bin/sh
+
+{% include "procstub" %}
+
+echo "starting spawn..."
+
+export zookeeper=$(wait_nodes zookeeperrabbit)
+export rabbit=$(wait_nodes rabbit)
+register_node spawn

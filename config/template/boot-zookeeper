@@ -1,0 +1,7 @@
+#!/bin/sh
+
+{% include "procstub" %}
+
+register_node zookeeper
+wait_zookeeper
+startProcess zookeeper ${JAVA_CMD} -cp ${HYDRA_JAR} org.apache.zookeeper.server.quorum.QuorumPeerMain ./etc/zookeeper.properties

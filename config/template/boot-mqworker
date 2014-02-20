@@ -1,0 +1,9 @@
+#!/bin/sh
+
+{% include "procstub" %}
+
+echo "starting qworker..."
+
+export rabbit=$(wait_nodes rabbit)
+export mqmaster=$(wait_nodes mqmaster)
+register_node qworker

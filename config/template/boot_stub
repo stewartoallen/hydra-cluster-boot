@@ -17,7 +17,7 @@ function wait_nodes() {
 
 function get_broker() {
 	export rabbit=$(wait_nodes rabbit)
-	echo "-Dbatch.brokerHost=localhost=${rabbit} -Dbatch.brokerPort=5672"
+	echo "-Dbatch.brokerHost=${rabbit} -Dbatch.brokerPort=5672"
 }
 
 function get_zookeeper() {

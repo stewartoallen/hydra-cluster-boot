@@ -2,10 +2,10 @@
 
 {% include "boot_stub" %}
 
-if [ ! -f minion/minion.state ]; then
-	mkdir -p minion
+if [ ! -f ${HYDRA_IMAGE}/minion/minion.state ]; then
+	mkdir -p ${HYDRA_IMAGE}/minion
 	echo "creating default minion state"
-	echo "{stopped:{},uuid:\"minion\"}" > minion/minion.state
+	echo "{stopped:{},uuid:\"minion\"}" > ${HYDRA_IMAGE}/minion/minion.state
 fi
 
 export broker=$(get_broker)

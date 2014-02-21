@@ -14,7 +14,7 @@ for dir in bin lib log etc/pid; do
 done
 
 # check for updates to required images
-for image in bin/hcl etc/log4j.conf lib/hydra.jar lib/libflcow.dylib lib/libflcow.so; do
+for image in bin/hcl bin/job-task.sh etc/log4j.conf lib/hydra.jar lib/libflcow.dylib lib/libflcow.so web.zip; do
 	local=${HYDRA_IMAGE}/${image}
 	remote=${HYDRA_BOOT}/image/${IMAGEVERSION}/${image}
 	[ ! -f ${local} ] && (
@@ -22,6 +22,12 @@ for image in bin/hcl etc/log4j.conf lib/hydra.jar lib/libflcow.dylib lib/libflco
 		curl -s ${remote} > ${local} || fail "failed image load '${image}'"
 	)
 done
+
+# unzip web directory
+(
+	cd $HYDRA_IMAGE
+	[ ! -d web ] && unzip web.zip
+)
 
 # launch host local processes
 for proc in ${PROCESSES}; do

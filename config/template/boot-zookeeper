@@ -6,10 +6,14 @@ register_node zookeeper
 
 zknodes=$(wait_nodes zookeeper)
 cat > ${HYDRA_IMAGE}/etc/zookeeper.properties << EOF
-# zknodes=${zknodes}
 dataDir=./etc/zookeeper
 clientPort=2181
 maxClientCnxns=1000000
 EOF
+server=0
+for node in ${zknodes}; do
+	echo "server.${server}=${node}:2181"
+	server=$((server+1))
+done >> ${HYDRA_IMAGE}/etc/zookeeper.properties
 
 startProcess zookeeper ${JAVA_CMD} -cp ${HYDRA_JAR} org.apache.zookeeper.server.quorum.QuorumPeerMain ./etc/zookeeper.properties

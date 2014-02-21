@@ -1,8 +1,6 @@
 #!/bin/sh
 
-{% include "procstub" %}
-
-echo "mesh-cmdline {{cmdline}}"
+{% include "boot_stub" %}
 
 register_node mesh
-startProcess mesh ${HYDRA_CMD} ${MESH_OPT} ${HYDRA_EXE} mesh server 5000 mesh
+startProcess mesh ${HYDRA_CMD} {{mesh_opt}} ${HYDRA_EXE} mesh server {{mesh_port}} mesh

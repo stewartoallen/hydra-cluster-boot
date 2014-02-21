@@ -1,9 +1,9 @@
 #!/bin/sh
 
-{% include "procstub" %}
+{% include "boot_stub" %}
 
-echo "starting spawn..."
+export broker=$(get_broker)
+export zookeeper=$(get_zookeeper)
 
-export zookeeper=$(wait_nodes zookeeperrabbit)
-export rabbit=$(wait_nodes rabbit)
 register_node spawn
+startProcess spawn ${HYDRA_CMD} ${broker} ${zookeeper} {{spawn_opt}} ${HYDRA_EXE} spawn etc web

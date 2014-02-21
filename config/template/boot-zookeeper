@@ -1,7 +1,15 @@
 #!/bin/sh
 
-{% include "procstub" %}
+{% include "boot_stub" %}
 
 register_node zookeeper
-wait_zookeeper
+
+zknodes=$(wait_nodes zookeeper)
+cat > ${HYDRA_IMAGE}/etc/zookeeper.properties << EOF
+# zknodes=${zknodes}
+dataDir=./etc/zookeeper
+clientPort=2181
+maxClientCnxns=1000000
+EOF
+
 startProcess zookeeper ${JAVA_CMD} -cp ${HYDRA_JAR} org.apache.zookeeper.server.quorum.QuorumPeerMain ./etc/zookeeper.properties

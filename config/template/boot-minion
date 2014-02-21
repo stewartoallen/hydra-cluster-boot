@@ -1,10 +1,16 @@
 #!/bin/sh
 
-{% include "procstub" %}
+{% include "boot_stub" %}
 
-echo "starting minion..."
+if [ ! -f minion/minion.state ]; then
+	mkdir -p minion
+	echo "creating default minion state"
+	echo "{stopped:{},uuid:\"minion\"}" > minion/minion.state
+fi
 
-export zookeeper=$(wait_nodes zookeeper)
-export rabbit=$(wait_nodes rabbit)
+export broker=$(get_broker)
+export zookeeper=$(get_zookeeper)
 export spawn=$(wait_nodes spawn)
+
 register_node minion
+startProcess minion ${HYDRA_CMD} ${broker} ${zookeeper} {{minion_opt}} ${HYDRA_EXE} minion minion

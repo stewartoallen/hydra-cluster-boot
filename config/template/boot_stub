@@ -7,46 +7,38 @@ function fail() {
 
 function register_node() {
 	process=$1
-	curl -s "${HYDRA_BOOT}/api/register_node?cluster=${CLUSTERID}&key=${process}&hostname=${HOSTNAME}"
+	curl -s "${HYDRA_BOOT}/api/register_node?cluster=${CLUSTER_ID}&key=${process}&hostname=${CLUSTER_HOST}"
 }
 
 function wait_nodes() {
 	process=$1
-	curl -s "${HYDRA_BOOT}/api/wait_nodes?cluster=${CLUSTERID}&key=${process}"
+	curl -s "${HYDRA_BOOT}/api/wait_nodes?cluster=${CLUSTER_ID}&key=${process}"
 }
 
-function wait_zookeeper() {
-	zknodes=$(wait_nodes zookeeper)
-cat > ${HYDRA_IMAGE}/etc/zookeeper.properties << EOF
-# zknodes=${zknodes}
-dataDir=./etc/zookeeper
-clientPort=2181
-maxClientCnxns=1000000
-EOF
+function get_broker() {
+	export rabbit=$(wait_nodes rabbit)
+	echo "-Dbatch.brokerHost=localhost=${rabbit} -Dbatch.brokerPort=5672"
+}
+
+function get_zookeeper() {
+	export zookeeper=$(wait_nodes zookeeper)
+	echo "-Dzk.servers=${zookeeper}:2181"
 }
 
 # setup environment
 export RUNBIN="${HYDRA_IMAGE}/bin"
 export PIDDIR="${HYDRA_IMAGE}/etc/pid"
 export HYDRA_JAR="${HYDRA_IMAGE}/lib/hydra.jar"
-export HYDRA_HOST="${HYDRA_HOST:-$(hostname)}"
 export PATH="${PATH}:${RUNBIN}"
-
-[ ! -d ${HYDRA_IMAGE} ] && fail "missing 'run' directory. aborting."
-[ ! -f ${HYDRA_JAR} ] && fail "missing hydra exec jar @ ${HYDRA_JAR}"
-
-export QUERY_OPT="-Ddebug.MeshQuerySource=2 -Dmesh.local.handlers=com.addthis.hydra.data.query.source.MeshQuerySource -Dmqmaster.mesh.peers=localhost -Dmeshy.senders=1 -Dmeshy.stream.prefetch=true -Dmqmaster.mesh.peer.port=5101 -Dmesh.query.root=minion -Dquery.tmpdir=log/query/tmp"
-export QMASTER_OPT="${QUERY_OPT} -Xmx512M -Xms512M -Deps.mem.debug=10000 -Dbatch.job.log4j=1 -Dcs.je.cacheShared=1 -Dcs.je.deferredWrite=1 -Dhydra.query.debug=1 -Dcom.yammer.metrics.GcMonitor.enable=false -Ddebug.level.SourceTracker=1 -Ddebug.level.QueryCache=2 -Ddebug.level.MeshQueryMaster=2 -Dquery.cache.enable=false -DQueryCache.CACHE_DIR=log/query/cache -Dmqmaster.enableZooKeeper=true"
-export QWORKER_OPT="${QUERY_OPT} -Xmx256M -Xms256M"
-export MINION_OPT="-Xmx128M -Xms128M -Dminion.mem=512 -Dminion.localhost=${HYDRA_HOST} -Dminion.group=local -Dminion.web.port=7070 -Dspawn.localhost=localhost -Dhttp.post.max=327680 -Dminion.sparse.updates=1 -Dreplicate.cmd.delay.seconds=1 -Dbackup.cmd.delay.seconds=0"
-export SPAWN_OPT="-Xmx128M -Xms128M -Dspawn.localhost=localhost -Dspawn.queryhost=${HYDRA_HOST} -Dspawn.status.interval=6000 -Dspawn.chore.interval=3000 -Dhttp.post.max=327680 -Dspawn.polltime=10000 -Dspawnbalance.min.disk.percent.avail.replicas=0.01 -Dspawn.auth.ldap=false -Dmesh.port=5000 -Djob.store.remote=false"
-export MESH_OPT="-Xmx128M -Xms128M -Dmeshy.autoMesh=false -Dmeshy.throttleLog=true -Dmeshy.buffers.enable=true -Dmeshy.stream.maxopen=10000 -Ddebug.level.StreamService=0 -Ddebug.level.ChannelState=0"
-export COMMON_OPT="-Dzk.servers=localhost:2181 -Dganglia.enable=false -Djava.net.preferIPv4Stack=true"
-export HYDRA_OPT="-Dbatch.brokerHost=localhost -Dbatch.brokerPort=5672 -Dhydra.tree.cache.maxSize=250 -Dhydra.tree.page.maxSize=50 -Deps.mem.debug=0"
+export COMMON_OPT="-Dganglia.enable=false -Djava.net.preferIPv4Stack=true"
+export HYDRA_OPT="-Dhydra.tree.cache.maxSize=250 -Dhydra.tree.page.maxSize=50 -Deps.mem.debug=0"
 export LOG4J_OPT="-Dlog4j.defaultInitOverride=true -Dlog4j.configuration=${HYDRA_IMAGE}/etc/log4j.conf"
-export JAVA_CMD="java -server ${JAVA_OPTS} ${COMMON_OPT} ${EXTOPT}"
+export JAVA_CMD="java -server ${COMMON_OPT}"
 export HYDRA_CMD="${JAVA_CMD} ${LOG4J_OPT} ${HYDRA_OPT}"
 export HYDRA_EXE="-jar ${HYDRA_JAR}"
+
+# require hydra.jar
+[ ! -f ${HYDRA_JAR} ] && fail "missing hydra exec jar @ ${HYDRA_JAR}"
 
 # pull in hydra properties if they exist
 if [ -f ${HYDRA_IMAGE}/etc/hydra.properties ]; then

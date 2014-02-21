@@ -10,22 +10,29 @@
   },
   "node": {
     "rabbit": {
-      "ctrlaltdel": {
+      "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393011076588
+        "updated": 1393015236198
       }
     },
     "zookeeper": {
-      "ctrlaltdel": {
+      "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393011076614
+        "updated": 1393015236223
+      }
+    },
+    "mesh": {
+      "127.0.0.1": {
+        "ip": "127.0.0.1",
+        "updated": 1393015236303
+      }
+    },
+    "spawn": {
+      "127.0.0.1": {
+        "ip": "127.0.0.1",
+        "updated": 1393015236402
       }
     }
   },
   "shortenHost": true,
-  "config": {
-    "mesh": {
-      "cmdline": "-Xmx128M -Xms128M -Dmeshy.autoMesh=false -Dmeshy.throttleLog=true -Dmeshy.buffers.enable=true -Dmeshy.stream.maxopen=10000 -Ddebug.level.StreamService=0 -Ddebug.level.ChannelState=0"
-    }
-  }
 }

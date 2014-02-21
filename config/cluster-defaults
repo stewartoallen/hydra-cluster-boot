@@ -1,4 +1,10 @@
 {
+	template: {
+		zookeeper: 1,
+		rabbit: 1,
+		spawn: 1,
+		qmaster: 1,
+	},
 	shortenHost:true,
 	config:{
 		mesh:{

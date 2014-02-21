@@ -17,7 +17,7 @@ function wait_nodes() {
 
 function wait_zookeeper() {
 	zknodes=$(wait_nodes zookeeper)
-cat > ${HYDRA_RUN}/etc/zookeeper.properties << EOF
+cat > ${HYDRA_IMAGE}/etc/zookeeper.properties << EOF
 # zknodes=${zknodes}
 dataDir=./etc/zookeeper
 clientPort=2181
@@ -26,13 +26,13 @@ EOF
 }
 
 # setup environment
-export RUNBIN="${HYDRA_RUN}/bin"
-export PIDDIR="${HYDRA_RUN}/etc/pid"
-export HYDRA_JAR="${HYDRA_HOME}/lib/hydra.jar"
+export RUNBIN="${HYDRA_IMAGE}/bin"
+export PIDDIR="${HYDRA_IMAGE}/etc/pid"
+export HYDRA_JAR="${HYDRA_IMAGE}/lib/hydra.jar"
 export HYDRA_HOST="${HYDRA_HOST:-$(hostname)}"
 export PATH="${PATH}:${RUNBIN}"
 
-[ ! -d ${HYDRA_RUN} ] && fail "missing 'run' directory. aborting."
+[ ! -d ${HYDRA_IMAGE} ] && fail "missing 'run' directory. aborting."
 [ ! -f ${HYDRA_JAR} ] && fail "missing hydra exec jar @ ${HYDRA_JAR}"
 
 export QUERY_OPT="-Ddebug.MeshQuerySource=2 -Dmesh.local.handlers=com.addthis.hydra.data.query.source.MeshQuerySource -Dmqmaster.mesh.peers=localhost -Dmeshy.senders=1 -Dmeshy.stream.prefetch=true -Dmqmaster.mesh.peer.port=5101 -Dmesh.query.root=minion -Dquery.tmpdir=log/query/tmp"
@@ -43,23 +43,14 @@ export SPAWN_OPT="-Xmx128M -Xms128M -Dspawn.localhost=localhost -Dspawn.queryhos
 export MESH_OPT="-Xmx128M -Xms128M -Dmeshy.autoMesh=false -Dmeshy.throttleLog=true -Dmeshy.buffers.enable=true -Dmeshy.stream.maxopen=10000 -Ddebug.level.StreamService=0 -Ddebug.level.ChannelState=0"
 export COMMON_OPT="-Dzk.servers=localhost:2181 -Dganglia.enable=false -Djava.net.preferIPv4Stack=true"
 export HYDRA_OPT="-Dbatch.brokerHost=localhost -Dbatch.brokerPort=5672 -Dhydra.tree.cache.maxSize=250 -Dhydra.tree.page.maxSize=50 -Deps.mem.debug=0"
-export LOG4J_OPT="-Dlog4j.defaultInitOverride=true -Dlog4j.configuration=${HYDRA_RUN}/etc/log4j.conf"
+export LOG4J_OPT="-Dlog4j.defaultInitOverride=true -Dlog4j.configuration=${HYDRA_IMAGE}/etc/log4j.conf"
 export JAVA_CMD="java -server ${JAVA_OPTS} ${COMMON_OPT} ${EXTOPT}"
 export HYDRA_CMD="${JAVA_CMD} ${LOG4J_OPT} ${HYDRA_OPT}"
 export HYDRA_EXE="-jar ${HYDRA_JAR}"
 
-# do in scope of HYDRA_RUN
-(
-	cd ${HYDRA_RUN}
-	# create missing directories
-	for dir in bin lib log etc/pid; do
-		[ ! -d $dir ] && mkdir -p $dir && echo "created '${dir}'"
-	done
-)
-
 # pull in hydra properties if they exist
-if [ -f ${HYDRA_RUN}/etc/hydra.properties ]; then
-	CMD_ADD=$(grep = ${HYDRA_RUN}/etc/hydra.properties | while read one; do echo "-D${one}"; done)
+if [ -f ${HYDRA_IMAGE}/etc/hydra.properties ]; then
+	CMD_ADD=$(grep = ${HYDRA_IMAGE}/etc/hydra.properties | while read one; do echo "-D${one}"; done)
 	export JAVA_CMD="${JAVA_CMD} ${CMD_ADD}"
 	export HYDRA_CMD="${HYDRA_CMD} ${CMD_ADD}"
 fi
@@ -67,13 +58,13 @@ fi
 # flcow (copy-on-write) support for 64 bit linux & os x
 case $(uname) in
 	Linux)
-		export LD_PRELOAD=${HYDRA_HOME}/lib/libflcow.so:${LD_PRELOAD}
+		export LD_PRELOAD=${HYDRA_IMAGE}/lib/libflcow.so:${LD_PRELOAD}
 		;;
 	Darwin)
-		export LD_PRELOAD=${HYDRA_HOME}/lib/libflcow.dylib:${LD_PRELOAD}
+		export LD_PRELOAD=${HYDRA_IMAGE}/lib/libflcow.dylib:${LD_PRELOAD}
 		;;
 esac
-export FLCOW_PATH="^${HYDRA_RUN}"
+export FLCOW_PATH="^${HYDRA_IMAGE}"
 export FLCOW_EXCLUDE="\.((stats)|(pid)|(done)|(complete))$"
 
 function testIsRunning() {
@@ -91,7 +82,7 @@ function testIsRunning() {
 
 function startProcess() {
 	export PROCNAME=$1; shift
-	cd ${HYDRA_RUN}
+	cd ${HYDRA_IMAGE}
 	PID="${PIDDIR}/pid.${PROCNAME}"
 	LOG=log/${PROCNAME}.log
 	testIsRunning ${PID}
@@ -106,7 +97,7 @@ function startProcess() {
 
 function stopProcess() {
 	echo "stopProcess :: $*"
-	cd ${HYDRA_RUN}
+	cd ${HYDRA_IMAGE}
 	for process in $*; do
 		if [ -f ${PIDDIR}/pid.${process} ]; then
 			PID=$(cat ${PIDDIR}/pid.${process})

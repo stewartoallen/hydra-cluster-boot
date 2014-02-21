@@ -18,29 +18,29 @@ export JAVA=$(which java)
 [ -z "${PROCESSES}" ] && fail "missing PROCESSES environment variable"
 [ -z "${JAVA}" ] && fail "missing java binaries"
 
-[ -z "${HYDRA_HOME}" ] && echo "defaulting HYDRA_HOME" && export HYDRA_HOME=${HOME}/hydra/home
-[ -z "${HYDRA_RUN}" ] && echo "defaulting HYDRA_RUN" && export HYDRA_RUN=${HOME}/hydra/run
+[ -z "${HYDRA_IMAGE}" ] && echo "defaulting HYDRA_IMAGE" && export HYDRA_IMAGE=${HOME}/hydra
 [ -z "${HYDRA_BOOT}" ] && echo "defaulting HYDRA_BOOT" && export HYDRA_BOOT="http://hydra-boot:8008"
 
-echo "HYDRA_HOME=${HYDRA_HOME} HYDRA_RUN=${HYDRA_RUN} HYDRA_BOOT=${HYDRA_BOOT}"
+echo "HYDRA_IMAGE=${HYDRA_IMAGE} HYDRA_BOOT=${HYDRA_BOOT}"
 
-[ ! -d "${HYDRA_HOME}" ] && (
-	echo "creating HYDRA_HOME"
-	mkdir -p ${HYDRA_HOME} && cd ${HYDRA_HOME} || fail "unable to create HYDRA_HOME"
-	mkdir bin lib
-	for image in hydra.jar libflcow.dylib libflcow.so; do
+# create required directories
+for dir in bin lib log etc/pid; do
+	dir=${HYDRA_IMAGE}/${dir}
+	[ ! -d ${dir} ] && mkdir -p ${dir} && echo "created ${dir}"
+done
+
+# check for updates to required images
+for image in bin/hcl etc/log4j.conf lib/hydra.jar lib/libflcow.dylib lib/libflcow.so; do
+	local=${HYDRA_IMAGE}/${image}
+	remote=${HYDRA_BOOT}/image/${IMAGEVERSION}/${image}
+	[ ! -f ${local} ] && (
 		echo "fetching $image..."
-		curl -s ${HYDRA_BOOT}/image/${IMAGEVERSION}/${image} > lib/${image} || fail "failed image load '${image}'"
-	done
-)
-
-[ ! -d "${HYDRA_RUN}" ] && (
-	echo "creating HYDRA_RUN"
-	mkdir -p ${HYDRA_RUN} && cd ${HYDRA_RUN} || fail "unable to create HYDRA_RUN"
-)
+		curl -s ${remote} > ${local} || fail "failed image load '${image}'"
+	)
+done
 
 for proc in ${PROCESSES}; do
 	echo "fetching ${proc} boot..."
-	bash <(curl -s "${HYDRA_BOOT}/render/boot-${proc}?&cluster=7d3862d0939e11e3af14fdc49d77d83b&hostname=${HOSTNAME}")
+	bash <(curl -s "${HYDRA_BOOT}/render/boot-${proc}?&cluster=${CLUSTERID}&hostname=${HOSTNAME}")
 done
 

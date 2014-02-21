@@ -2,6 +2,7 @@
 
 {% include "procstub" %}
 
-echo "starting mesh..."
+echo "mesh-cmdline {{cmdline}}"
 
 register_node mesh
+startProcess mesh ${HYDRA_CMD} ${MESH_OPT} ${HYDRA_EXE} mesh server 5000 mesh

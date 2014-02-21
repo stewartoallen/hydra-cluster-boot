@@ -1,0 +1,31 @@
+{
+  "template": {
+    "zookeeper": 1,
+    "rabbit": 1,
+    "spawn": 1,
+    "qmaster": 1,
+    "qworker": 0,
+    "mesh": 0,
+    "minion": 0
+  },
+  "node": {
+    "rabbit": {
+      "ctrlaltdel": {
+        "ip": "127.0.0.1",
+        "updated": 1393011076588
+      }
+    },
+    "zookeeper": {
+      "ctrlaltdel": {
+        "ip": "127.0.0.1",
+        "updated": 1393011076614
+      }
+    }
+  },
+  "shortenHost": true,
+  "config": {
+    "mesh": {
+      "cmdline": "-Xmx128M -Xms128M -Dmeshy.autoMesh=false -Dmeshy.throttleLog=true -Dmeshy.buffers.enable=true -Dmeshy.stream.maxopen=10000 -Ddebug.level.StreamService=0 -Ddebug.level.ChannelState=0"
+    }
+  }
+}

@@ -1,0 +1,8 @@
+{
+	shortenHost:true,
+	config:{
+		mesh:{
+			cmdline:"-Xmx128M -Xms128M -Dmeshy.autoMesh=false -Dmeshy.throttleLog=true -Dmeshy.buffers.enable=true -Dmeshy.stream.maxopen=10000 -Ddebug.level.StreamService=0 -Ddebug.level.ChannelState=0"
+		},
+	},
+}

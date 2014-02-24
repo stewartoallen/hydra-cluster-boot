@@ -7,3 +7,9 @@ export zookeeper=$(get_zookeeper)
 
 register_node spawn
 startProcess spawn ${HYDRA_CMD} ${broker} ${zookeeper} {{spawn_opt}} ${HYDRA_EXE} spawn etc web
+
+while [ /bin/true ]; do
+	echo "waiting for spawn to come up ..."
+	sleep 3
+	curl 'http://localhost:5050/command.put' --data 'label=default-task&owner=install&cpu=1&mem=512&io=1&command=${RUNBIN}/job-task.sh job.conf {% raw %}{{nodes}} {{node}} {{jobid}}{% endraw %}' && break
+done

@@ -59,6 +59,10 @@ esac
 export FLCOW_PATH="^${HYDRA_IMAGE}"
 export FLCOW_EXCLUDE="\.((stats)|(pid)|(done)|(complete))$"
 
+function setWorkingDir() {
+	cd ${HYDRA_IMAGE}
+}
+
 function testIsRunning() {
 	PIDFILE=$1
 	[ ! -f ${PIDFILE} ] && return 0
@@ -84,6 +88,9 @@ function startProcess() {
 		nohup $* > ${LOG} 2>&1 &
 		echo "$!" > "${PID}"
 		echo "started ${PROCNAME}"
+		return 0
+	else
+		return 1
 	fi
 }
 

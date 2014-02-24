@@ -2,5 +2,14 @@
 
 {% include "boot_stub" %}
 
+setWorkingDir
+if [ ! -d mesh ]; then
+	(
+		echo "creating mesh data directory"
+		mkdir mesh && cd mesh
+		ln -s ../minion/ job
+		ln -s ../log/ log
+	)
+fi
 register_node mesh
 startProcess mesh ${HYDRA_CMD} {{mesh_opt}} ${HYDRA_EXE} mesh server {{mesh_port}} mesh

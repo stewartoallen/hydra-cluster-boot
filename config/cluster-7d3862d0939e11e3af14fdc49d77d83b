@@ -12,48 +12,51 @@
     "rabbit": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393277781362
+        "updated": 1393278327411
       }
     },
     "zookeeper": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393277781381
+        "updated": 1393278327432
       }
     },
     "mesh": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393277784188
+        "updated": 1393278330928
       }
     },
     "spawn": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393277781472
+        "updated": 1393278327520
       }
     },
     "minion": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393277783611
+        "updated": 1393278330670
       }
     },
     "qmaster": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393277783687
+        "updated": 1393278330751
       }
     },
     "qworker": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393277783759
+        "updated": 1393278330839
       }
     }
   },
   "shortenHost": true,
   "config": {
+    "default": {
+      "cmdline": "-Dhydra-preload-a-com.newbrandanalytics.hydra.HydraPreload=http://neuron.com/engage/nba/nba-custom.jar"
+    },
     "mesh": {
       "port": 5000,
       "cmdline": "-Xmx128M -Xms128M -Dmeshy.autoMesh=false -Dmeshy.throttleLog=true -Dmeshy.buffers.enable=true -Dmeshy.stream.maxopen=10000 -Ddebug.level.StreamService=0 -Ddebug.level.ChannelState=0"

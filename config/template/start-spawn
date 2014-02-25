@@ -1,6 +1,6 @@
 #!/bin/sh
 
-{% include "boot_stub" %}
+{% include "proc-stub" %}
 
 export broker=$(get_broker)
 export zookeeper=$(get_zookeeper)

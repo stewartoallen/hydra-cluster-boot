@@ -1,6 +1,6 @@
 #!/bin/sh
 
-{% include "boot_stub" %}
+{% include "proc-stub" %}
 
 echo "stopProcess :: rabbit"
-[ -f ${PIDDIR}/pid.rabbitmq ] && rm ${PIDDIR}/pid.rabbitmq && rabbitmqctl stop
+[ -f ${PIDDIR}/pid.rabbit ] && rabbitmqctl stop && rm ${PIDDIR}/pid.rabbit

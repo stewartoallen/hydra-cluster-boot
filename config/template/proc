@@ -2,8 +2,8 @@
 
 function startProcess() {
 	for proc in $*; do
-		echo -n "fetching ${proc} boot... "
-		bash <(curl -s "${HYDRA_BOOT}/render/boot-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
+		echo -n "fetching ${proc} start... "
+		bash <(curl -s "${HYDRA_BOOT}/render/start-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
 	done
 }
 

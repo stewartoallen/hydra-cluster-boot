@@ -1,6 +1,6 @@
 #!/bin/sh
 
-{% include "boot_stub" %}
+{% include "proc-stub" %}
 
 register_node zookeeper
 

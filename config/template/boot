@@ -16,5 +16,5 @@ export JAVA=$(which java)
 [ -z "${CLUSTER_HOST}" ] && export CLUSTER_HOST=$(hostname)
 
 # chain boot with cluster and host set properly
-bash <(curl -s "${HYDRA_BOOT}/render/boot_two?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
+bash <(curl -s "${HYDRA_BOOT}/render/boot-two?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
 

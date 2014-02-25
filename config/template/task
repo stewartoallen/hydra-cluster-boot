@@ -1,6 +1,6 @@
 #!/bin/sh
 
-{% include "boot_stub" %}
+{% include "proc-stub" %}
 
 if [ -f job.conf ]; then
 	EXTARGS=$(grep '// -' job.conf | while read a b; do echo $b; done | tr '\n' ' ' | tr '\r' ' ')
@@ -11,8 +11,6 @@ fi
 [ -z "${JAVA_CMD}" ] && echo "missing JAVA_CMD '${JAVA_CMD}'" && exit 1
 [ -z "${LOG4J_OPT}" ] && echo "missing LOG4J_OPT '${LOG4J_OPT}'" && exit 1
 [ -z "${HYDRA_JAR}" ] && echo "missing HYDRA_JAR '${HYDRA_JAR}'" && exit 1
-
-set
 
 eval exec ${JAVA_CMD:-java} \
 	-server \

@@ -1,5 +1,5 @@
 #!/bin/sh
 
-{% include "boot_stub" %}
+{% include "proc-stub" %}
 
 stopProcess qworker

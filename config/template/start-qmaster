@@ -1,6 +1,6 @@
 #!/bin/sh
 
-{% include "boot_stub" %}
+{% include "proc-stub" %}
 
 export zookeeper=$(wait_nodes zookeeper)
 export rabbit=$(wait_nodes rabbit)

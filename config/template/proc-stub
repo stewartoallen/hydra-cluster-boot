@@ -85,7 +85,9 @@ function startProcess() {
 	running=$?
 	if [ ${running} -eq 0 ]; then
 		echo "startProcess :: ${PROCNAME}"
-		nohup $* > ${LOG} 2>&1 &
+		echo $* > ${LOG}
+		echo "-----(( ${PROCNAME} ))-----(( $(date) ))-----" >> ${LOG}
+		nohup $* >> ${LOG} 2>&1 &
 		echo "$!" > "${PID}"
 		echo "started ${PROCNAME}"
 		return 0

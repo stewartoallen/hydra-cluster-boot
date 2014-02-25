@@ -13,4 +13,4 @@ export zookeeper=$(get_zookeeper)
 export spawn=$(wait_nodes spawn)
 
 register_node minion
-startProcess minion ${HYDRA_CMD} ${broker} ${zookeeper} {{minion_opt}} ${HYDRA_EXE} minion minion
+startProcess minion ${HYDRA_CMD} ${broker} ${zookeeper} {{ minion.cmdline }} ${HYDRA_EXE} minion minion

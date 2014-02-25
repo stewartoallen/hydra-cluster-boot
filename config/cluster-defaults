@@ -7,7 +7,7 @@
 	},
 	shortenHost:true,
 	config:{
-		default:{
+		defaults:{
 			cmdline:"-Dganglia.enable=false -Djava.net.preferIPv4Stack=true",
 		},
 		mesh:{

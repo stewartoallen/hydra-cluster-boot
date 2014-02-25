@@ -12,4 +12,4 @@ if [ ! -d mesh ]; then
 	)
 fi
 register_node mesh
-startProcess mesh ${HYDRA_CMD} {{mesh_opt}} ${HYDRA_EXE} mesh server {{mesh_port}} mesh
+startProcess mesh ${HYDRA_CMD} {{ mesh.cmdline }} ${HYDRA_EXE} mesh server {{ mesh.port||5000 }} mesh

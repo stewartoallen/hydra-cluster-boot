@@ -5,4 +5,4 @@
 export zookeeper=$(wait_nodes zookeeper)
 
 register_node qworker
-startProcess qworker ${HYDRA_CMD} {{qworker_opt}} ${HYDRA_EXE} mqworker server 5101 ${HYDRA_IMAGE} ${CLUSTER_HOST}:5100
+startProcess qworker ${HYDRA_CMD} {{ qworker.cmdline }} ${HYDRA_EXE} mqworker server 5101 ${HYDRA_IMAGE} ${CLUSTER_HOST}:5100

@@ -6,4 +6,4 @@ export zookeeper=$(wait_nodes zookeeper)
 export rabbit=$(wait_nodes rabbit)
 
 register_node qmaster
-startProcess qmaster ${HYDRA_CMD} {{qmaster_opt}} ${HYDRA_EXE} mqmaster etc web jar
+startProcess qmaster ${HYDRA_CMD} {{ qmaster.cmdline }} ${HYDRA_EXE} mqmaster etc web jar

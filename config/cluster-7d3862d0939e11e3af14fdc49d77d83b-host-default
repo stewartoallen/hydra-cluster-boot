@@ -1,1 +1,11 @@
-{"process":{"rabbit":true,"zookeeper":true,"spawn":true,"minion":true,"qmaster":true,"qworker":true,"mesh":true}}
+{
+	process:{
+		rabbit:true,
+		zookeeper:true,
+		spawn:true,
+		minion:true,
+		qmaster:true,
+		qworker:true,
+		mesh:true
+	}
+}

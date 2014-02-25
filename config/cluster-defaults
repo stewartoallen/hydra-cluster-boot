@@ -1,5 +1,5 @@
 {
-	template: {
+	require:{
 		zookeeper: 1,
 		rabbit: 1,
 		spawn: 1,
@@ -7,8 +7,8 @@
 	},
 	shortenHost:true,
 	config:{
-		"default": {
-			"cmdline": "-Dganglia.enable=false -Djava.net.preferIPv4Stack=true",
+		default:{
+			cmdline:"-Dganglia.enable=false -Djava.net.preferIPv4Stack=true",
 		},
 		mesh:{
 			port:5000,

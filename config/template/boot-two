@@ -1,7 +1,8 @@
 #!/bin/sh
 
 [ -z "${CLUSTER_HOST}" ] && export CLUSTER_HOST="{{hostname}}"
-[ -z "${IMAGEVERSION}" ] && export IMAGEVERSION="{{version}}"
+[ -z "${IMAGE_VERSION}" ] && export IMAGE_VERSION="{{version}}"
+[ -z "${IMAGE_HOST}" ] && export IMAGE_HOST="${HYDRA_BOOT}"
 [ -z "${PROCESSES}" ] && export PROCESSES="{{process}}"
 [ -z "${CLUSTER_HOST}" ] && fail "missing CLUSTER_HOST environment variable"
 [ -z "${CLUSTER_ID}" ] && fail "missing CLUSTER_ID environment variable"
@@ -19,7 +20,7 @@ done
 # check for updates to required images
 for image in etc/log4j.conf lib/hydra.jar lib/libflcow.dylib lib/libflcow.so web.zip; do
 	local=${HYDRA_IMAGE}/${image}
-	remote=${HYDRA_BOOT}/image/${IMAGEVERSION}/${image}
+	remote=${IMAGE_HOST}/image/${IMAGE_VERSION}/${image}
 	[ ! -f ${local} ] && (
 		echo "fetching $image..."
 		curl -s ${remote} > ${local} || fail "failed image load '${image}'"

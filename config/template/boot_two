@@ -7,6 +7,9 @@
 [ -z "${CLUSTER_ID}" ] && fail "missing CLUSTER_ID environment variable"
 [ -z "${PROCESSES}" ] && fail "missing PROCESSES environment variable"
 
+# add hydra bin dir to path so processes can inherit
+export PATH=${PATH}:${HYDRA_IMAGE}/bin
+
 # create required directories
 for dir in bin lib log etc/pid; do
 	dir=${HYDRA_IMAGE}/${dir}
@@ -14,7 +17,7 @@ for dir in bin lib log etc/pid; do
 done
 
 # check for updates to required images
-for image in bin/hcl bin/job-task.sh etc/log4j.conf lib/hydra.jar lib/libflcow.dylib lib/libflcow.so web.zip; do
+for image in etc/log4j.conf lib/hydra.jar lib/libflcow.dylib lib/libflcow.so web.zip; do
 	local=${HYDRA_IMAGE}/${image}
 	remote=${HYDRA_BOOT}/image/${IMAGEVERSION}/${image}
 	[ ! -f ${local} ] && (
@@ -27,6 +30,13 @@ done
 (
 	cd $HYDRA_IMAGE
 	[ ! -d web ] && unzip web.zip
+)
+
+# install command line helper
+HCL=${HYDRA_IMAGE}/bin/hcl
+[ ! -f ${HCL}  ] && (
+	curl -s "${HYDRA_BOOT}/render/hcl?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}" > ${HCL} || fail "failed hcl load"
+	chmod +x ${HCL}
 )
 
 # launch host local processes

@@ -8,7 +8,7 @@
 	shortenHost:true,
 	config:{
 		"default": {
-			"cmdline": "",
+			"cmdline": "-Dganglia.enable=false -Djava.net.preferIPv4Stack=true",
 		},
 		mesh:{
 			port:5000,

@@ -1,0 +1,154 @@
+#!/bin/bash
+
+function startProcess() {
+	for proc in $*; do
+		echo -n "fetching ${proc} boot... "
+		bash <(curl -s "${HYDRA_BOOT}/render/boot-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
+	done
+}
+
+function stopProcess() {
+	for proc in $*; do
+		echo -n "fetching ${proc} stop... "
+		bash <(curl -s "${HYDRA_BOOT}/render/stop-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
+	done
+	return 0
+}
+
+case $1 in
+	exe)
+		shift
+		${HYDRA_CMD} ${HYDRA_EXE} $*
+		exit
+		;;
+	query)
+		shift
+		${HYDRA_CMD} -Dlog4j.configuration=${HYDRA_IMAGE}/etc/log4j-quiet.conf ${HYDRA_EXE} qutil $*
+		exit
+		;;
+	mesh)
+		shift
+		${HYDRA_CMD} -Dlog4j.configuration=${HYDRA_IMAGE}/etc/log4j-quiet.conf ${HYDRA_EXE} mesh client $*
+		exit
+		;;
+	task)
+		bash <(curl -s "${HYDRA_BOOT}/render/task?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
+		exit
+		;;
+esac
+
+case "$1-$2" in
+	local-start)
+		startProcess mesh rabbit zookeeper qmaster spawn qworker minion
+		;;
+	local-stop)
+		stopProcess qworker minion qmaster spawn zookeeper rabbit mesh
+		;;
+	local-restart)
+		hcl local stop
+		sleep 1
+		hcl local start
+		;;
+	local-seed)
+		curl 'http://localhost:5050/command.put' --data 'label=default-task&owner=install&cpu=1&mem=512&io=1&command=${HYDRA_IMAGE}/bin/job-task.sh job.conf {% raw %} {{nodes}} {{node}} {{jobid}} {% endraw %}'
+		echo "created default spawn command"
+		;;
+	job-list)
+		job=${3:-nojob}
+		(cd ${HYDRA_IMAGE}/minion/; find * -maxdepth 0 -type d)
+		;;
+	job-tail)
+		job=${3:-nojob}
+		tail -f ${HYDRA_IMAGE}/minion/${job}/*/live/log/log.{out,err}
+		;;
+	job-clean)
+		job=${3:-nojob}
+		rm -rf ${HYDRA_IMAGE}/minion/${job}/*/*
+		;;
+	job-cleanrun)
+		job=${3:-nojob}
+		hcl job clean ${job}
+		hcl job enable ${job}
+		hcl job kick ${job}
+		sleep 3
+		hcl job tail ${job}
+		;;
+	job-kick)
+		host=${4:-${HYDRA_HOST}:5050}
+		job=${3:-nojob}
+		curl "http://${host}/job.submit?id=${job}&spawn=1"; echo
+		;;
+	job-enable)
+		host=${4:-${HYDRA_HOST}:5050}
+		job=${3:-nojob}
+		curl "http://${host}/job.set?id=${job}&enable=1"; echo
+		;;
+	job-delete)
+		host=${4:-${HYDRA_HOST}:5050}
+		job=${3:-nojob}
+		curl "http://${host}/job.delete?id=${job}"; echo
+		;;
+	push-job)
+		shift;shift
+		if [ -z "${1}" ]; then
+			echo "usage: push-job <conf> <jobid> [host:port]"
+			exit
+		fi
+		conf=${1:-job.conf}
+		job=${2:-nojobid}
+		host=${3:-${HYDRA_HOST}:5050}
+		echo -n "posting job update (conf=$conf job=$job host=$host) ... "
+		/bin/echo -n "id=${job}&field=config&value=" > /tmp/tmp.post
+		cat ${conf} | sed 's/%/%25/g' | sed 's/&/%26/g' >> /tmp/tmp.post
+		curl  --data-binary @/tmp/tmp.post "http://${host}/job.set"
+		echo
+		;;
+	push-macro)
+		shift;shift
+		if [ -z ${1} ]; then
+			echo "usage: push-macro <macro_file> [host:port] [macro_id] [owner] [description]"
+			exit
+		fi
+		macro_file=${1}
+		host=${2:-${HYDRA_HOST}:5050}
+		macro_id=${3}
+		owner=${4}
+		desc=${5}
+		if [ -z ${macro_file} ]; then
+			echo "missing macro file"
+			exit
+		fi
+		if [ -z ${macro_id} ]; then
+			macro_id=$(grep "// id:" ${macro_file} | while read a b c; do echo "$c"; done)
+		fi
+		if [ -z ${macro_id} ]; then
+			echo "missing macro id in $macro_file"
+			exit
+		fi
+		if [ -z ${owner} ]; then
+			owner=$(grep "// owner:" ${macro_file} | while read a b c; do echo "$c"; done)
+		fi
+		if [ -z ${desc} ]; then
+			desc=$(grep "// description:" ${macro_file} | while read a b c; do echo "$c"; done)
+		fi
+		echo -n "pushing macro file=${macro_file} id=${macro_id} owner=${owner} desc=${description} host=${host} ... "
+		/bin/echo -n "label=${macro_id}&owner=${owner}&description=${desc}&macro=" > /tmp/tmp.post
+		cat ${macro_file} | sed 's/%/%25/g' | sed 's/&/%26/g' | sed 's/+/%2b/g' >> /tmp/tmp.post
+		curl --data-binary @/tmp/tmp.post "http://${host}/macro.put"
+		echo
+		;;
+	*)
+		cat << EOF
+commands: 
+  exe    [ args ]                     -- invoke hydra jar directly
+  job    [ kick | tail | list ]       -- simple job control / inspection
+  job    [ clean | delete | enable ]  -- hollow out, delete or enable a job
+  job    [ cleanrun ]                 -- hollow out then run a job
+  local  [ start | stop | seed ]      -- start/stop complete local stack
+  mesh   <host> <port> <command>      -- mesh client command
+  push   [ job | macro ]              -- inject job or macro into spawn
+  query  [ args ]                     -- query local or remote map data
+EOF
+		;;
+esac
+

@@ -12,50 +12,50 @@
     "rabbit": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393278327411
+        "updated": 1393350552177
       }
     },
     "zookeeper": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393278327432
+        "updated": 1393350552200
       }
     },
     "mesh": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393278330928
+        "updated": 1393350552109
       }
     },
     "spawn": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393278327520
+        "updated": 1393350552331
       }
     },
     "minion": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393278330670
+        "updated": 1393350555485
       }
     },
     "qmaster": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393278330751
+        "updated": 1393350552268
       }
     },
     "qworker": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393278330839
+        "updated": 1393350555428
       }
     }
   },
   "shortenHost": true,
   "config": {
     "default": {
-      "cmdline": "-Dhydra-preload-a-com.newbrandanalytics.hydra.HydraPreload=http://neuron.com/engage/nba/nba-custom.jar"
+      "cmdline": "-Dganglia.enable=false -Djava.net.preferIPv4Stack=true -Dhydra-preload-a-com.newbrandanalytics.hydra.HydraPreload=http://neuron.com/engage/nba/nba-custom.jar"
     },
     "mesh": {
       "port": 5000,

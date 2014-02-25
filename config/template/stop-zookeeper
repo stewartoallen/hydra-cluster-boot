@@ -1,0 +1,5 @@
+#!/bin/sh
+
+{% include "boot_stub" %}
+
+stopProcess zookeeper

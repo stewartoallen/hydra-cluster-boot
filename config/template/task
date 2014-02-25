@@ -2,6 +2,8 @@
 
 {% include "proc-stub" %}
 
+echo "-----(( task ))-----(( $* ))-----(( $(pwd) ))-----"
+
 if [ -f job.conf ]; then
 	EXTARGS=$(grep '// -' job.conf | while read a b; do echo $b; done | tr '\n' ' ' | tr '\r' ' ')
 	EXTJAR=$(grep '// jar=' job.conf | tr '=' ' ' | while read a b c; do echo $c; done | tr '\n' ' ' | tr '\r' ' ')

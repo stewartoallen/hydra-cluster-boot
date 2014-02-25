@@ -10,6 +10,6 @@ startProcess spawn ${HYDRA_CMD} ${broker} ${zookeeper} {{spawn_opt}} ${HYDRA_EXE
 while [ /bin/true ]; do
 	echo "waiting for spawn to come up ..."
 	sleep 1
-	curl 'http://localhost:5050/command.put' --data 'label=default-task&owner=install&cpu=1&mem=512&io=1&command=${RUNBIN}/job-task.sh job.conf {% raw %}{{nodes}} {{node}} {{jobid}}{% endraw %}' && echo && break
+	curl 'http://localhost:5050/command.put' --data 'label=default-task&owner=install&cpu=1&mem=512&io=1&command=hcl task job.conf {% raw %}{{nodes}} {{node}} {{jobid}}{% endraw %}' && echo && break
 done
 )

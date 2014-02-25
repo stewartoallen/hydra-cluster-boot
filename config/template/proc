@@ -32,7 +32,8 @@ case $1 in
 		exit
 		;;
 	task)
-		bash <(curl -s "${HYDRA_BOOT}/render/task?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
+		shift
+		bash <(curl -s "${HYDRA_BOOT}/render/task?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}") $*
 		exit
 		;;
 esac

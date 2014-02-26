@@ -9,46 +9,59 @@
     "minion": 0
   },
   "node": {
+    "defaults": {
+      "process": {
+        "rabbit": true,
+        "zookeeper": true,
+        "spawn": true,
+        "minion": true,
+        "qmaster": true,
+        "qworker": true,
+        "mesh": true
+      }
+    }
+  },
+  "proc": {
     "rabbit": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393368763929
+        "updated": 1393427861441
       }
     },
     "zookeeper": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393368763952
+        "updated": 1393427861461
       }
     },
     "mesh": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393368762606
+        "updated": 1393427860115
       }
     },
     "spawn": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393368764067
+        "updated": 1393427861562
       }
     },
     "minion": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393368768230
+        "updated": 1393427866728
       }
     },
     "qmaster": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393368764009
+        "updated": 1393427861512
       }
     },
     "qworker": {
       "127.0.0.1": {
         "ip": "127.0.0.1",
-        "updated": 1393368768177
+        "updated": 1393427866677
       }
     }
   },

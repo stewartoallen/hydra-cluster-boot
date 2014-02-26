@@ -10,12 +10,11 @@ GETTING STARTED
  - ``npm install swig``
  - ``npm install node-uuid``
  - ``node start``
-
- - create account ``(http://[HYDRA_BOOT]/api/create_account)``
- - create cluster ``(http://[HYDRA_BOOT]/api/create_cluster?account=[ACCOUNT_ID])``
+ - create account  ``(http://[HYDRA_BOOT]/api/create_account)``
+ - create cluster  ``(http://[HYDRA_BOOT]/api/create_cluster?account=[ACCOUNT_ID])``
 
 BOOT CLUSTER
 ============
 
- - ``bash <(curl -s "http://[HYDRA_BOOT]/render/boot?cluster=[CLUSTER_ID]")`
+ - ``bash <(curl -s "http://[HYDRA_BOOT]/render/boot?cluster=[CLUSTER_ID]")``
 

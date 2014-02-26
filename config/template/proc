@@ -3,14 +3,14 @@
 function startProcess() {
 	for proc in $*; do
 		echo -n "fetching ${proc} start... "
-		bash <(curl -s "${HYDRA_BOOT}/render/start-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
+		bash <(curl -s "http://${HYDRA_BOOT}/render/start-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
 	done
 }
 
 function stopProcess() {
 	for proc in $*; do
 		echo -n "fetching ${proc} stop... "
-		bash <(curl -s "${HYDRA_BOOT}/render/stop-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
+		bash <(curl -s "http://${HYDRA_BOOT}/render/stop-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
 	done
 	return 0
 }
@@ -33,7 +33,7 @@ case $1 in
 		;;
 	task)
 		shift
-		bash <(curl -s "${HYDRA_BOOT}/render/task?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}") $*
+		bash <(curl -s "http://${HYDRA_BOOT}/render/task?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}") $*
 		exit
 		;;
 esac

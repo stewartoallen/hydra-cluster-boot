@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[ -z "${HYDRA_BOOT}" ] && export HYDRA_BOOT="http://hydra-boot:8008"
+[ -z "${HYDRA_BOOT}" ] && export HYDRA_BOOT="hydra-boot:8008"
 [ -z "${CLUSTER_ID}" ] && export CLUSTER_ID={{cluster}}
 [ -z "${CLUSTER_HOST}" ] && export CLUSTER_HOST={{hostname}}
 [ -z "${HYDRA_IMAGE}" ] && export HYDRA_IMAGE=$(dirname $(dirname $0))
@@ -9,5 +9,5 @@
 # add hydra bin dir to path so processes can inherit
 export PATH=${PATH}:${HYDRA_IMAGE}/bin
 
-bash <(curl -s "${HYDRA_BOOT}/render/proc?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}") $*
+bash <(curl -s "http://${HYDRA_BOOT}/render/proc?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}") $*
 

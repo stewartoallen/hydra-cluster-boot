@@ -7,12 +7,12 @@ function fail() {
 
 function register_node() {
 	process=$1
-	curl -s "${HYDRA_BOOT}/api/register_node?cluster=${CLUSTER_ID}&key=${process}&hostname=${CLUSTER_HOST}"
+	curl -s "http://${HYDRA_BOOT}/api/register_node?cluster=${CLUSTER_ID}&key=${process}&hostname=${CLUSTER_HOST}"
 }
 
 function wait_nodes() {
 	process=$1
-	curl -s "${HYDRA_BOOT}/api/wait_nodes?cluster=${CLUSTER_ID}&key=${process}"
+	curl -s "http://${HYDRA_BOOT}/api/wait_nodes?cluster=${CLUSTER_ID}&key=${process}"
 }
 
 function get_broker() {

@@ -36,13 +36,13 @@ done
 # install command line helper
 HCL=${HYDRA_IMAGE}/bin/hcl
 [ ! -f ${HCL}  ] && (
-	curl -s "${HYDRA_BOOT}/render/hcl?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}" > ${HCL} || fail "failed hcl load"
+	curl -s "http://${HYDRA_BOOT}/render/hcl?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}" > ${HCL} || fail "failed hcl load"
 	chmod +x ${HCL}
 )
 
 # launch host local processes
 for proc in ${PROCESSES}; do
 	echo -n "fetching ${proc} start... "
-	bash <(curl -s "${HYDRA_BOOT}/render/start-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
+	bash <(curl -s "http://${HYDRA_BOOT}/render/start-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
 done
 

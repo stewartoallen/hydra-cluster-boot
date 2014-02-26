@@ -5,6 +5,7 @@
 [ ! $(which rabbitmq-server) ] && fail "missing rabbitmq-server executable"
 startProcess rabbit rabbitmq-server && (
 while [ /bin/true ]; do
+# user must be able to exec this command
 	rabbitmqctl status >/dev/null 2>&1 && break
 	sleep 1
 	echo "waiting for rabbit to start"

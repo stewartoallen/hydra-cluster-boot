@@ -3,4 +3,4 @@
 {% include "proc-stub" %}
 
 echo "stopProcess :: rabbit"
-[ -f ${PIDDIR}/pid.rabbit ] && {{ rabbit.control || rabbitmqctl }} stop && rm ${PIDDIR}/pid.rabbit
+[ -f ${PIDDIR}/pid.rabbit ] && {{ rabbit.control || "rabbitmqctl" }} stop && rm ${PIDDIR}/pid.rabbit

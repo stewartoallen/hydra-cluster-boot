@@ -1,13 +1,15 @@
 #!/bin/bash
 
-function startProcess() {
+{% include "proc-env" %}
+
+function startProcessList() {
 	for proc in $*; do
 		echo -n "fetching ${proc} start... "
 		bash <(curl -s "http://${HYDRA_BOOT}/render/start-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
 	done
 }
 
-function stopProcess() {
+function stopProcessList() {
 	for proc in $*; do
 		echo -n "fetching ${proc} stop... "
 		bash <(curl -s "http://${HYDRA_BOOT}/render/stop-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
@@ -40,10 +42,10 @@ esac
 
 case "$1-$2" in
 	local-start)
-		startProcess mesh rabbit zookeeper qmaster spawn qworker minion
+		startProcessList mesh rabbit zookeeper qmaster spawn qworker minion
 		;;
 	local-stop)
-		stopProcess qworker minion qmaster spawn zookeeper rabbit mesh
+		stopProcessList qworker minion qmaster spawn zookeeper rabbit mesh
 		;;
 	local-restart)
 		hcl local stop

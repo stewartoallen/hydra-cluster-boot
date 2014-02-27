@@ -1,9 +1,6 @@
 #!/bin/sh
 
-function fail() {
-	echo $1
-	exit
-}
+{% include "proc-env" %}
 
 function register_node() {
 	process=$1
@@ -24,40 +21,6 @@ function get_zookeeper() {
 	export zookeeper=$(wait_nodes zookeeper)
 	echo "-Dzk.servers=${zookeeper}:2181"
 }
-
-# setup environment
-export RUNBIN="${HYDRA_IMAGE}/bin"
-export PIDDIR="${HYDRA_IMAGE}/etc/pid"
-export HYDRA_JAR="${HYDRA_IMAGE}/lib/hydra.jar"
-export PATH="${PATH}:${RUNBIN}"
-export COMMON_OPT="{{ defaults.cmdline }}"
-export HYDRA_OPT="-Dhydra.tree.cache.maxSize=250 -Dhydra.tree.page.maxSize=50 -Deps.mem.debug=0"
-export LOG4J_OPT="-Dlog4j.defaultInitOverride=true -Dlog4j.configuration=${HYDRA_IMAGE}/etc/log4j.conf"
-export JAVA_CMD="java -server ${COMMON_OPT}"
-export HYDRA_CMD="${JAVA_CMD} ${LOG4J_OPT} ${HYDRA_OPT}"
-export HYDRA_EXE="-jar ${HYDRA_JAR}"
-
-# require hydra.jar
-[ ! -f ${HYDRA_JAR} ] && fail "missing hydra exec jar @ ${HYDRA_JAR}"
-
-# pull in hydra properties if they exist
-if [ -f ${HYDRA_IMAGE}/etc/hydra.properties ]; then
-	CMD_ADD=$(grep = ${HYDRA_IMAGE}/etc/hydra.properties | while read one; do echo "-D${one}"; done)
-	export JAVA_CMD="${JAVA_CMD} ${CMD_ADD}"
-	export HYDRA_CMD="${HYDRA_CMD} ${CMD_ADD}"
-fi
-
-# flcow (copy-on-write) support for 64 bit linux & os x
-case $(uname) in
-	Linux)
-		export LD_PRELOAD=${HYDRA_IMAGE}/lib/libflcow.so:${LD_PRELOAD}
-		;;
-	Darwin)
-		export LD_PRELOAD=${HYDRA_IMAGE}/lib/libflcow.dylib:${LD_PRELOAD}
-		;;
-esac
-export FLCOW_PATH="^${HYDRA_IMAGE}"
-export FLCOW_EXCLUDE="\.((stats)|(pid)|(done)|(complete))$"
 
 function setWorkingDir() {
 	cd ${HYDRA_IMAGE}

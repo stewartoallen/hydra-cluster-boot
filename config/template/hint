@@ -1,1 +1,1 @@
-bash <(curl -s "http://{{boothost}}/render/boot?cluster=localstack")
+bash <(curl -s "http://{{boothost}}/boot?cluster=localstack")

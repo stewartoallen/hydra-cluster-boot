@@ -18,6 +18,16 @@ function stopProcessList() {
 }
 
 case $1 in
+	boot)
+		bash <(curl -s "http://${HYDRA_BOOT}/boot?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
+		exit
+		;;
+	halt)
+		for proc in ${HYDRA_IMAGE}/etc/pid/pid.*; do
+			stopProcessList "${proc#*.}"
+		done
+		exit
+		;;
 	exe)
 		shift
 		${HYDRA_CMD} ${HYDRA_EXE} $*

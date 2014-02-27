@@ -5,7 +5,7 @@
 [ ! $(which rabbitmq-server) ] && fail "missing rabbitmq-server executable"
 startProcess rabbit {{ rabbit.start || "rabbitmq-server" }} && (
 while [ /bin/true ]; do
-	{{ rabbit.check || "rabbitmqctl status >/dev/null 2>&1" }} && break
+	{% autoescape false %} {{ rabbit.check || "rabbitmqctl status >/dev/null 2>&1" }} {% endautoescape %} && break
 	sleep 1
 	echo "waiting for rabbit to start"
 done

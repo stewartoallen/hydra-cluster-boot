@@ -20,6 +20,7 @@
   },
   proc: { },
   shortenHost: true,
+  isLocal: true,
   config: {
     defaults: {
       cmdline: "-Dganglia.enable=false -Djava.net.preferIPv4Stack=true -Dhydra-preload-a-com.newbrandanalytics.hydra.HydraPreload=http://neuron.com/engage/nba/nba-custom.jar"

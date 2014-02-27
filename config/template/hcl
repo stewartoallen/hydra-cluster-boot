@@ -1,6 +1,6 @@
 #!/bin/bash
 
-[ -z "${HYDRA_BOOT}" ] && export HYDRA_BOOT="hydra-boot:8008"
+[ -z "${HYDRA_BOOT}" ] && export HYDRA_BOOT="{{boothost}}"
 [ -z "${CLUSTER_ID}" ] && export CLUSTER_ID={{cluster}}
 [ -z "${CLUSTER_HOST}" ] && export CLUSTER_HOST={{hostname}}
 [ -z "${HYDRA_IMAGE}" ] && export HYDRA_IMAGE=$(dirname $(dirname $0))

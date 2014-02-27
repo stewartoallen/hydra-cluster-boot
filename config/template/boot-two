@@ -26,7 +26,7 @@ for dir in .bootmagic bin lib log etc/pid; do
 done
 
 # check for updates to required images
-for image in etc/log4j.conf lib/hydra.jar lib/libflcow.dylib lib/libflcow.so web.zip; do
+for image in {{ image }}; do
 	local=${HYDRA_IMAGE}/${image}
 	remote=${IMAGE_HOST}/image/${IMAGE_VERSION}/${image}
 	[ ! -f ${local} ] && (
@@ -38,7 +38,7 @@ done
 # unzip web directory
 (
 	cd $HYDRA_IMAGE
-	[ ! -d web ] && unzip web.zip
+	[ -f web.zip ] && [ ! -d web ] && unzip web.zip
 )
 
 # install command line helper

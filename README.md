@@ -2,7 +2,7 @@ Cluster Boot Service (CBS)
 ==========================
 
 A web service that solves first-boot, start-dependency and node allocation through dynamic script
-creation for Hydra computer clusters.
+creation for Hydra compute clusters.
 
 Getting Started
 ===============
@@ -19,6 +19,6 @@ Getting Started
 Boot Cluster Node
 =================
 
- - ``bash <(curl -s "http://[HYDRA_BOOT]/render/boot?cluster=[CLUSTER_ID]")``
+ - ``bash <(curl -s "http://[HYDRA_BOOT]/boot?cluster=[CLUSTER_ID]")``
  - to boot a localstack, use ``localstack`` as your [CLUSTER_ID]
 

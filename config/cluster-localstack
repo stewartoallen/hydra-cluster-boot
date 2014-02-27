@@ -7,15 +7,7 @@
   },
   node: {
     defaults: {
-      process: {
-        rabbit: true,
-        zookeeper: true,
-        spawn: true,
-        minion: true,
-        qmaster: true,
-        qworker: true,
-        mesh: true
-      }
+      process: ["mesh", "rabbit", "zookeeper", "spawn", "minion", "qmaster", "qworker"]
     }
   },
   proc: { },

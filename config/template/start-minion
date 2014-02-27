@@ -2,12 +2,6 @@
 
 {% include "proc-stub" %}
 
-if [ ! -f ${HYDRA_IMAGE}/minion/minion.state ]; then
-	mkdir -p ${HYDRA_IMAGE}/minion
-	echo "creating default minion state"
-	echo "{stopped:{},uuid:\"minion\"}" > ${HYDRA_IMAGE}/minion/minion.state
-fi
-
 export broker=$(get_broker)
 export zookeeper=$(get_zookeeper)
 export spawn=$(wait_nodes spawn)

@@ -4,6 +4,16 @@
 
 export zookeeper=$(wait_nodes zookeeper)
 export rabbit=$(wait_nodes rabbit)
+export qworkers=$(wait_nodes qworker)
 
 register_node qmaster
-startProcess qmaster ${HYDRA_CMD} {{ qmaster.cmdline }} ${HYDRA_EXE} mqmaster etc web jar
+export peers=$(
+x=0
+for peer in localhost ${qworkers}; do
+	[ $x -gt 0 ] && echo -n ","
+	echo -n ${peer}
+	x=$((x+1))
+done
+)
+echo "found query nodes: ${peers}"
+startProcess qmaster ${HYDRA_CMD} {{ qmaster.cmdline }} -Dqmaster.mesh.peers=${peers} ${HYDRA_EXE} mqmaster etc web jar

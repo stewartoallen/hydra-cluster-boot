@@ -3,6 +3,22 @@
 {% include "proc-stub" %}
 
 export zookeeper=$(wait_nodes zookeeper)
+export qmasters=$(wait_nodes qmaster)
+export qworkers=$(wait_nodes qworker)
 
 register_node qworker
-startProcess qworker ${HYDRA_CMD} {{ qworker.cmdline }} ${HYDRA_EXE} mqworker server 5101 ${HYDRA_IMAGE} ${CLUSTER_HOST}:5100
+export peers=$(
+x=0
+for peer in ${qmasters}; do
+	[ $x -gt 0 ] && echo -n ","
+	echo -n ${peer}:5100
+	x=$((x+1))
+done
+for peer in ${qworkers}; do
+	[ $x -gt 0 ] && echo -n ","
+	echo -n ${peer}:5101
+	x=$((x+1))
+done
+)
+echo "found peering query nodes: ${peers}"
+startProcess qworker ${HYDRA_CMD} {{ qworker.cmdline }} ${HYDRA_EXE} mqworker server 5101 ${HYDRA_IMAGE} ${peers} # ${CLUSTER_HOST}:5100 

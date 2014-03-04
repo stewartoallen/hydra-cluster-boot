@@ -7,8 +7,6 @@ creation for Hydra compute clusters.
 Getting Started
 ===============
 
- - ``npm install swig``
- - ``npm install node-uuid``
  - place your executable jar in ``config/image/default/lib/hydra.jar``
  - place a zip of the hydra web dir in ``config/image/default/web.zip``
  - ``node start boothost=[HYDRA_BOOT]``

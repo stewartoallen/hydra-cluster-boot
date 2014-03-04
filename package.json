@@ -16,7 +16,10 @@
     ],
     "main":"main.js",
     "dependencies":{
-        "levelup":"0.18.x"
+        "levelup":"0.18.x",
+        "leveldown":"0.10.x",
+        "node-uuid":"1.4.x",
+        "swig":"1.3.x"
     },
     "engines":{
         "node":">=0.9"

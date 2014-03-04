@@ -16,7 +16,7 @@
 	isLocal: true,
 	config: {
 		defaults: {
-			cmdline: "-Dganglia.enable=false -Djava.net.preferIPv4Stack=true"
+			cmdline: "-Dganglia.enable=false -Djava.net.preferIPv4Stack=true -Dmeshy.source.noCreationFrames=false"
 		},
 		mesh: {
 			port: 5000,
@@ -26,7 +26,7 @@
 			cmdline: "-Xmx128M -Xms128M -Dspawn.localhost=localhost -Dspawn.queryhost=${CLUSTER_HOST} -Dspawn.status.interval=6000 -Dspawn.chore.interval=3000 -Dhttp.post.max=327680 -Dspawn.polltime=10000 -Dspawnbalance.min.disk.percent.avail.replicas=0.01 -Dspawn.auth.ldap=false -Dmesh.port=5000 -Djob.store.remote=false"
 		},
 		qmaster: {
-			cmdline: "-Xmx512M -Xms512M -Deps.mem.debug=10000 -Dbatch.job.log4j=1 -Dcs.je.cacheShared=1 -Dcs.je.deferredWrite=1 -Dhydra.query.debug=1 -Ddebug.level.SourceTracker=1 -Ddebug.level.QueryCache=2 -Ddebug.level.MeshQueryMaster=2 -Dquery.cache.enable=false -DQueryCache.CACHE_DIR=log/query/cache -Dmqmaster.enableZooKeeper=true -Ddebug.MeshQuerySource=2 -Dmesh.local.handlers=com.addthis.hydra.data.query.source.MeshQuerySource -Dmqmaster.mesh.peers=localhost -Dmeshy.senders=1 -Dmeshy.stream.prefetch=true -Dmqmaster.mesh.peer.port=5101 -Dmesh.query.root=minion -Dquery.tmpdir=log/query/tmp"
+			cmdline: "-Xmx512M -Xms512M -Deps.mem.debug=10000 -Dbatch.job.log4j=1 -Dcs.je.cacheShared=1 -Dcs.je.deferredWrite=1 -Dhydra.query.debug=1 -Ddebug.level.SourceTracker=1 -Ddebug.level.QueryCache=2 -Ddebug.level.MeshQueryMaster=2 -Dquery.cache.enable=false -DQueryCache.CACHE_DIR=log/query/cache -Dmqmaster.enableZooKeeper=true -Ddebug.MeshQuerySource=2 -Dmesh.local.handlers=com.addthis.hydra.data.query.source.MeshQuerySource -Dmeshy.senders=1 -Dmeshy.stream.prefetch=true -Dmqmaster.mesh.peer.port=5101 -Dmesh.query.root=minion -Dquery.tmpdir=log/query/tmp"
 		},
 		qworker: {
 			cmdline: "-Xmx256M -Xms256M -Ddebug.MeshQuerySource=2 -Dmesh.local.handlers=com.addthis.hydra.data.query.source.MeshQuerySource -Dmqmaster.mesh.peers=localhost -Dmeshy.senders=1 -Dmeshy.stream.prefetch=true -Dmqmaster.mesh.peer.port=5101 -Dmesh.query.root=minion -Dquery.tmpdir=log/query/tmp"

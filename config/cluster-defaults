@@ -16,7 +16,7 @@
 	isLocal: false,
 	config: {
 		defaults: {
-			cmdline: "-Dganglia.enable=false -Djava.net.preferIPv4Stack=true"
+			cmdline: "-Dganglia.enable=false -Djava.net.preferIPv4Stack=true -Dmeshy.source.noCreationFrames=false"
 		},
 		mesh: {
 			port: 5000,

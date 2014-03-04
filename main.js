@@ -5,7 +5,11 @@ var fs = require('fs');
 var os = require('os');
 var server = null;
 var db = null;
-var ctype = {};
+var ctype = {
+    "html" : "text/html",
+    "css" : "text/css",
+    "js" : "application/javascript"
+};
 var template = {};
 var waiters = {};
 var clusterDefault = {};
@@ -42,10 +46,11 @@ var http = {
         http.fail(res, "no valid target", 404);
     },
 
-    sendFile : function(res, filename) {
+    sendFile : function(res, path) {
         try {
-            var filePath = ["config","image",filename].join('/');
-            var contentType = ctype[filename.substring(filename.lastIndexOf('.'))] || "application/octet-stream";
+            var filePath = path.join('/');
+            var suffix = filePath.substring(filePath.lastIndexOf('.')+1);
+            var contentType = ctype[suffix] || "application/octet-stream";
             var contentLength = fs.statSync(filePath).size;
             res.writeHead(200, {
                 'Content-Type' : contentType,
@@ -53,20 +58,27 @@ var http = {
             });
             fs.createReadStream(filePath).pipe(res);
         } catch (error) {
+            console.log(["error",error]);
             http.fail(res, error, 500);
         }
     },
 
-    template : function(res, templateName, values) {
+    template : function(res, templateName, values, ctype) {
         swig.renderFile(templateName, values, function(err, output) {
-            if (err) return http.fail(res, err, 500);
-            return http.ok(res, output);
+            if (err) return http.fail(res, err, err.errno == 34 ? 404 : 500);
+            return http.ok(res, output, ctype);
         });
     },
 
-    ok : function(res, msg) {
-        res.writeHead(200, {'Content-Type': 'text/plain'});
-        res.end(typeof msg == 'string' ? msg : JSON.stringify(msg)+"\n");
+    bounce : function(res, url) {
+        res.writeHead(302, {'Location': url});
+        res.end();
+    },
+
+    ok : function(res, msg, ctype) {
+        var out = (typeof msg == 'string' ? msg : JSON.stringify(msg))+"\n";
+        res.writeHead(200, {'Content-Type': ctype || 'text/plain', 'Content-Length' : out.length});
+        res.end(out);
     },
 
     fail : function(res, msg, code) {
@@ -120,6 +132,12 @@ var complete = {
     "/boot" : function(req, res, url) {
         url.pathname = "/render" + url.pathname;
         return prefix["/render/"](req, res, url);
+    },
+    "/me" : function(req, res, url) {
+        return http.bounce(res, "/me/index.html");
+    },
+    "/me/" : function(req, res, url) {
+        return http.bounce(res, "/me/index.html");
     }
 };
 
@@ -139,16 +157,23 @@ var prefix = {
         });
     },
     "/image/" : function(req, res, url) {
-        return http.sendFile(res, url.pathname.substring(7));
+        return http.sendFile(res, ["config","image",url.pathname.substring(7)]);
+    },
+    "/me/" : function(req, res, url) {
+        url.pathname = "/render"+url.pathname;
+        return prefix["/render/"](req, res, url);
     },
     "/render/" : function(req, res, url) {
-        var funcName = url.pathname.substring(8);
+        var filePath = url.pathname;
+        var suffix = filePath.substring(filePath.lastIndexOf('.')+1);
+        var contentType = ctype[suffix];
+        var funcName = filePath.substring(8);
         var func = render[funcName];
         var call = function(res, q, cluster, host) {
             if (func) {
                 func(res, q, cluster, host);
             } else {
-                http.template(res, q.funcName, cluster.config);
+                http.template(res, q.funcName, cluster.config, contentType);
             }
         };
         var q = url.query;

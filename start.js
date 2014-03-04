@@ -1,4 +1,4 @@
-var boot = require('hydra-boot');
+var boot = require('./main.js');
 
 var arg = process.argv.slice();
 var nvm = arg.shift();

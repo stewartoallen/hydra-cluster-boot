@@ -153,6 +153,8 @@ case "$1-$2" in
 	*)
 		cat << EOF
 commands: 
+  boot                                -- start node processes
+  halt                                -- stop node processes
   exe    [ args ]                     -- invoke hydra jar directly
   job    [ kick | tail | list ]       -- simple job control / inspection
   job    [ clean | delete | enable ]  -- hollow out, delete or enable a job

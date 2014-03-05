@@ -203,8 +203,8 @@ var renderJS = function(res, query, cluster, host) {
     http.template(res, query.funcName, {
         cluster: query.cluster,
         boothost: params.boothost,
-        spawnhost: "localhost:5050",
-        queryhost: "localhost:2222"
+        spawnhost: cluster.proc ? firstKey(cluster.proc.spawn)+":5050" : null,
+        queryhost: cluster.proc ? firstKey(cluster.proc.qmaster)+":2222" : null
     });
 };
 
@@ -288,6 +288,10 @@ var oMerge = function(o) {
         }
     }
     return m;
+};
+
+var firstKey = function(o) {
+    for (var key in o) return key;
 };
 
 var getKeys = function(o) {

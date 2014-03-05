@@ -165,7 +165,7 @@ var cluster = {
     manage:function() {
         var spawn = clusterData.proc['spawn'];
         for (var key in spawn) {
-            window.open('http://{{boothost}}/me/spawn/spawn.html?auth='+clusterData.authKey,'_spawn');
+            window.open('http://{{boothost}}/me/spawn/spawn.html?cluster='+clusterNode.id+'&auth='+clusterData.authKey,'_spawn');
         }
     },
 

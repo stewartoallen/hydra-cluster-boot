@@ -133,6 +133,9 @@ var complete = {
         url.pathname = "/render" + url.pathname;
         return prefix["/render/"](req, res, url);
     },
+    "/" : function(req, res, url) {
+        return http.bounce(res, "/me/index.html");
+    },
     "/me" : function(req, res, url) {
         return http.bounce(res, "/me/index.html");
     },
@@ -228,7 +231,8 @@ var render = {
 
     "hint" : function(res, query, cluster, host) {
         http.template(res, query.funcName, {
-            boothost: params.boothost
+            boothost: params.boothost,
+            cluster:query.cluster
         });
     }
 };
@@ -356,6 +360,17 @@ var api = {
         });
     },
 
+    get_account : function(query, remote, callback) {
+        var key = ['account',query.id];
+        config.getJS(key, function(err, account) {
+            if (err) {
+                callback(err);
+            } else {
+                callback(null, account);
+            }
+        });
+    },
+
     create_account : function(query, remote, callback) {
         if (remote != "127.0.0.1") return callback("not authorized");
         var id = require('node-uuid').v1().replace(/-/g,'');
@@ -403,7 +418,7 @@ var api = {
             if (account.permits <= 0) return callback("insufficient account permits");
             config.getJS(clusterKey, function(err, val) {
                 if (err) {
-                    var init = {require:{},proc:{},node:{defaults:{}},config:{defaults:{}}};
+                    var init = clusterDefault;//{require:{},proc:{},node:{defaults:{}},config:{defaults:{}}};
                     config.putJS(clusterKey, init, function(err) {
                         if (err) {
                             callback("db put fail");
@@ -434,10 +449,34 @@ var api = {
                 config.delete(clusterKey, function(err) {
                     if (err) return callback("failed to delete cluster");
                     account.permits++;
+                    for (var i=0; i<account.clusters.length; i++) {
+                        if (account.clusters[i] == query.cluster) {
+                            account.clusters.splice(i,1);
+                            break;
+                        }
+                    }
                     config.putJS(accountKey, account, function(err) {
                         if (err) return callback("failed to update account");
                         callback(null, {cluster:query.cluster,deleted:true});
                     });
+                });
+            });
+        });
+    },
+
+    update_cluster : function(query, remote, callback) {
+        if (!query.account) return callback("missing account id");
+        if (!query.cluster) return callback("missing cluster id");
+        if (!query.data) return callback("missing cluster data");
+        var accountKey = ['account',query.account];
+        var clusterKey = ['cluster',query.cluster];
+        config.getJS(accountKey, function(err, account) {
+            if (err || !account) return callback("invalid account id");
+            config.getJS(clusterKey, function(err, cluster) {
+                if (err || !cluster) return callback("invalid cluster id");
+                config.putJS(clusterKey, JSON.parse(query.data), function(err) {
+                    if (err) return callback("failed to update cluster");
+                    callback(null, {cluster:query.cluster,updated:true});
                 });
             });
         });

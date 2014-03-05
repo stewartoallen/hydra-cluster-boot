@@ -1,0 +1,42 @@
+<html>
+<head>
+    <title>Cluster Manager</title>
+    <style>
+        body,div,table { padding:0px; margin:0px; border:0px; font-family:helvetica,arial,sans-serif; font-size:small }
+        #top { position:relative; padding:5px; background:#eee; border-bottom:1px solid black; text-align:center }
+        #middle { position:relative; }
+        #bottom { position:relative; padding:5px; background:#eee; border-top:1px solid black; text-align:center }
+        #left { padding:5px; background:#f5f5f5; border-right:1px solid black; }
+        #left button { width:40px }
+        #center { width:100% }
+        #account { list-style-type: none; padding:5px; margin:5px }
+        #account li { padding:2px; margin:2px }
+        #account li a { background-color:transparent; border:1px solid white; padding:2px; }
+        #account li a:hover { background-color:#fdd; border:1px solid red }
+        #cluster th { text-align:right }
+        #cluster label { border-right:1px solid #55f; padding-right:5px }
+    </style>
+    <script src="lib/jquery.js"></script>
+    <script src="me.js"></script>
+</head>
+<body>
+    <div id="top"><a onclick="account.reset()">Cluster Manager</a></div>
+    <div id="middle">
+        <table width="100%">
+            <tr>
+                <td id="left">
+                    <div style="min-width:250px;text-align:center">
+                        <button id="add-cluster" onclick="cluster.add()">+</button>
+                        <button id="del-cluster" onclick="cluster.delete()">-</button>
+                    </div>
+                    <div id="clusters"></div>
+                </td>
+                <td id="center">
+                    <div id="cluster">{% include "me/cluster.html" %}</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="bottom"><a onclick="account.reset()">v0.0.1</a></div>
+</body>
+</html>

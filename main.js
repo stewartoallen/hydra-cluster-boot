@@ -19,6 +19,7 @@ var params = {
 
 /**
  * TODO
+ * INJECT spawnhost and queryhost into renderJS() calls
  * check image date/size/md5sum ? each time and stop/download/unzip ?
  * handle missing image files
  * add simple config (db) mem caching layer
@@ -198,6 +199,22 @@ var prefix = {
     }
 };
 
+var renderJS = function(res, query, cluster, host) {
+    http.template(res, query.funcName, {
+        cluster: query.cluster,
+        boothost: params.boothost,
+        spawnhost: "localhost:5050",
+        queryhost: "localhost:2222"
+    });
+};
+
+var renderHTML = function(res, query, cluster, host) {
+    http.template(res, query.funcName, {
+        boothost: params.boothost,
+        cluster: query.cluster
+    }, "text/html");
+};
+
 var render = {
     "hcl" : function(res, query, cluster, host) {
         http.template(res, query.funcName, {
@@ -237,11 +254,11 @@ var render = {
         });
     },
 
-    "me/me.js" : function(res, query, cluster, host) {
-        http.template(res, query.funcName, {
-            boothost: params.boothost,
-        });
-    }
+    "me/me.js" : renderJS,
+    "me/spawn/spawn.js" : renderJS,
+    "me/query/query.js" : renderJS,
+    "me/spawn/spawn.html" : renderHTML,
+    "me/query/query.html" : renderHTML
 };
 
 var shortenHost = function(hostname) {

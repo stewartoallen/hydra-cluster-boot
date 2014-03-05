@@ -58,7 +58,7 @@ var initonce = false,
 	form_macro_editor = null,
 	flowGraph=null,
 	queued=0,spawnqueuesize=0,spawnqueueerrorsize=0,
-	rpcroot="http://localhost:5050";
+	rpcroot="http://{{spawnhost}}";
 
 function parse(json,defval) {
 	try {
@@ -808,7 +808,8 @@ function toggleQuiesce() {
 }
 
 /* AJAX & CALLBACK from spawn_init(): fetch spawn setup data (quiesce and debug) */
-function setupCallback(setup) {
+function setupCallback(newSetup) {
+    setup = newSetup;
 	$('quiesce').innerHTML = setup.quiesce ? 'Reactivate' : 'Quiesce';
 	setJoblist(setup.jobs);
 	setHostlist(setup.hosts);
@@ -1941,7 +1942,7 @@ function renderJobsCall() {
 			state = 'blocked';
 		}
 		table.rows.push(isCompact ? [
-			setup.queryHost && job.queryConfig && job.queryConfig.canQuery ? '<a href="http://'+setup.queryHost+'/query/index.html?job='+job.id+'" title="query job" target="_morgoth">Q</a>' : '',
+			setup.queryHost && job.queryConfig && job.queryConfig.canQuery ? '<a href="http://{{boothost}}/me/query/query.html?cluster={{cluster}}&job='+job.id+'" title="query job" target="_morgoth">Q</a>' : '',
 			'<a href="#" title="rekick" onclick="Spawn.rekickJob(\''+job.id+'\'); return false;">R</a>',
 			'<a href="#" title="stop" onclick="Spawn.stopJob(\''+job.id+'\',0); return false;">S</a>',
 			'<a href="#" title="inspect" onclick="Spawn.showJobNodes(\''+job.id+'\',true,true); return false;">'+pithy+'</a>',
@@ -1957,10 +1958,10 @@ function renderJobsCall() {
 			[fnum(files,true),files],
 			[fnum(bytes,true),bytes],
 		] : [
-			setup.queryHost && job.queryConfig && job.queryConfig.canQuery ? '<a href="http://'+setup.queryHost+'/query/index.html?job='+job.id+'" title="query job" target="_morgoth">Q</a>' : '',
+			setup.queryHost && job.queryConfig && job.queryConfig.canQuery ? '<a href="http://{{boothost}}/me/query/query.html?cluster={{cluster}}&job='+job.id+'" title="query job" target="_morgoth">Q</a>' : '',
 			'<a href="#" title="rekick" onclick="Spawn.rekickJob(\''+job.id+'\'); return false;">R</a>',
 			'<a href="#" title="stop" onclick="Spawn.stopJob(\''+job.id+'\',0); return false;">S</a>',
-            '<a href="http://'+setup.spawnHost+'/job.expand?id='+job.id+'" title="expand">D</a>',
+            '<a href="http://'+setup.spawnHost+'/job.expand?id='+job.id+'&auth='+auth+'" title="expand">D</a>',
 			'<a href="#" title="inspect" onclick="Spawn.showJobNodes(\''+job.id+'\',true,true); return false;">'+pithy+'</a>',
 			'<a href="#" title="edit" onclick="Spawn.editJob(\''+job.id+'\'); return false;">'+job.description+'</a>',
 			job.creator ? '<a href="#" title="owner:'+job.owner+'">'+job.creator+'</a>' : '',

@@ -24,7 +24,7 @@ var busyimg = '<img width="32" height="32" src="spinner.gif">',
     hkv = {},
     hostUpdater=null,
     liveQueryPolling=null,
-	rpcroot="http://localhost:2222"; 
+	rpcroot="http://{{queryhost}}";
 
 // dict of hash kv-pairs
 try {

@@ -154,7 +154,6 @@ var cluster = {
             url:"/api/update_cluster",
             data:{account:db.account,cluster:clusterNode.id,data:JSON.stringify(clusterData)},
             success:function(data,status,xhr) {
-                console.log('cluster updated');
                 cluster.select(clusterNode);
             },
             error:function(xhr,status,error) {
@@ -164,7 +163,10 @@ var cluster = {
     },
 
     manage:function() {
-
+        var spawn = clusterData.proc['spawn'];
+        for (var key in spawn) {
+            window.open('http://{{boothost}}/me/spawn/index.html?auth='+clusterData.authKey,'_spawn');
+        }
     },
 
     setAbout:function() {
@@ -208,7 +210,6 @@ var cluster = {
     },
 
     setRequired:function(require) {
-        console.log(["set.required",require]);
         var newRequired = prompt("Enter required number of "+require+" nodes for this cluster", clusterData.require[require]);
         if (newRequired) {
             clusterData.require[require] = parseInt(newRequired);
@@ -217,7 +218,7 @@ var cluster = {
     },
 
     showRegistered:function(registered) {
-
+        console.log(["show.registered",registered]);
     },
 
     addTemplate:function() {

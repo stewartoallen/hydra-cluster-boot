@@ -235,6 +235,12 @@ var render = {
             boothost: params.boothost,
             cluster:query.cluster
         });
+    },
+
+    "me/me.js" : function(res, query, cluster, host) {
+        http.template(res, query.funcName, {
+            boothost: params.boothost,
+        });
     }
 };
 
@@ -279,7 +285,7 @@ var countKeys = function(o) {
 
 var setDefaults = function(oS, oT) {
     for (var key in oS) {
-        if (!oT[key]) oT[key] = oS[key];
+        if (typeof oT[key] == 'undefined') oT[key] = oS[key];
     }
 };
 

@@ -5,6 +5,7 @@
 
 var initonce = false,
 	iam = '',
+    auth = '',
 	filter = '',
 	showHost = null,
 	editing = null;
@@ -84,6 +85,7 @@ function init() {
 			var kv = kvs[i].split('=');
 			params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1]);
 		}
+        auth = params['auth'] || '';
 		if (params['nopoll']) {
 			enablePolling = false;
 		}
@@ -247,7 +249,7 @@ var nextcb = 0;
 
 function callRPC(path, callback) {
 	var fname = 'jsonp_cb'+(nextcb++);
-	path = rpcroot + path + '&user='+settings["iam"]+'&cbfunc-arg="'+fname+'"&cbfunc=Spawn.cbfuncs.'+fname;
+	path = rpcroot + path + '&user='+settings["iam"]+'&auth='+auth+'&cbfunc-arg="'+fname+'"&cbfunc=Spawn.cbfuncs.'+fname;
 
 	var script = document.createElement('script');
 	script.id = fname;

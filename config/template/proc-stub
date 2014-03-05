@@ -13,12 +13,12 @@ function wait_nodes() {
 }
 
 function get_broker() {
-	export rabbit=$(wait_nodes rabbit)
+	export rabbit=$(wait_nodes rabbit | awk '{ print $1 }')
 	echo "-Dbatch.brokerHost=${rabbit} -Dbatch.brokerPort=5672"
 }
 
 function get_zookeeper() {
-	export zookeeper=$(wait_nodes zookeeper)
+	export zookeeper=$(wait_nodes zookeeper | awk '{ print $1 }')
 	echo "-Dzk.servers=${zookeeper}:2181"
 }
 

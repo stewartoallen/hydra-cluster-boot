@@ -173,6 +173,7 @@ var prefix = {
         var funcName = filePath.substring(8);
         var func = render[funcName];
         var call = function(res, q, cluster, host) {
+            if (cluster.authKey) cluster.config.defaults.authkey = cluster.authKey;
             if (func) {
                 func(res, q, cluster, host);
             } else {
@@ -474,7 +475,10 @@ var api = {
             if (err || !account) return callback("invalid account id");
             config.getJS(clusterKey, function(err, cluster) {
                 if (err || !cluster) return callback("invalid cluster id");
-                config.putJS(clusterKey, JSON.parse(query.data), function(err) {
+                var newCluster = JSON.parse(query.data);
+                // preserve running cluster process state data
+                newCluster.proc = cluster.proc;
+                config.putJS(clusterKey, newCluster, function(err) {
                     if (err) return callback("failed to update cluster");
                     callback(null, {cluster:query.cluster,updated:true});
                 });

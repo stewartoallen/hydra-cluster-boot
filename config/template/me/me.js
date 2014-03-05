@@ -111,9 +111,13 @@ var cluster = {
         $('#cluster-about').html(clusterData.about || clusterNode.id);
         var html = [];
         for (var key in cluster.require) {
+            if (cluster.require[key] == 0) continue;
             html.push(util.tag("button",{onclick:"cluster.setRequired(\""+key+"\")"}));
             html.push(key+":"+cluster.require[key]+"</button>");
         }
+        html.push(util.tag("button",{onclick:"cluster.addRequired()"}));
+        html.push("+");
+        html.push("</button>");
         $("#cluster-required").html(html.join(''));
         var html = [];
         for (var key in cluster.proc) {
@@ -127,6 +131,9 @@ var cluster = {
             html.push(util.tag("button",{onclick:"cluster.showTemplate(\""+key+"\")"}));
             html.push(key+"</button>");
         }
+        html.push(util.tag("button",{onclick:"cluster.addTemplate()"}));
+        html.push("+");
+        html.push("</button>");
         $("#cluster-templates").html(html.join(''));
         $("#cluster-set-local").html("set local : "+clusterData.isLocal);
         $("#cluster-set-naming").html("short host names : "+clusterData.shortenHost);
@@ -161,32 +168,76 @@ var cluster = {
     },
 
     setAbout:function() {
-        clusterData.about = prompt("Describe this cluster",clusterData.about || clusterNode.id);
-        cluster.update();
+        var newAbout = prompt("Describe this cluster",clusterData.about || clusterNode.id);
+        if (newAbout || newAbout == '') {
+            clusterData.about = newAbout;
+            cluster.update();
+        }
+    },
+
+    setAuthKey:function() {
+        var newAuthKey = prompt("Set WEB API Auth Key",clusterData.authKey || clusterNode.id);
+        if (newAuthKey || newAuthKey == '') {
+            clusterData.authKey = newAuthKey;
+            cluster.update();
+        }
     },
 
     setLocal:function() {
         var local = prompt("Is this a local stack?", clusterData.isLocal);
-        clusterData.isLocal = (local == 'true' || local == '1');
-        cluster.update();
+        if (local) {
+            clusterData.isLocal = (local == 'true' || local == '1');
+            cluster.update();
+        }
     },
 
     setShortHost:function() {
         var shorten = prompt("Shorten node host names?", clusterData.shortenHost);
-        clusterData.shortenHost = (shorten == 'true' || shorten == '1');
-        cluster.update();
+        if (shorten) {
+            clusterData.shortenHost = (shorten == 'true' || shorten == '1');
+            cluster.update();
+        }
+    },
+
+    addRequired:function() {
+        var required = prompt("Enter process name requirement");
+        if (required && !clusterData.require[required]) {
+            clusterData.require[required] = 1;
+            cluster.setRequired(required);
+        }
     },
 
     setRequired:function(require) {
-
+        console.log(["set.required",require]);
+        var newRequired = prompt("Enter required number of "+require+" nodes for this cluster", clusterData.require[require]);
+        if (newRequired) {
+            clusterData.require[require] = parseInt(newRequired);
+            cluster.update();
+        }
     },
 
     showRegistered:function(registered) {
 
     },
 
-    showTemplate:function(template){
+    addTemplate:function() {
+        var template = prompt("Enter node template name");
+        if (template && !clusterData.node[template]) {
+            clusterData.node[template] = { process:[],image:clusterData.node["defaults"].image };
+            cluster.showTemplate(template);
+        }
+    },
 
+    showTemplate:function(template){
+        var processList = clusterData.node[template].process.join(",");
+        var newProcessList = prompt("Enter CSV list of processes to run on this node type",processList);
+        if (newProcessList) {
+            clusterData.node[template].process = newProcessList.split(',');
+            cluster.update();
+        } else if (newProcessList == '' && template != 'defaults') {
+            delete clusterData.node[template];
+            cluster.update();
+        }
     },
 
     add:function() {

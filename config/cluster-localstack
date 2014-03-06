@@ -8,7 +8,7 @@
 	node: {
 		defaults: {
 			process: ["mesh", "rabbit", "zookeeper", "spawn", "minion", "qmaster", "qworker"],
-			image: ["etc/log4j.conf","lib/hydra.jar","lib/libflcow.dylib","lib/libflcow.so","web.zip"]
+			image: ["etc/log4j.conf","lib/hydra.jar","lib/libflcow.dylib","lib/libflcow.so"]
 		}
 	},
 	proc: { },

@@ -59,7 +59,7 @@ var initonce = false,
 	form_macro_editor = null,
 	flowGraph=null,
 	queued=0,spawnqueuesize=0,spawnqueueerrorsize=0,
-	rpcroot="http://{{spawnhost}}";
+	rpcroot="http://undefined:5050";
 
 function parse(json,defval) {
 	try {
@@ -81,11 +81,12 @@ function init() {
 		{
 			return;
 		}
-		var kvs = window.location.search.substring(1).split('&');
-		for (var i=0; i<kvs.length; i++) {
-			var kv = kvs[i].split('=');
-			params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1]);
-		}
+//		var kvs = window.location.search.substring(1).split('&');
+//		for (var i=0; i<kvs.length; i++) {
+//			var kv = kvs[i].split('=');
+//			params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1]);
+//		}
+        params = decodeParams();
 		if (params['nopoll']) {
 			enablePolling = false;
 		}
@@ -93,6 +94,7 @@ function init() {
             var clusterString = settings['cluster-'+params.cluster];
             if (clusterString) {
                 clusterData = JSON.parse(clusterString);
+                rpcroot="http://"+firstKey(clusterData.proc.spawn)+":5050"
                 auth = clusterData.authKey;
             }
         }

@@ -22,9 +22,12 @@ var busyimg = '<img width="32" height="32" src="spinner.gif">',
     // dict of hash kv-pairs
     hs = document.location.hash.slice(1),
     hkv = {},
+    params = {},
+    clusterData = {},
+    auth=null,
     hostUpdater=null,
     liveQueryPolling=null,
-	rpcroot="http://{{queryhost}}";
+	rpcroot="http://undefined:2222";
 
 // dict of hash kv-pairs
 try {
@@ -648,6 +651,17 @@ function closeCompletedHosts(){
 
 /* called on page load  */
 function init() {
+    params = decodeParams();
+
+    if (params.cluster) {
+        var clusterString = store['cluster-'+params.cluster];
+        if (clusterString) {
+            clusterData = JSON.parse(clusterString);
+            rpcroot="http://"+firstKey(clusterData.proc.qmaster)+":2222"
+            auth = clusterData.authKey;
+        }
+    }
+
     storedQueriesDecode();
     
     // Populate query fields from URL (use hash, then query string)

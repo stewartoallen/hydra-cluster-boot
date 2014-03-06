@@ -24,7 +24,7 @@ case $1 in
 		;;
 	halt)
 		for proc in ${HYDRA_IMAGE}/etc/pid/pid.*; do
-			stopProcessList "${proc#*.}"
+			[ -f "${proc}" ] && stopProcessList "${proc#*.}"
 		done
 		exit
 		;;

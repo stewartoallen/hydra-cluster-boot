@@ -1,17 +1,20 @@
 #!/bin/sh
 
 function fail() {
-	echo "aborting... $1"
+	echo "aborting... $*"
 	exit
 }
 
 [ -z "${CLUSTER_HOST}" ] && export CLUSTER_HOST="{{hostname}}"
-[ -z "${IMAGE_VERSION}" ] && export IMAGE_VERSION="{{version}}"
-[ -z "${IMAGE_HOST}" ] && export IMAGE_HOST="${HYDRA_BOOT}"
+[ -z "${IMAGE_ROOT}" ] && export IMAGE_ROOT="{{imageroot}}"
 [ -z "${PROCESSES}" ] && export PROCESSES="{{process}}"
 [ -z "${CLUSTER_HOST}" ] && fail "missing CLUSTER_HOST environment variable"
 [ -z "${CLUSTER_ID}" ] && fail "missing CLUSTER_ID environment variable"
 [ -z "${PROCESSES}" ] && fail "missing PROCESSES environment variable"
+
+SIZECMD="fail NO SIZECMD: "
+[ $(uname) == 'Linux' ] && SIZECMD="stat -c %s"
+[ $(uname) == 'Darwin' ] && SIZECMD="stat -f %z"
 
 # add hydra bin dir to path so processes can inherit
 export PATH=${PATH}:${HYDRA_IMAGE}/bin
@@ -25,13 +28,30 @@ for dir in .bootmagic bin lib log etc/pid; do
 	[ ! -d ${dir} ] && mkdir -p ${dir} && echo "created ${dir}"
 done
 
+function fetch() {
+    local=$1
+    remote=$2
+    tmp=$(mktemp /tmp/curl-XXXXXX)
+    curl -f -s "${remote}" > "${tmp}" && (
+        mv "${tmp}" "${local}"
+        echo "loaded"
+    ) || (
+        rm "${tmp}"
+        echo "skipped"
+    )
+}
+
 # check for updates to required images
-for image in {{ image }}; do
+for image in {{images}}; do
 	local=${HYDRA_IMAGE}/${image}
-	remote=${IMAGE_HOST}/image/${IMAGE_VERSION}/${image}
+	remote=${IMAGE_ROOT}/${image}
 	[ ! -f ${local} ] && (
-		echo "fetching $image..."
-		curl -s ${remote} > ${local} || fail "failed image load '${image}'"
+		echo -n "fetching $image... "
+		fetch "${local}" "${remote}"
+	) || (
+	    filesize=$(eval $SIZECMD $local)
+		echo -n "verifying $image [$filesize]... "
+		fetch "${local}" "${remote}?ifnotsize=${filesize}"
 	)
 done
 

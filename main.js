@@ -19,13 +19,10 @@ var params = {
 
 /**
  * TODO
- * INJECT spawnhost and queryhost into renderJS() calls
  * REMOVE injection since it's passed in localStorage now
  * check image date/size/md5sum ? each time and stop/download/unzip ?
- * handle missing image files
  * add simple config (db) mem caching layer
  * fix linux vs mac osx rabbit cmd (auto switch in boot?)
- * make image host/path part of cluster record
  */
 
 var http = {
@@ -48,9 +45,8 @@ var http = {
         http.fail(res, "no valid target", 404);
     },
 
-    sendFile : function(res, path) {
+    sendFile : function(res, filePath) {
         try {
-            var filePath = path.join('/');
             var suffix = filePath.substring(filePath.lastIndexOf('.')+1);
             var contentType = ctype[suffix] || "application/octet-stream";
             var contentLength = fs.statSync(filePath).size;
@@ -162,7 +158,13 @@ var prefix = {
         });
     },
     "/image/" : function(req, res, url) {
-        return http.sendFile(res, ["config","image",url.pathname.substring(7)]);
+        var path = ["config","image",url.pathname.substring(7)];
+        var filePath = path.join('/');
+        if (url.query.ifnotsize) {
+            var size = fs.statSync(filePath).size;
+            if (size == parseInt(url.query.ifnotsize)) return http.fail(res, 'same size', 404);
+        }
+        return http.sendFile(res, filePath);
     },
     "/me/" : function(req, res, url) {
         url.pathname = "/render"+url.pathname;
@@ -202,10 +204,10 @@ var prefix = {
 
 var renderJS = function(res, query, cluster, host) {
     http.template(res, query.funcName, {
-        cluster: query.cluster,
         boothost: params.boothost,
-        spawnhost: cluster.proc ? firstKey(cluster.proc.spawn)+":5050" : null,
-        queryhost: cluster.proc ? firstKey(cluster.proc.qmaster)+":2222" : null
+        cluster: query.cluster
+//        spawnhost: cluster.proc ? firstKey(cluster.proc.spawn)+":5050" : null,
+//        queryhost: cluster.proc ? firstKey(cluster.proc.qmaster)+":2222" : null
     });
 };
 
@@ -228,7 +230,6 @@ var render = {
     "boot" : function(res, query, cluster, host) {
         if (cluster.isLocal) query.hostname = 'localhost';
         http.template(res, query.funcName, {
-            version: query.version || 'default',
             cluster: query.cluster,
             hostname: query.sethost,
             boothost: params.boothost
@@ -239,12 +240,10 @@ var render = {
         if (!host) return http.fail(res, 'invalid host '+ query.hostname);
         if (!host.process) return http.fail(res, 'host missing process list');
         http.template(res, query.funcName, {
-            version: query.version || 'default',
-            cluster: query.cluster,
             hostname: query.hostname,
-            boothost: params.boothost,
             process: host.process.join(' '),
-            image: (host.image || cluster.node.defaults.image).join(' ')
+            images: (host.image || cluster.node.defaults.image).join(' '),
+            imageroot: cluster.imageRoot || ['http://',params.boothost,'/image/default'].join('')
         });
     },
 

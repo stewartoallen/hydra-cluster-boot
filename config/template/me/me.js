@@ -186,6 +186,14 @@ var cluster = {
         }
     },
 
+    setImageRoot:function() {
+        var newImageRoot = prompt("Set Image Root URL. Leave blank to accept default.",clusterData.imageRoot);
+        if (newImageRoot || newImageRoot == '') {
+            clusterData.imageRoot = newImageRoot;
+            cluster.update();
+        }
+    },
+
     setLocal:function() {
         var local = prompt("Is this a local stack?", clusterData.isLocal);
         if (local) {

@@ -20,6 +20,7 @@ var params = {
 /**
  * TODO
  * INJECT spawnhost and queryhost into renderJS() calls
+ * REMOVE injection since it's passed in localStorage now
  * check image date/size/md5sum ? each time and stop/download/unzip ?
  * handle missing image files
  * add simple config (db) mem caching layer

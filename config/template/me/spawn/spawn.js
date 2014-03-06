@@ -9,6 +9,7 @@ var initonce = false,
 	filter = '',
 	showHost = null,
 	editing = null;
+    clusterData = null,
 	params = {},
 	aliases = {},
 	revAliases = {},
@@ -85,10 +86,16 @@ function init() {
 			var kv = kvs[i].split('=');
 			params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1]);
 		}
-        auth = params['auth'] || '';
 		if (params['nopoll']) {
 			enablePolling = false;
 		}
+        if (params.cluster) {
+            var clusterString = settings['cluster-'+params.cluster];
+            if (clusterString) {
+                clusterData = JSON.parse(clusterString);
+                auth = clusterData.authKey;
+            }
+        }
 		showTab(settings['tab'] || 'jobs');
 		iam = $('form_iam').value;
 		if (iam != '') {

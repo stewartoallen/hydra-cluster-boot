@@ -107,6 +107,7 @@ var cluster = {
             return;
         }
         clusterData = cluster;
+        db['cluster-'+clusterNode.id] = JSON.stringify(cluster);
         $('#cluster').show();
         $('#cluster-about').html(clusterData.about || clusterNode.id);
         var html = [];
@@ -165,7 +166,7 @@ var cluster = {
     manage:function() {
         var spawn = clusterData.proc['spawn'];
         for (var key in spawn) {
-            window.open('http://{{boothost}}/me/spawn/spawn.html?cluster='+clusterNode.id+'&auth='+clusterData.authKey,'_spawn');
+            window.open('http://{{boothost}}/me/spawn/spawn.html?cluster='+clusterNode.id,'_spawn');
         }
     },
 

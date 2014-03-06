@@ -136,7 +136,7 @@ var cluster = {
         html.push("+");
         html.push("</button>");
         $("#cluster-templates").html(html.join(''));
-        $("#cluster-set-local").html("set local : "+clusterData.isLocal);
+        $("#cluster-set-local").html("local : "+clusterData.isLocal);
         $("#cluster-set-naming").html("short host names : "+clusterData.shortenHost);
         $.ajax({
             url:"/render/hint",

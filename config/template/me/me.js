@@ -18,6 +18,7 @@ function on_ready() {
 var clusterNode = null;
 var clusterStyle = null;
 var clusterSelect = null;
+var clusterConfig = null;
 var clusterData = null;
 
 var util = {
@@ -110,6 +111,7 @@ var cluster = {
         db['cluster-'+clusterNode.id] = JSON.stringify(cluster);
         $('#cluster').show();
         $('#cluster-about').html(clusterData.about || clusterNode.id);
+        /* render node type count requirements */
         var html = [];
         for (var key in cluster.require) {
             if (cluster.require[key] == 0) continue;
@@ -120,6 +122,7 @@ var cluster = {
         html.push("+");
         html.push("</button>");
         $("#cluster-required").html(html.join(''));
+        /* render named node configurations */
         var html = [];
         for (var key in cluster.proc) {
             if (cluster.proc[key] == 0) continue;
@@ -127,6 +130,7 @@ var cluster = {
             html.push(key+":"+util.count_keys(cluster.proc[key])+"</button>");
         }
         $("#cluster-registered").html(html.join(''));
+        /* render node type process lists */
         var html = [];
         for (var key in cluster.node) {
             html.push(util.tag("button",{onclick:"cluster.showTemplate(\""+key+"\")"}));
@@ -136,6 +140,19 @@ var cluster = {
         html.push("+");
         html.push("</button>");
         $("#cluster-templates").html(html.join(''));
+
+        /* render process type configurations */
+        var html = [];
+        for (var key in cluster.config) {
+            html.push(util.tag("button",{onclick:"cluster.showConfiguration(\""+key+"\")"}));
+            html.push(key+"</button>");
+        }
+        html.push(util.tag("button",{onclick:"cluster.addConfiguration()"}));
+        html.push("+");
+        html.push("</button>");
+        $("#cluster-configs").html(html.join(''));
+
+
         $("#cluster-set-local").html("local : "+clusterData.isLocal);
         $("#cluster-set-naming").html("short host names : "+clusterData.shortenHost);
         $.ajax({
@@ -241,6 +258,58 @@ var cluster = {
         }
         html.push('</table>');
         $('#right-body').html(html.join(''));
+    },
+
+    addConfiguration:function() {
+        console.log("add config");
+    },
+
+    showConfiguration:function(config) {
+        clusterConfig = config;
+        var opts = clusterData.config[clusterConfig];
+        $('#right-title').html(config+" configuration");
+        var html = ['<table>'];
+        for (var key in opts) {
+            var val = opts[key];
+            if (val.length > 30) val = val.substring(0,27)+"...";
+            html.push('<tr><th><button onclick="cluster.editConfigKey(this)">');
+            html.push(key);
+            html.push('</button></th><th>')
+            html.push(val);
+            html.push('</th></tr>');
+        }
+        html.push("<tr><th><button onclick='cluster.addConfigKey()'>+</button></th></tr>")
+        html.push('</table>');
+        $('#right-body').html(html.join(''));
+    },
+
+    editConfigKey:function(button) {
+        var opts = clusterData.config[clusterConfig];
+        var key = button.innerText;
+        var newValue = prompt("Value for "+key, opts[key]);
+        if (newValue == null) return;
+        if (newValue.length > 0) {
+            opts[key] = newValue;
+            cluster.update();
+            cluster.showConfiguration(clusterConfig);
+        } else {
+            delete opts[key];
+            cluster.update();
+            cluster.showConfiguration(clusterConfig);
+        }
+    },
+
+    addConfigKey:function() {
+        var opts = clusterData.config[clusterConfig];
+        var newKey = prompt("Name of new config key");
+        if (newKey && newKey.length > 0 && !clusterConfig[newKey]) {
+            var newValue = prompt("Value for "+newKey);
+            if (newValue && newValue.length > 0) {
+                opts[newKey] = newValue;
+                cluster.update();
+                cluster.showConfiguration(clusterConfig);
+            }
+        }
     },
 
     addTemplate:function() {

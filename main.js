@@ -19,10 +19,10 @@ var params = {
 
 /**
  * TODO
- * REMOVE injection since it's passed in localStorage now
- * check image date/size/md5sum ? each time and stop/download/unzip ?
  * add simple config (db) mem caching layer
  * fix linux vs mac osx rabbit cmd (auto switch in boot?)
+ * config template right panel
+ * redo rendering to determine content-type
  */
 
 var http = {
@@ -47,11 +47,9 @@ var http = {
 
     sendFile : function(res, filePath) {
         try {
-            var suffix = filePath.substring(filePath.lastIndexOf('.')+1);
-            var contentType = ctype[suffix] || "application/octet-stream";
             var contentLength = fs.statSync(filePath).size;
             res.writeHead(200, {
-                'Content-Type' : contentType,
+                'Content-Type' : contentType(filePath,"application/octet-stream"),
                 'Content-Length' : contentLength
             });
             fs.createReadStream(filePath).pipe(res);
@@ -172,8 +170,6 @@ var prefix = {
     },
     "/render/" : function(req, res, url) {
         var filePath = url.pathname;
-        var suffix = filePath.substring(filePath.lastIndexOf('.')+1);
-        var contentType = ctype[suffix];
         var funcName = filePath.substring(8);
         var func = render[funcName];
         var call = function(res, q, cluster, host) {
@@ -181,7 +177,7 @@ var prefix = {
             if (func) {
                 func(res, q, cluster, host);
             } else {
-                http.template(res, q.funcName, cluster.config, contentType);
+                http.template(res, q.funcName, cluster.config, contentType(filePath));
             }
         };
         var q = url.query;
@@ -257,6 +253,10 @@ var render = {
     "me/query/query.js" : renderJS,
     "me/spawn/spawn.html" : renderHTML,
     "me/query/query.html" : renderHTML
+};
+
+var contentType = function(name, dv) {
+    return ctype[name.substring(name.lastIndexOf('.')+1)] || dv;
 };
 
 var shortenHost = function(hostname) {

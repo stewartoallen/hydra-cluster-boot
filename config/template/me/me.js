@@ -227,7 +227,20 @@ var cluster = {
     },
 
     showRegistered:function(registered) {
-        console.log(["show.registered",registered]);
+        var nodes = clusterData.proc[registered];
+        $('#right-title').html(registered+" nodes");
+        var html = ['<table>'];
+        for (var key in nodes) {
+            html.push('<tr><td>');
+            html.push(key);
+            html.push('</td><td>');
+            html.push(nodes[key].ip);
+            html.push('</td><td>');
+            html.push(new Date(nodes[key].updated).toString('yy/MM/dd HH:mm'));
+            html.push('</td></tr>');
+        }
+        html.push('</table>');
+        $('#right-body').html(html.join(''));
     },
 
     addTemplate:function() {

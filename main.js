@@ -206,8 +206,6 @@ var renderJS = function(res, query, cluster, host) {
     http.template(res, query.funcName, {
         boothost: params.boothost,
         cluster: query.cluster
-//        spawnhost: cluster.proc ? firstKey(cluster.proc.spawn)+":5050" : null,
-//        queryhost: cluster.proc ? firstKey(cluster.proc.qmaster)+":2222" : null
     });
 };
 

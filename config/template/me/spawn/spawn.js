@@ -1,4 +1,3 @@
-// uses closures and only exports a single 'Spawn' object to window
 // TODO defer event callback updates w/in 1 second of a mouse move
 // TODO implement page reload/refresh afer # events and # mouse idle time
 (function() {
@@ -81,11 +80,6 @@ function init() {
 		{
 			return;
 		}
-//		var kvs = window.location.search.substring(1).split('&');
-//		for (var i=0; i<kvs.length; i++) {
-//			var kv = kvs[i].split('=');
-//			params[decodeURIComponent(kv[0])] = decodeURIComponent(kv[1]);
-//		}
         params = decodeParams();
 		if (params['nopoll']) {
 			enablePolling = false;
@@ -2250,9 +2244,9 @@ function showJobLogs(host, port, job, node) {
 		var which = $('job_log_head').checked ? 'head' : 'tail';
 		var url = 'about:blank';
 		if ($('job_log_stdout').checked) {
-			url = "http://"+lastLog.host+":"+lastLog.port+"/job."+which+"?id="+lastLog.job+"&node="+lastLog.node+"&lines="+lines+"&out=1&err=0&html="+encodeURIComponent("<b>stdout</b><pre>{{out}}</pre>");
+			url = "http://"+lastLog.host+":"+lastLog.port+"/job."+which+"?id="+lastLog.job+"&node="+lastLog.node+"&lines="+lines+"&out=1&err=0&html="+encodeURIComponent("<b>stdout</b><pre>{% raw %}{{out}}{% endraw %}</pre>");
 		} else {
-			url = "http://"+lastLog.host+":"+lastLog.port+"/job."+which+"?id="+lastLog.job+"&node="+lastLog.node+"&lines="+lines+"&out=0&err=1&html="+encodeURIComponent("<b>stderr</b><pre>{{err}}</pre>");
+			url = "http://"+lastLog.host+":"+lastLog.port+"/job."+which+"?id="+lastLog.job+"&node="+lastLog.node+"&lines="+lines+"&out=0&err=1&html="+encodeURIComponent("<b>stderr</b><pre>{% raw %}{{err}}{% endraw %}</pre>");
 		}
 		$('job_logs').src = url;
 		showHide('job_logs_border', true);

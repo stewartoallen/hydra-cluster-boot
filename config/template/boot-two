@@ -31,8 +31,9 @@ done
 function fetch() {
     local=$1
     remote=$2
+	sizecheck=${3:0}
     tmp=$(mktemp /tmp/curl-XXXXXX)
-    curl -f -s "${remote}" > "${tmp}" && (
+    curl -f -s "${remote}?ifnotsize=${sizecheck}" > "${tmp}" && (
         mv "${tmp}" "${local}"
         echo "loaded"
     ) || (
@@ -51,7 +52,7 @@ for image in {{images}}; do
 	) || (
 	    filesize=$(eval $SIZECMD $local)
 		echo -n "verifying $image [$filesize]... "
-		fetch "${local}" "${remote}?ifnotsize=${filesize}"
+		fetch "${local}" "${remote}" ${filesize}
 	)
 done
 

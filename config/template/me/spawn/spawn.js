@@ -58,7 +58,7 @@ var initonce = false,
 	form_macro_editor = null,
 	flowGraph=null,
 	queued=0,spawnqueuesize=0,spawnqueueerrorsize=0,
-	rpcroot="http://undefined:5050";
+	rpcroot="http://localhost:5050";
 
 function parse(json,defval) {
 	try {

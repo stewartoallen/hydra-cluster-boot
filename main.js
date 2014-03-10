@@ -23,11 +23,12 @@ var params = {
  * fix linux vs mac osx rabbit cmd (auto switch in boot?)
  * config template right panel
  * redo rendering to determine content-type
+ * button to purge registered nodes or delete specific nodes
  */
 
 var http = {
     handle : function(req, res) {
-        console.log("--> "+req.url);
+        console.log((new Date().getTime())+" --> "+req.url);
         if (!(req.method == 'GET' || req.method == 'POST')) {
             return http.fail(res);
         }
@@ -316,6 +317,7 @@ var api = {
             if (err) return callback(err);
             if (cluster.isLocal) return callback(null, 'localhost');
             var target = cluster.require[query.key];
+            if (target == 0) return callback(null, "");
             if (typeof target == 'undefined') return callback("invalid target key '"+query.key+"'");
             if (!cluster.proc || !cluster.proc[query.key] || countKeys(cluster.proc[query.key]) < target) {
                 var wait_key = [query.cluster,query.key].join('_');

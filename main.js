@@ -216,6 +216,7 @@ var renderHTML = function(res, query, cluster, host) {
 var render = {
     "hcl" : function(res, query, cluster, host) {
         http.template(res, query.funcName, {
+            authkey : cluster.authKey,
             cluster: query.cluster,
             hostname: query.hostname,
             boothost: params.boothost

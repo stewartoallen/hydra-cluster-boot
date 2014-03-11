@@ -5,9 +5,9 @@
 [ -z "${CLUSTER_HOST}" ] && export CLUSTER_HOST={{hostname}}
 [ -z "${HYDRA_IMAGE}" ] && export HYDRA_IMAGE=$(dirname $(dirname $0))
 [ -z "${HYDRA_HOST}" ] && export HYDRA_HOST=localhost
+[ -z "${HYDRA_AUTH}" ] && export HYDRA_AUTH={{authkey}}
 
 # add hydra bin dir to path so processes can inherit
 export PATH=${PATH}:${HYDRA_IMAGE}/bin
 
 bash <(curl -s "http://${HYDRA_BOOT}/render/proc?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}") $*
-

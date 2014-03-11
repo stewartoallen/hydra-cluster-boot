@@ -72,7 +72,7 @@
 			</tr>
 		</table>
 		<div id="command_edit">
-			<form method="post" action="/command.put" target="_blank">
+			<form method="post" action="/XXX/command.put" target="_blank">
 				<table class="render" id="command_submit">
 					<tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('command_edit',false);">X</a>&nbsp;</th></tr>
 					<tr><th>label</th><td><input id="form_command_label" name="label" size=20 autocapitalize="off" autocorrect="off"></td></tr>
@@ -90,7 +90,7 @@
 		<div id="macros_list" class="lrpad"></div>
 		<div class="addnew"><button onclick="Spawn.newMacro()">create new macro</button></div>
 		<div id="macro_edit">
-			<form method="post" action="/macro.put" target="_blank" id="form_macro_put">
+			<form method="post" action="/XXX/macro.put" target="_blank" id="form_macro_put">
 				<table class="render" id="macro_submit">
 					<tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('macro_edit',false);">X</a>&nbsp;</th></tr>
 					<tr><th>label</th><td><input id="form_macro_label" name="label" size=80 autocapitalize="off" autocorrect="off">
@@ -113,7 +113,7 @@
 		<div id="alias_list" class="lrpad"></div>
 		<div class="addnew"><button onclick="Spawn.newAlias()">create new alias</button></div>
 		<div id="alias_edit">
-			<form method="post" action="/alias.put" target="_blank">
+			<form method="post" action="/XXX/alias.put" target="_blank">
 				<table class="render" id="alias_submit">
 					<tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('alias_edit',false);">X</a>&nbsp;</th></tr>
 					<tr><th>alias</th><td><input id="form_alias_alias" name="alias" size=40 autocapitalize="off" autocorrect="off"></td></tr>
@@ -223,7 +223,7 @@
 			</table>
 		</div>
 		<div id="job_edit">
-			<form method="post" action="/job.submit" target="_blank">
+			<form method="get" action="/XXX/job.submit" target="_blank">
 				<table class="render" id="job_submit" width="907px" height="686px">
 					<tr>
 						<th colspan=2 align=right style="overflow:hidden;padding-top:5px;">
@@ -309,6 +309,7 @@
 					</tr>
 					<tr><th colspan=2>
 						<input type="hidden" name="id" id="send_id">
+                        <input type="hidden" name="auth" id="send_auth">
 						<input type="hidden" name="hosts" id="send_hosts">
 						<input type="hidden" name="spawn" id="send_spawn">
 						<input type="hidden" name="enable" id="send_enable">

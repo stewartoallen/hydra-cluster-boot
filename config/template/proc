@@ -89,17 +89,17 @@ case "$1-$2" in
 	job-kick)
 		host=${4:-${HYDRA_HOST}:5050}
 		job=${3:-nojob}
-		curl "http://${host}/job.submit?id=${job}&spawn=1"; echo
+		curl "http://${host}/job.submit?id=${job}&spawn=1&auth=${HYDRA_AUTH}"; echo
 		;;
 	job-enable)
 		host=${4:-${HYDRA_HOST}:5050}
 		job=${3:-nojob}
-		curl "http://${host}/job.set?id=${job}&enable=1"; echo
+		curl "http://${host}/job.set?id=${job}&enable=1&auth=${HYDRA_AUTH}"; echo
 		;;
 	job-delete)
 		host=${4:-${HYDRA_HOST}:5050}
 		job=${3:-nojob}
-		curl "http://${host}/job.delete?id=${job}"; echo
+		curl "http://${host}/job.delete?id=${job}&auth=${HYDRA_AUTH}"; echo
 		;;
 	push-job)
 		shift;shift
@@ -111,7 +111,7 @@ case "$1-$2" in
 		job=${2:-nojobid}
 		host=${3:-${HYDRA_HOST}:5050}
 		echo -n "posting job update (conf=$conf job=$job host=$host) ... "
-		/bin/echo -n "id=${job}&field=config&value=" > /tmp/tmp.post
+		/bin/echo -n "id=${job}&auth=${HYDRA_AUTH}&field=config&value=" > /tmp/tmp.post
 		cat ${conf} | sed 's/%/%25/g' | sed 's/&/%26/g' >> /tmp/tmp.post
 		curl  --data-binary @/tmp/tmp.post "http://${host}/job.set"
 		echo
@@ -145,7 +145,7 @@ case "$1-$2" in
 			desc=$(grep "// description:" ${macro_file} | while read a b c; do echo "$c"; done)
 		fi
 		echo -n "pushing macro file=${macro_file} id=${macro_id} owner=${owner} desc=${description} host=${host} ... "
-		/bin/echo -n "label=${macro_id}&owner=${owner}&description=${desc}&macro=" > /tmp/tmp.post
+		/bin/echo -n "label=${macro_id}&auth=${HYDRA_AUTH}&owner=${owner}&description=${desc}&macro=" > /tmp/tmp.post
 		cat ${macro_file} | sed 's/%/%25/g' | sed 's/&/%26/g' | sed 's/+/%2b/g' >> /tmp/tmp.post
 		curl --data-binary @/tmp/tmp.post "http://${host}/macro.put"
 		echo

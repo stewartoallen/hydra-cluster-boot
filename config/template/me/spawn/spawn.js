@@ -92,6 +92,11 @@ function init() {
                 auth = clusterData.authKey;
             }
         }
+        var forms = document.getElementsByTagName('form');
+        for (var i=0; i<forms.length; i++) {
+            var act = forms[i].action;
+            forms[i].action = rpcroot + act.substring(act.indexOf("/XXX")+4);
+        }
 		showTab(settings['tab'] || 'jobs');
 		iam = $('form_iam').value;
 		if (iam != '') {
@@ -975,8 +980,9 @@ function deleteCommand(label) {
 }
 
 /* AJAX CALLBACK from getConfig() that renders the node table */
-function renderCommands(lastCmdlist) {
+function renderCommands(newCmdlist) {
 	var filter = new ColumnFilter(["label","command"]);
+    lastCmdlist = newCmdlist || lastCmdlist;
 	commands = lastCmdlist;
 	commandList = [];
 	var commandsFilter = settings['commandsfilter'] || '';
@@ -1752,7 +1758,8 @@ function fillFormsFromJob(uuid, clone) {
 	currentJob.spawn = false;
 	//$('form_job_conf').value = job.config || '';
 	form_config_editor.setValue(job.config || '');
-	$('form_job_owner').value = $('form_iam').value || job.owner; 
+    $('send_auth').value = auth;
+	$('form_job_owner').value = $('form_iam').value || job.owner;
 	$('form_job_desc').value = job.description || 'describe this job';
 	$('form_job_nodes').value = job.nodes.length == 0 ? 1 : job.nodes.length;
 	$('form_job_ondone').value = job.onComplete || '';

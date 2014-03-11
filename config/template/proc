@@ -28,6 +28,10 @@ case $1 in
 		done
 		exit
 		;;
+	reboot)
+		hcl halt && hcl boot
+		exit
+		;;
 	exe)
 		shift
 		${HYDRA_CMD} ${HYDRA_EXE} $*

@@ -529,7 +529,7 @@ function showTab(tab) {
 
 /* called when node checkbox is toggled */
 function dropHost(uuid) {
-	new Ajax.Request("/host.delete?uuid="+uuid, { method: 'get',  onComplete: null });
+	callRPC("/host.delete?uuid="+uuid);
 }
 
 /* rebalance a host */

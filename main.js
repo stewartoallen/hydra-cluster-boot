@@ -223,10 +223,10 @@ var render = {
     },
 
     "boot" : function(res, query, cluster, host) {
-        if (cluster.isLocal) query.hostname = 'localhost';
+        if (cluster.isLocal) query.hostname = 'lslhost';
         http.template(res, query.funcName, {
             cluster: query.cluster,
-            hostname: query.sethost,
+            hostname: query.sethost || cluster.isLocal ? "localhost" : null,
             boothost: params.boothost
         });
     },
@@ -245,7 +245,7 @@ var render = {
     "hint" : function(res, query, cluster, host) {
         http.template(res, query.funcName, {
             boothost: params.boothost,
-            cluster:query.cluster
+            cluster: query.cluster
         });
     },
 
@@ -504,7 +504,11 @@ var api = {
                 if (err || !cluster) return callback("invalid cluster id");
                 var newCluster = JSON.parse(query.data);
                 // preserve running cluster process state data
-                newCluster.proc = cluster.proc;
+                if (newCluster.proc == 'delete') {
+                    newCluster.proc = {};
+                } else {
+                    newCluster.proc = cluster.proc;
+                }
                 config.putJS(clusterKey, newCluster, function(err) {
                     if (err) return callback("failed to update cluster");
                     callback(null, {cluster:query.cluster,updated:true});

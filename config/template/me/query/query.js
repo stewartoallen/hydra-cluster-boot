@@ -65,7 +65,7 @@ function callRPC(path, args, callback) {
 	script.src = path;
 
 	cbfuncs[fname] = function(func, data) {
-		callback(data);
+		if (callback) callback(data);
 		delete cbfuncs[func];
 		document.getElementById(func).remove();
 	};
@@ -657,7 +657,7 @@ function init() {
         var clusterString = store['cluster-'+params.cluster];
         if (clusterString) {
             clusterData = JSON.parse(clusterString);
-            rpcroot="http://"+firstKey(clusterData.proc.qmaster)+":2222"
+            if (!clusterData.isLocal) rpcroot="http://"+firstKey(clusterData.proc.qmaster)+":2222"
             auth = clusterData.authKey;
         }
     }

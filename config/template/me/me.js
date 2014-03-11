@@ -129,6 +129,11 @@ var cluster = {
             html.push(util.tag("button",{onclick:"cluster.showRegistered(\""+key+"\")"}));
             html.push(key+":"+util.count_keys(cluster.proc[key])+"</button>");
         }
+        if (html.length > 0) {
+            html.push(util.tag("button",{onclick:"cluster.clearRegistered()"}));
+            html.push("-");
+            html.push("</button>");
+        }
         $("#cluster-registered").html(html.join(''));
         /* render node type process lists */
         var html = [];
@@ -181,10 +186,7 @@ var cluster = {
     },
 
     manage:function() {
-        var spawn = clusterData.proc['spawn'];
-        for (var key in spawn) {
-            window.open('http://{{boothost}}/me/spawn/spawn.html?cluster='+clusterNode.id,'_spawn');
-        }
+        window.open('http://{{boothost}}/me/spawn/spawn.html?cluster='+clusterNode.id,'_spawn');
     },
 
     setAbout:function() {
@@ -239,6 +241,13 @@ var cluster = {
         var newRequired = prompt("Enter required number of "+require+" nodes for this cluster", clusterData.require[require]);
         if (newRequired) {
             clusterData.require[require] = parseInt(newRequired);
+            cluster.update();
+        }
+    },
+
+    clearRegistered:function() {
+        if (confirm("Delete all registered node data?")) {
+            clusterData.proc = 'delete';
             cluster.update();
         }
     },

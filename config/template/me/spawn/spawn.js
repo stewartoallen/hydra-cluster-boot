@@ -88,7 +88,7 @@ function init() {
             var clusterString = settings['cluster-'+params.cluster];
             if (clusterString) {
                 clusterData = JSON.parse(clusterString);
-                rpcroot="http://"+firstKey(clusterData.proc.spawn)+":5050"
+                if (!clusterData.isLocal) rpcroot="http://"+firstKey(clusterData.proc.spawn)+":5050"
                 auth = clusterData.authKey;
             }
         }
@@ -260,7 +260,7 @@ function callRPC(path, callback) {
 	script.src = path;
 
 	cbfuncs[fname] = function(data, topic, func) {
-		callback(data);
+		if (callback) callback(data);
 		delete cbfuncs[func];
 		document.getElementById(func).remove();
 	};
@@ -558,22 +558,22 @@ function hostFailInfoCallback(data) {
 
 /* danger, danger */
 function failHost(uuid, deadFs) {
-	new Ajax.Request("/host.fail?uuids="+uuid+"&deadFs="+(deadFs ? 1 : 0), { method: 'get',  onComplete: null });
+    callRPC("/host.fail?uuids="+uuid+"&deadFs="+(deadFs ? 1 : 0));
 }
 
 function cancelHostFail(uuid) {
-	new Ajax.Request("/cancel.host.fail?uuids="+uuid, {method: 'get', oncComplete: null });
+	callRPC("/cancel.host.fail?uuids="+uuid);
 }
 
 function enableHost(hosts) {
 	if (confirm('are you sure want to enable '+hosts+' ?')) {
-		new Ajax.Request("/host.enable?hosts="+hosts, { method: 'get',  onComplete: null });
+        callRPC("/host.enable?hosts="+hosts);
 	}
 }
 
 function disableHost(hosts) {
 	if (confirm('are you sure you want to disable '+hosts+' ?')) {
-		new Ajax.Request("/host.disable?hosts="+hosts, { method: 'get',  onComplete: null });
+        callRPC("/host.disable?hosts="+hosts);
 	}
 }
 

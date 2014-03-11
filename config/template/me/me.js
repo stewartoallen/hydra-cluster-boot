@@ -17,7 +17,7 @@ function on_ready() {
 
 var clusterNode = null;
 var clusterStyle = null;
-var clusterSelect = null;
+var clusterSelect = db['select-cluster'];
 var clusterConfig = null;
 var clusterTemplate = null;
 var clusterData = null;
@@ -48,13 +48,14 @@ var account = {
         location.reload();
     },
 
-    get:function() {
+    get:function(callback) {
         cluster.render(null);
         $.ajax({
             url:"/api/get_account",
             data:{id:db.account},
             success:function(data,status,xhr) {
                 account.render(decode(data));
+                if (callback) callback();
             },
             error:function(xhr,status,error) {
                 db.account='';
@@ -62,6 +63,7 @@ var account = {
             }
         });
     },
+
     render:function(account) {
         var html = ["<ul id='account'>"];
         var clusters = account.clusters;
@@ -96,6 +98,7 @@ var cluster = {
             data:{id:node.text},
             success:function(data,status,xhr) {
                 cluster.render(decode(data));
+                db['select-cluster'] = clusterNode.id;
             },
             error:function(xhr,status,error) {
                 alert("Failure Retrieving Cluster Info: "+error);
@@ -381,6 +384,25 @@ var cluster = {
             },
             error:function(xhr,status,error) {
                 alert("Failure Deleting Cluster: "+error);
+            }
+        });
+    },
+
+    clone:function() {
+        if (clusterNode == null) return alert("no cluster selected");
+        var clusterSave = clusterData;
+        $.ajax({
+            url:"/api/create_cluster",
+            data:{account:db.account},
+            success:function(data,status,xhr) {
+                clusterSelect = decode(data).cluster;
+                account.get(function() {
+                    clusterData = clusterSave;
+                    cluster.update();
+                });
+            },
+            error:function(xhr,status,error) {
+                alert("Failure Cloning Cluster: "+error);
             }
         });
     }

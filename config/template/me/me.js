@@ -355,7 +355,7 @@ var cluster = {
     },
 
     saveTemplateFiles:function() {
-        clusterTemplate.iamge = $('#template-files').val().split('\n');
+        clusterTemplate.image = $('#template-files').val().split('\n');
         cluster.update();
     },
 

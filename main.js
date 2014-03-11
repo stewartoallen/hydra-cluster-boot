@@ -23,7 +23,7 @@ var params = {
  * fix linux vs mac osx rabbit cmd (auto switch in boot?)
  * config template right panel
  * redo rendering to determine content-type
- * button to purge registered nodes or delete specific nodes
+ * add cluster cloning
  */
 
 var http = {

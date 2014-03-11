@@ -19,6 +19,7 @@ var clusterNode = null;
 var clusterStyle = null;
 var clusterSelect = null;
 var clusterConfig = null;
+var clusterTemplate = null;
 var clusterData = null;
 
 var util = {
@@ -330,15 +331,29 @@ var cluster = {
     },
 
     showTemplate:function(template){
-        var processList = clusterData.node[template].process.join(",");
-        var newProcessList = prompt("Enter CSV list of processes to run on this node type",processList);
-        if (newProcessList) {
-            clusterData.node[template].process = newProcessList.split(',');
-            cluster.update();
-        } else if (newProcessList == '' && template != 'defaults') {
-            delete clusterData.node[template];
-            cluster.update();
-        }
+        clusterTemplate = clusterData.node[template];
+        $('#right-title').html(template+" template");
+        var html = ['<table id="node-template">'];
+        html.push("<tr><th>processes <button style='float:right' onclick='cluster.saveTemplateProcesses()'>save</button></th></tr>");
+        html.push("<tr><th><textarea id='template-processes' rows='5' cols='35'>");
+        html.push(clusterTemplate.process.join("\n"));
+        html.push("</textarea></th></tr>");
+        html.push("<tr><th>files <button style='float:right' onclick='cluster.saveTemplateFiles()'>save</button></th></tr>");
+        html.push("<tr><th><textarea id='template-files' rows='5' cols='35'>");
+        html.push(clusterTemplate.image.join("\n"));
+        html.push("</textarea></th></tr>");
+        html.push('</table>');
+        $('#right-body').html(html.join(''));
+    },
+
+    saveTemplateProcesses:function() {
+        clusterTemplate.process = $('#template-processes').val().split('\n');
+        cluster.update();
+    },
+
+    saveTemplateFiles:function() {
+        clusterTemplate.iamge = $('#template-files').val().split('\n');
+        cluster.update();
     },
 
     add:function() {

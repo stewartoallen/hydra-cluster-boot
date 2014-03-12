@@ -23,6 +23,7 @@ var params = {
  * fix linux vs mac osx rabbit cmd (auto switch in boot?)
  * config template right panel
  * redo rendering to determine content-type
+ * redo all rendering to have a consistent set of base objects
  */
 
 var http = {

@@ -97,6 +97,8 @@ var cluster = {
             url:"/api/get_cluster",
             data:{id:node.text},
             success:function(data,status,xhr) {
+                $('#right-title').html('');
+                $('#right-body').html('');
                 cluster.render(decode(data));
                 db['select-cluster'] = clusterNode.id;
             },

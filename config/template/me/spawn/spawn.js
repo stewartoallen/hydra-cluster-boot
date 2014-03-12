@@ -276,7 +276,7 @@ function callRPC(path, callback) {
 
 /* alerts on a failed rpc */
 function rpcCallback(data) {
-	console.log(['rpc callback',data]);
+	//console.log(['rpc callback',data]);
 }
 
 function sortTable(id, col) {
@@ -690,10 +690,14 @@ function eventPollSetup() {
 }
 
 function eventPollCallback(obj,topic) {
-	//console.log(['event poll callback', rpc]);
+	//console.log(['event poll callback', obj, topic, typeof obj, Array.isArray(obj)]);
 	eventPoller = null;
 	eventPollSetup();
-	eventUpdater(eventHandler(topic, obj));
+    if (Array.isArray(obj)) {
+        eventUpdater(eventHandler("event.batch", obj));
+    } else {
+        eventUpdater(eventHandler(topic, obj));
+    }
 }
 
 function eventUpdater(update) {

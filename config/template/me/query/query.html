@@ -23,11 +23,10 @@
 <body onload="QM.init()">
     <div id="top">Distributed Data Browser</div>
     <div id="mode">
-        <button id='b_completedqueries' onclick="QM.showTab('completedqueries');">Finished Queries</button>
-        <button id='b_runningqueries' onclick="QM.showTab('runningqueries');">Live Queries</button>
+        <button id='b_completed-queries' onclick="QM.showTab('completed-queries');">Finished Queries</button>
+        <button id='b_running-queries' onclick="QM.showTab('running-queries');">Live Queries</button>
         <button id='b_browse' onclick="QM.showTab('browse');">Browse Data</button>
         <button id='b_setup' onclick="QM.showTab('setup');">Settings</button>
-        <button id='b_rescan' onclick="QM.monitorsRescan();">Rescan Jobs</button>
     </div>
     <form name="foo" method="get">
     <div id="setup" class="padme">
@@ -37,7 +36,7 @@
             <tr><th width=5% nowrap>to query</th><td><input id="o2q" type="text" onkeyup="return QM.queryCodec(this.value,event,'decode')"/></td></tr>
         </table>
     </div>
-    <div id="completedqueries" class="">
+    <div id="completed-queries" class="">
         <div id="completed" class="cachetable"></div>
         <div id="completedstatus" class="status" style="display:none;">
             <span>
@@ -53,7 +52,7 @@
         </div>
         <div id="completedhosts" class="cachetable" style="display:none;"></div>
     </div>
-    <div id="runningqueries" class="">
+    <div id="running-queries" class="">
         <div id="queries" class="cachetable"></div>
         <div id="runningstatus" class="status" style="display:none;">
             <span>

@@ -1,12 +1,5 @@
 (function() {
 
-/* stub console log if browser doesn't support it */
-if ( !(window.console && console.log) ) {
-    window.console = { 
-        log: function() { }
-    };
-}
-
 var busyimg = '<img width="32" height="32" src="spinner.gif">',
     store = window.localStorage || {},
     navstack = [ "" ],
@@ -14,7 +7,7 @@ var busyimg = '<img width="32" height="32" src="spinner.gif">',
     queries = [],
     render = 1,
     maxnav = fetchValue('browse.max',25),
-    tabs = ['completedqueries','browse','runningqueries','setup'],
+    tabs = ['completed-queries','browse','running-queries','setup'],
     // dict of query string kv-pairs
     qs = document.location.search.slice(1),
     qkv = qs.parseQuery(),
@@ -82,23 +75,25 @@ function rpcDecode(data) {
 /* hide and show selected elements */
 function showTab(tab) {
     for (var i=0; i<tabs.length; i++) {
+        var button = $('b_'+tabs[i]);
+        var display = $(tabs[i]);
         if (tabs[i] == tab) {
-            $(tabs[i]).style.display = 'block';
-            $('b_'+tabs[i]).style.backgroundColor = '#fea';
+            display.style.display = 'block';
+            button.style.backgroundColor = '#fea';
             storeValue('tab',tab);
         } else {
-            $(tabs[i]).style.display = 'none';
-            $('b_'+tabs[i]).style.backgroundColor = '#fff';
+            display.style.display = 'none';
+            button.style.backgroundColor = '#fff';
         }
         //console.log(tabs[i]);
     }
     stopHostPolling();
     stopLiveQueryPolling();
     switch (tab) {
-        case 'completedqueries':
+        case 'completed-queries':
             cacheRescan();
             break;
-        case 'runningqueries':
+        case 'running-queries':
             queriesRescan();
             break;
     }
@@ -320,23 +315,18 @@ function queriesRescan() {
     }
 }
 
-/* sent rpc to refresh from QueryMaster */
-function monitorsRescan() {
-    callRPC('/monitors.rescan', [], function(data) { alert(data); });    
-}
-
 /* sent rpc to get a list of hosts for a query from QueryMaster */
 function queryHostsRescan(uuid,job) {
     var tab=fetchValue('tab'); 
     var request = callRPC('/host/list', ['uuid='+uuid], function(data) { renderQueryHosts(data,tab); });
     switch (tab) {
-        case 'completedqueries':
+        case 'completed-queries':
             $('sel_compl_uuid').update(uuid);
             $('sel_compl_job').update(job);
             $('completedhosts').update("");            
             // $('sel_compl_progress').innerHTML ="-"; 
             break;
-        case 'runningqueries':
+        case 'running-queries':
             $('sel_run_uuid').update(uuid);
             $('sel_run_job').update(job);  
             $('runninghosts').update(""); 
@@ -369,12 +359,12 @@ function renderQueryHosts(hosts,tab){
     html += '</table>';
     // var tab=fetchValue('tab');    
     switch (tab) {
-        case 'completedqueries':             
+        case 'completed-queries':
             $('completedhosts').innerHTML = html;
             show('completedstatus');
             show('completedhosts');
             break;
-        case 'runningqueries':            
+        case 'running-queries':
             $('runninghosts').innerHTML = html; 
             var progress = (((finished/1.00)/hosts.length)*100.0);
             // $('sel_run_progress').innerHTML = (isNaN(progress) || (progress==0) )?"-":progress+"%";
@@ -678,14 +668,13 @@ function init() {
     treeNavStack();
     storedQueriesShow();
 
-    showTab(fetchValue('tab','runningqueries'));
+    showTab(fetchValue('tab','browse'));
     storeValue('job',jobid);
 }
 
 window.QM = {
     init : init,
     showTab : showTab,
-    monitorsRescan : monitorsRescan,
     queryCodec : queryCodec,
     queryRaw : queryRaw,
     queryCSV : queryCSV,

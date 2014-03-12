@@ -5,13 +5,12 @@ body,div,table { padding:0px; margin:0px; border:0px; font-family:helvetica,aria
 .cachetable table td { border:1px solid #ddd; background-color:#eee }
 .cachetable table td a { text-align:center }
 .padme { padding:5px }
-#b_rescan { right:5px; position:absolute }
 #conf { font-family:courier,fixed; font-size:small }
 #top { padding:5px; background:#eee; border-bottom:1px solid black; text-align:center }
 #mode { padding:5px; background:#ddd; border-bottom:1px solid black; text-align:center }
 #setup { display:none } 
 #cache { display:none } 
-#runningqueries { display:none } 
+#running-queries { display:none }
 #table_query { border:1px solid blue }
 #table_query th { background:#ddd; padding-left:2px; padding-right:2px }
 #table_query td { background:#eee }

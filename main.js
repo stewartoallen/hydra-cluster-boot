@@ -224,10 +224,10 @@ var render = {
     },
 
     "boot" : function(res, query, cluster, host) {
-        if (cluster.isLocal) query.hostname = 'lslhost';
+        if (cluster.isLocal) query.sethost = 'localhost';
         http.template(res, query.funcName, {
             cluster: query.cluster,
-            hostname: query.sethost || cluster.isLocal ? "localhost" : null,
+            hostname: query.sethost,
             boothost: params.boothost
         });
     },

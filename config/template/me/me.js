@@ -178,12 +178,13 @@ var cluster = {
         });
     },
 
-    update:function() {
+    update:function(callback) {
         $.ajax({
             url:"/api/update_cluster",
             data:{account:db.account,cluster:clusterNode.id,data:JSON.stringify(clusterData)},
             success:function(data,status,xhr) {
                 cluster.select(clusterNode);
+                if (callback) callback();
             },
             error:function(xhr,status,error) {
                 alert("Failure Updating Cluster: "+error);
@@ -277,6 +278,11 @@ var cluster = {
 
     addConfiguration:function() {
         console.log("add config");
+        var newConfigName = prompt("Enter New Configuration Name");
+        if (newConfigName && !clusterData.config[newConfigName]) {
+            clusterData.config[newConfigName] = {};
+            cluster.update();
+        }
     },
 
     showConfiguration:function(config) {
@@ -294,8 +300,16 @@ var cluster = {
             html.push('</th></tr>');
         }
         html.push("<tr><th><button onclick='cluster.addConfigKey()'>+</button></th></tr>")
+        html.push("<tr><th colspan='2' style='text-align:center'><button onclick='cluster.deleteConfiguration()'>delete configuration</button></th></tr>");
         html.push('</table>');
         $('#right-body').html(html.join(''));
+    },
+
+    deleteConfiguration:function() {
+        if (clusterConfig && confirm("Are you sure you want to delete this configuration?")) {
+            delete clusterData.config[clusterConfig];
+            cluster.update();
+        }
     },
 
     editConfigKey:function(button) {
@@ -305,12 +319,14 @@ var cluster = {
         if (newValue == null) return;
         if (newValue.length > 0) {
             opts[key] = newValue;
-            cluster.update();
-            cluster.showConfiguration(clusterConfig);
+            cluster.update(function() {
+                cluster.showConfiguration(clusterConfig);
+            });
         } else {
             delete opts[key];
-            cluster.update();
-            cluster.showConfiguration(clusterConfig);
+            cluster.update(function() {
+                cluster.showConfiguration(clusterConfig);
+            });
         }
     },
 
@@ -321,8 +337,9 @@ var cluster = {
             var newValue = prompt("Value for "+newKey);
             if (newValue && newValue.length > 0) {
                 opts[newKey] = newValue;
-                cluster.update();
-                cluster.showConfiguration(clusterConfig);
+                cluster.update(function() {
+                    cluster.showConfiguration(clusterConfig);
+                });
             }
         }
     },
@@ -331,34 +348,42 @@ var cluster = {
         var template = prompt("Enter node template name");
         if (template && !clusterData.node[template]) {
             clusterData.node[template] = { process:[],image:clusterData.node["defaults"].image };
-            cluster.showTemplate(template);
+            cluster.update(function() {
+                cluster.showTemplate(template);
+            });
         }
     },
 
     showTemplate:function(template){
-        clusterTemplate = clusterData.node[template];
+        clusterTemplate = template;
+        var template = clusterData.node[template];
         $('#right-title').html(template+" template");
         var html = ['<table id="node-template">'];
-        html.push("<tr><th>processes <button style='float:right' onclick='cluster.saveTemplateProcesses()'>save</button></th></tr>");
+        html.push("<tr><th>processes</th></tr>");
         html.push("<tr><th><textarea id='template-processes' rows='5' cols='35'>");
-        html.push(clusterTemplate.process.join("\n"));
+        html.push(template.process.join("\n"));
         html.push("</textarea></th></tr>");
-        html.push("<tr><th>files <button style='float:right' onclick='cluster.saveTemplateFiles()'>save</button></th></tr>");
+        html.push("<tr><th>files</th></tr>");
         html.push("<tr><th><textarea id='template-files' rows='5' cols='35'>");
-        html.push(clusterTemplate.image.join("\n"));
+        html.push(template.image.join("\n"));
         html.push("</textarea></th></tr>");
+        html.push("<tr><th style='text-align:center'><button onclick='cluster.saveTemplate()'>save</button><button onclick='cluster.deleteTemplate()'>delete template</button></th></tr>");
         html.push('</table>');
         $('#right-body').html(html.join(''));
     },
 
-    saveTemplateProcesses:function() {
-        clusterTemplate.process = $('#template-processes').val().split('\n');
+    saveTemplate:function() {
+        var template = clusterData.node[clusterTemplate];
+        template.process = $('#template-processes').val().split('\n');
+        template.image = $('#template-files').val().split('\n');
         cluster.update();
     },
 
-    saveTemplateFiles:function() {
-        clusterTemplate.image = $('#template-files').val().split('\n');
-        cluster.update();
+    deleteTemplate:function() {
+        if (clusterTemplate != 'defaults' && confirm("Are you sure you want to delete this template?")) {
+            delete clusterData.node[clusterTemplate];
+            cluster.update();
+        }
     },
 
     add:function() {
@@ -400,6 +425,7 @@ var cluster = {
                 clusterSelect = decode(data).cluster;
                 account.get(function() {
                     clusterData = clusterSave;
+                    clusterData.about = "CLONED "+clusterData.about;
                     cluster.update();
                 });
             },

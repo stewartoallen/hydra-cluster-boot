@@ -39,6 +39,11 @@ var util = {
         }
         html.push(">");
         return html.join('');
+    },
+    clearRightPanel:function() {
+        $('#right-title').html('');
+        $('#right-body').html('');
+        $('#right-footer').html('');
     }
 };
 
@@ -97,8 +102,7 @@ var cluster = {
             url:"/api/get_cluster",
             data:{id:node.text},
             success:function(data,status,xhr) {
-                $('#right-title').html('');
-                $('#right-body').html('');
+                util.clearRightPanel();
                 cluster.render(decode(data));
                 db['select-cluster'] = clusterNode.id;
             },
@@ -300,9 +304,9 @@ var cluster = {
             html.push('</th></tr>');
         }
         html.push("<tr><th><button onclick='cluster.addConfigKey()'>+</button></th></tr>")
-        html.push("<tr><th colspan='2' style='text-align:center'><button onclick='cluster.deleteConfiguration()'>delete configuration</button></th></tr>");
         html.push('</table>');
         $('#right-body').html(html.join(''));
+        $('#right-footer').html("<button onclick='cluster.deleteConfiguration()'>delete configuration</button>");
     },
 
     deleteConfiguration:function() {
@@ -367,9 +371,9 @@ var cluster = {
         html.push("<tr><th><textarea id='template-files' rows='5' cols='35'>");
         html.push(template.image.join("\n"));
         html.push("</textarea></th></tr>");
-        html.push("<tr><th style='text-align:center'><button onclick='cluster.saveTemplate()'>save</button><button onclick='cluster.deleteTemplate()'>delete template</button></th></tr>");
         html.push('</table>');
         $('#right-body').html(html.join(''));
+        $('#right-footer').html("<button onclick='cluster.saveTemplate()'>save</button><button onclick='cluster.deleteTemplate()'>delete template</button>");
     },
 
     saveTemplate:function() {

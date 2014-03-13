@@ -360,7 +360,7 @@ var cluster = {
 
     showTemplate:function(templateName){
         clusterTemplate = templateName;
-        var template = clusterData.node[template];
+        var template = clusterData.node[templateName];
         $('#right-title').html(templateName+" template");
         var html = ['<table id="node-template">'];
         html.push("<tr><th>processes</th></tr>");

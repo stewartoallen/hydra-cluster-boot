@@ -1,15 +1,19 @@
 <table>
+    <tr><th><label>Boot</label></th><td id="cluster-hint"></td></tr>
     <tr><th><label>About</label></th><td id="cluster-about"></td></tr>
-    <tr><th><label>Options</label></th><td>
+    <tr><th><label>Actions</label></th><td>
         <button onclick="cluster.manage()">manage</button>
+        <button onclick="cluster.clone()">clone</button>
+        <button onclick="cluster.delete()">delete</button>
+    </td></tr>
+    <tr><th><label>Settings</label></th><td>
         <button onclick="cluster.setAbout()">about</button>
         <button onclick="cluster.setAuthKey()">auth</button>
         <button onclick="cluster.setImageRoot()">image</button>
         <button onclick="cluster.setLocal()" id="cluster-set-local">local</button>
         <button onclick="cluster.setShortHost()" id="cluster-set-naming">short host names</button>
     </td></tr>
-    <tr><th><label>Boot Node</label></th><td id="cluster-hint"></td></tr>
-    <tr><th><label>Configurations</label></th><td id="cluster-configs"></td></tr>
+    <tr><th><label>Process Config</label></th><td id="cluster-configs"></td></tr>
     <tr><th><label>Node Templates</label></th><td id="cluster-templates"></td></tr>
     <tr><th><label>Required Nodes</label></th><td id="cluster-required"></td></tr>
     <tr><th><label>Registered Nodes</label></th><td id="cluster-registered"></td></tr>

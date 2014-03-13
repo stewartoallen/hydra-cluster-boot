@@ -14,7 +14,7 @@ var template = {};
 var waiters = {};
 var clusterDefault = {};
 var params = {
-    boothost : [os.hostname(),8008].join(":")
+    boothost : [os.hostname(),8007].join(":")
 };
 
 /**

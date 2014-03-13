@@ -417,6 +417,7 @@ var cluster = {
 
     clone:function() {
         if (clusterNode == null) return alert("no cluster selected");
+        if (!confirm("Clone this cluster?")) return;
         var clusterSave = clusterData;
         $.ajax({
             url:"/api/create_cluster",

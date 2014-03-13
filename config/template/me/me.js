@@ -358,10 +358,10 @@ var cluster = {
         }
     },
 
-    showTemplate:function(template){
-        clusterTemplate = template;
+    showTemplate:function(templateName){
+        clusterTemplate = templateName;
         var template = clusterData.node[template];
-        $('#right-title').html(template+" template");
+        $('#right-title').html(templateName+" template");
         var html = ['<table id="node-template">'];
         html.push("<tr><th>processes</th></tr>");
         html.push("<tr><th><textarea id='template-processes' rows='5' cols='35'>");

@@ -8,6 +8,7 @@ var busyimg = '<img width="32" height="32" src="spinner.gif">',
     render = 1,
     maxnav = fetchValue('browse.max',25),
     tabs = ['completed-queries','browse','running-queries','setup'],
+    tabSetting = "query.tab",
     // dict of query string kv-pairs
     qs = document.location.search.slice(1),
     qkv = qs.parseQuery(),
@@ -80,7 +81,7 @@ function showTab(tab) {
         if (tabs[i] == tab) {
             display.style.display = 'block';
             button.style.backgroundColor = '#fea';
-            storeValue('tab',tab);
+            storeValue(tabSetting,tab);
         } else {
             display.style.display = 'none';
             button.style.backgroundColor = '#fff';
@@ -317,7 +318,7 @@ function queriesRescan() {
 
 /* sent rpc to get a list of hosts for a query from QueryMaster */
 function queryHostsRescan(uuid,job) {
-    var tab=fetchValue('tab'); 
+    var tab=fetchValue(tabSetting);
     var request = callRPC('/host/list', ['uuid='+uuid], function(data) { renderQueryHosts(data,tab); });
     switch (tab) {
         case 'completed-queries':
@@ -357,7 +358,7 @@ function renderQueryHosts(hosts,tab){
         finished+=(h.finished=="true"?1:0);
     }
     html += '</table>';
-    // var tab=fetchValue('tab');    
+    // var tab=fetchValue(tabSetting);
     switch (tab) {
         case 'completed-queries':
             $('completedhosts').innerHTML = html;
@@ -668,7 +669,7 @@ function init() {
     treeNavStack();
     storedQueriesShow();
 
-    showTab(fetchValue('tab','browse'));
+    showTab(fetchValue(tabSetting,'browse'));
     storeValue('job',jobid);
 }
 

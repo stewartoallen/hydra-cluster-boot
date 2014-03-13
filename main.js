@@ -239,7 +239,7 @@ var render = {
             hostname: query.hostname,
             process: host.process.join(' '),
             images: (host.image || cluster.node.defaults.image).join(' '),
-            imageroot: cluster.imageRoot || ['http://',params.boothost,'/image/default'].join('')
+            imageroot: cluster.imageRoot || defaultImageRoot()
         });
     },
 
@@ -264,6 +264,10 @@ var contentType = function(name, dv) {
 var shortenHost = function(hostname) {
     var newhost = hostname.split(".")[0];
     return (Number.isNaN(parseInt(newhost))) ? newhost : hostname;
+};
+
+var defaultImageRoot = function() {
+    return ['http://',params.boothost,'/image/default'].join('')
 };
 
 var oGet = function(obj, find, dv) {
@@ -447,7 +451,8 @@ var api = {
             if (account.permits <= 0) return callback("insufficient account permits");
             config.getJS(clusterKey, function(err, val) {
                 if (err) {
-                    var init = clusterDefault;//{require:{},proc:{},node:{defaults:{}},config:{defaults:{}}};
+                    var init = clusterDefault;
+                    init.imageRoot = defaultImageRoot();
                     config.putJS(clusterKey, init, function(err) {
                         if (err) {
                             callback("db put fail");
@@ -510,6 +515,8 @@ var api = {
                 } else {
                     newCluster.proc = cluster.proc;
                 }
+                // set default imageRoot
+                if (!newCluster.imageRoot) newCluster.imageRoot = defaultImageRoot();
                 config.putJS(clusterKey, newCluster, function(err) {
                     if (err) return callback("failed to update cluster");
                     callback(null, {cluster:query.cluster,updated:true});

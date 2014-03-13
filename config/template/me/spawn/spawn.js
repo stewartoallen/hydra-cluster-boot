@@ -40,6 +40,7 @@ var initonce = false,
 	lastLog = {},
 	lastRender = {},
 	tabs = ["commands","macros","jobs","hosts","alias","zk","mesh"],
+    tabSetting = "spawn.tab",
 	setup = {},
 	scroll = {},
 	settings = window.localStorage || {},
@@ -57,7 +58,9 @@ var initonce = false,
 	form_config_editor = null,
 	form_macro_editor = null,
 	flowGraph=null,
-	queued=0,spawnqueuesize=0,spawnqueueerrorsize=0,
+	queued=0,
+    spawnqueuesize=0,
+    spawnqueueerrorsize=0,
 	rpcroot="http://localhost:5050";
 
 function parse(json,defval) {
@@ -97,7 +100,7 @@ function init() {
             var act = forms[i].action;
             forms[i].action = rpcroot + act.substring(act.indexOf("/XXX")+4);
         }
-		showTab(settings['tab'] || 'jobs');
+		showTab(settings[tabSetting] || 'jobs');
 		iam = $('form_iam').value;
 		if (iam != '') {
 			settings['iam'] = iam;
@@ -106,8 +109,8 @@ function init() {
 			iam = settings['iam'];
 			$('form_iam').value = iam;
 		}
-		if (settings[settings['tab']+'filter']) {
-			filter = settings[settings['tab']+'filter'];
+		if (settings[settings[tabSetting]+'filter']) {
+			filter = settings[settings[tabSetting]+'filter'];
 			$('form_filter').value = filter;
 		}
 		for (var i=0; i<window.localStorage.length; i++) {
@@ -194,7 +197,7 @@ function windowKeyDown(evt) {
 	}
 	switch (evt.keyCode)
 	{
-		case 8: if (settings['tab'] == 'jobs') { deleteJob(settings['showJob']); evt.stopPropagation(); return false; } break;
+		case 8: if (settings[tabSetting] == 'jobs') { deleteJob(settings['showJob']); evt.stopPropagation(); return false; } break;
 		case 27: if (editing) { showEdit(editing,false); evt.stopPropagation(); return false; } break; // esc to close edit window
 	}
 }
@@ -219,10 +222,10 @@ function windowKeyPress(evt) {
 		case 122: showTab('zk'); break; // z
 		case 114: refresh(); break; // 'r'
 		case 116: toggleQuiesce(); break; // t
-		case 101: if (settings['tab'] == 'jobs') editJob(settings['showJob']); break; // e
-		case 113: if (settings['tab'] == 'jobs') toggleQuiesce(); break; // 'q' (TODO open query winow -- http://'+setup.queryHost+'/query/index.html?job='+job.id)
-		case 115: if (settings['tab'] == 'jobs') stopJob(settings['showJob'],0); break; // s
-		case 107: if (settings['tab'] == 'jobs') rekickJob(settings['showJob']); break; // k
+		case 101: if (settings[tabSetting] == 'jobs') editJob(settings['showJob']); break; // e
+		case 113: if (settings[tabSetting] == 'jobs') toggleQuiesce(); break; // 'q' (TODO open query winow -- http://'+setup.queryHost+'/query/index.html?job='+job.id)
+		case 115: if (settings[tabSetting] == 'jobs') stopJob(settings['showJob'],0); break; // s
+		case 107: if (settings[tabSetting] == 'jobs') rekickJob(settings['showJob']); break; // k
 	}
 }
 
@@ -510,7 +513,7 @@ function showTab(tab) {
 
 	$('form_filter').value = settings[tab+'filter'] || '';//set the new tab filtering value
 	filter = $('form_filter').value;
-	settings['tab'] = tab; //save the new tab selection
+	settings[tabSetting] = tab; //save the new tab selection
 	for (var i=0; i<tabs.length; i++) {
 		var dom = 'tab_'+tabs[i];
 		var btn = 'btn_'+tabs[i];
@@ -2270,8 +2273,8 @@ function setJobFilter(val,ev) {
 	if (val || (e && e.keyCode == 13)) {
 		filter = val || $('form_filter').value;
 		$('form_filter').value = filter;
-		settings[settings['tab']+'filter'] = filter;
-		var table = $('table_'+settings['tab']);
+		settings[settings[tabSetting]+'filter'] = filter;
+		var table = $('table_'+settings[tabSetting]);
 		if(table && filterFunctions[table.id])
 			filterFunctions[table.id].call();
 		else
@@ -2283,8 +2286,8 @@ function setJobFilter(val,ev) {
 function clearJobFilter() {
 	filter = '';
 	$('form_filter').value = filter;
-	settings[settings['tab']+'filter'] = filter;
-	var table = $('table_'+settings['tab']);
+	settings[settings[tabSetting]+'filter'] = filter;
+	var table = $('table_'+settings[tabSetting]);
     if(table && filterFunctions[table.id])
         filterFunctions[table.id].call();
     else

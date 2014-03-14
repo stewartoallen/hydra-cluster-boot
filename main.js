@@ -321,7 +321,7 @@ var api = {
             if (err) return callback(err);
             if (cluster.isLocal) return callback(null, 'localhost');
             var target = cluster.require[query.key];
-            if (target == 0) return callback(null, "");
+            if (target == 0) return callback(null, getKeys(cluster.proc[query.key]).join(" "));
             if (typeof target == 'undefined') return callback("invalid target key '"+query.key+"'");
             if (!cluster.proc || !cluster.proc[query.key] || countKeys(cluster.proc[query.key]) < target) {
                 var wait_key = [query.cluster,query.key].join('_');

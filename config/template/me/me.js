@@ -82,7 +82,7 @@ var account = {
             html.push('</li>');
         }
         html.push("</ul>");
-        $('#clusters').html(html.join(''));
+        $('#left-body').html(html.join(''));
         if (clusterSelect) {
             cluster.select($('#'+clusterSelect)[0]);
             clusterSelect = null;
@@ -278,6 +278,7 @@ var cluster = {
         }
         html.push('</table>');
         $('#right-body').html(html.join(''));
+        $('#right-footer').html("<button onclick='cluster.clearRegistered()'>clear nodes</button>");
     },
 
     addConfiguration:function() {

@@ -1,6 +1,7 @@
 <table>
-    <tr><th><label>Boot</label></th><td id="cluster-hint"></td></tr>
     <tr><th><label>About</label></th><td id="cluster-about"></td></tr>
+    <tr><th><label>Boot Node</label></th><td id="cluster-hint"></td></tr>
+    <tr><td></td><td><div class="separator"></div></td></tr>
     <tr><th><label>Actions</label></th><td>
         <button onclick="cluster.manage()">manage</button>
         <button onclick="cluster.clone()">clone</button>
@@ -13,8 +14,10 @@
         <button onclick="cluster.setLocal()" id="cluster-set-local">local</button>
         <button onclick="cluster.setShortHost()" id="cluster-set-naming">short host names</button>
     </td></tr>
+    <tr><td></td><td><div class="separator"></div></td></tr>
     <tr><th><label>Process Config</label></th><td id="cluster-configs"></td></tr>
     <tr><th><label>Node Templates</label></th><td id="cluster-templates"></td></tr>
     <tr><th><label>Required Nodes</label></th><td id="cluster-required"></td></tr>
+    <tr><td></td><td><div class="separator"></div></td></tr>
     <tr><th><label>Registered Nodes</label></th><td id="cluster-registered"></td></tr>
 </table>

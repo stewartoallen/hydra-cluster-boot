@@ -48,7 +48,7 @@ var initonce = false,
 	clientID = Math.floor(Math.random()*1000000),
 	currentJob = {checked:{},respawn:false,nodes:[]},
 	isCompact = navigator.userAgent.match(/iPad/i) != null || settings['compact'] == 1 || settings['compact'] == true,
-	hostDomain = settings['host.domain'] || '.',
+	hostDomain = settings['host.domain'] || '',
 	lineWrap = settings['line.wrap'] == 'true' || settings['line.wrap'] == 1 || false,
 	paramWrap = !(settings['param.wrap'] == 'false' || settings['param.wrap'] == 0) || isCompact, 
 	sizeK = 1024,
@@ -366,20 +366,26 @@ function renderTable(id,table,scrolling,addclass) {
 			}
 		});
 	}
-	var src = '<div><table height="100%" id="'+table.id+'"'+(table.allscroll ? ' class="'+tableclass.join(' ')+'"' : 'id=1')+'><thead><tr>';
+    var src = ['<div>'];
+    if (table.title) {
+        src.push('<div class="table-title">');
+        src.push(table.title);
+        src.push('</div>');
+    }
+	src.push('<div><table height="100%" id="'+table.id+'"'+(table.allscroll ? ' class="'+tableclass.join(' ')+'"' : 'id=1')+'><thead><tr>');
 	for (var i=0; i<table.label.length; i++) {
 		var ladd = (table.labeladd && table.labeladd.length >= i) ? " "+table.labeladd[i] : '';
-		src += '<th'+ladd+'><a href="#" onclick="Spawn.sortTable(\''+id+'\','+(i+1)+')">'+table.label[i]+'</a></th>';
+		src.push('<th'+ladd+'><a href="#" onclick="Spawn.sortTable(\''+id+'\','+(i+1)+')">'+table.label[i]+'</a></th>');
 	}
-	src += '<th></th>';
-	src += '</tr></thead><tbody>';
+    src.push('<th></th>');
+    src.push('</tr></thead><tbody>');
 	for (var i=table.rowon; i<table.rowoff; i++) {
 		var row = table.rows[i] || [];
-		src += '<tr class="'+(i%2?"row_odd":"row_even")+'">';
+        src.push('<tr class="'+(i%2?"row_odd":"row_even")+'">');
 		for (var j=0; j<row.length; j++) {
 			var radd = (table.rowadd && table.rowadd.length >= j) ? " "+table.rowadd[j] : '';
 			var cval = typeof(row[j]) != 'object' ? row[j] : row[j][0];
-			src += '<td'+radd+'>'+cval+'</a></td>';
+            src.push('<td'+radd+'>'+cval+'</a></td>');
 		}
 		if (i == table.rowon && (table.rowon > 0 || table.rowoff < table.rows.length)) {
 			var len = table.rows.length;
@@ -392,9 +398,9 @@ function renderTable(id,table,scrolling,addclass) {
 			divs += '<tr><td height="'+pheight+'%" style="background-color:#88d">&nbsp;</td></tr>';
 			divs += '<tr><td height="'+pafter+'%"></td></tr>';
 			divs += '</table>';
-			src += '<td class="col_scoll" id="'+scrollid+'" align="center" rowspan="'+height+'" height="100%" valign="middle">'+divs+'</td>';
+            src.push('<td class="col_scoll" id="'+scrollid+'" align="center" rowspan="'+height+'" height="100%" valign="middle">'+divs+'</td>');
 		}
-		src += '</tr>'
+        src.push('</tr>');
 	}
 	scroll[scrollid] = function(delta) {
 		if (delta > 0 && delta < 1) {
@@ -416,7 +422,8 @@ function renderTable(id,table,scrolling,addclass) {
 			renderTable(id,table,true,addclass);
 		}
 	};
-	$(id).innerHTML =  src + '</tbody></table></div>';
+    src.push('</tbody></table></div>');
+	$(id).innerHTML =  src.join('');
 	if(table.filterFunction){
 		filterFunctions[table.id] = table.filterFunction;
 	}
@@ -437,8 +444,10 @@ function showEdit(e,b) {
 	$(e).style.display = b ? 'block' : 'none';
 	if (b) {
 		editing = e;
+        $('modal').display = 'inline';
 	} else {
 		editing = null;
+        $('modal').display = 'none';
 	}
 }
 
@@ -522,10 +531,10 @@ function showTab(tab) {
 		}
 		if (tab_dom != dom) {
 			$(dom).style.display = 'none';
-			$(btn).style.backgroundColor = '';
+//			$(btn).style.backgroundColor = '';
 		} else {
 			$(dom).style.display = 'block';
-			$(btn).style.backgroundColor = '#d0d0f0';
+//			$(btn).style.backgroundColor = '#d0d0f0';
 		}
 	}
 }
@@ -997,8 +1006,8 @@ function renderCommands(newCmdlist) {
 	var table = {
 		allscroll:true,
 		id:"table_commands", 
-		label:["edit","label","command","jobs","delete"],
-		rowadd:['align="center"','nowrap','width=100%','align="center"','align="center"'],
+		label:["command","uses","command","delete"],
+		rowadd:['nowrap','align="center"','width=100%','align="center"'],
 		rows:[],
 		rowon:0,
 		rowoff:16,
@@ -1028,15 +1037,13 @@ function renderCommands(newCmdlist) {
 		commandList.push(key);
 		html += '<option value="'+key+'">'+key+'</option>';
 		table.rows.push([
-			'<a href="#" title="edit" onclick="Spawn.editCommand(\''+key+'\')">E</a>',
-			'<a href="#" title="edit" onclick="Spawn.showCommandJobs(\''+key+'\')">'+key+'</a>',
+			'<a href="#" title="edit" onclick="Spawn.editCommand(\''+key+'\')">'+key+'</a>',
+            '<a href="#" title="edit" onclick="Spawn.showCommandJobs(\''+key+'\')">'+command.jobs.length+'</a>',
 			command.command.join(' '),
-			command.jobs.length,
 			'<a href="#" title="delete" onclick="Spawn.deleteCommand(\''+key+'\'); return false;">X</a>',
 		]);
 		$('select_job_command').innerHTML = html;
 	}
-//	$('status_cmds').innerHTML = commandList.length;
 	renderTable('commands_list', table);
 	showCommandJobs(settings['showCommand']);
 	window.Spawn.commands = commands;
@@ -1058,6 +1065,7 @@ function showCommandJobs(command) {
 		rows:[],
 		rowon:0,
 		rowoff:16,
+        title:"Jobs using '"+command+"' command"
 	};
 	var joblist = commands[command].jobs;
 	for (var i=0; i<joblist.length; i++) {
@@ -1079,7 +1087,8 @@ function getAliases() {
 	callRPC('/alias.list?', getAliasesCallback);
 }
 
-function getAliasesCallback(aliases) {
+function getAliasesCallback(newAliases) {
+    aliases = newAliases || aliases;
 	revAliases = {};
 	for (var key in aliases) {
 		var list = aliases[key];
@@ -1120,7 +1129,7 @@ function deleteAlias(key) {
 }
 
 function renderAliases() {
-	var filter=new ColumnFilter(["alias","jobs"]);
+	var filter = new ColumnFilter(["alias","jobs"]);
 	var table = {
 		allscroll:true,
 		id:"table_alias", 
@@ -1210,8 +1219,8 @@ function renderMacros(newMacrolist) {
 	var table = {
 		allscroll:true,
 		id:"table_macros",
-		label:["edit","label","description","owner","edited","delete"],
-		rowadd:['align="center"','nowrap','width=100% nowrap',,'align="center" nowrap','align="center"'],
+		label:["macro","description","owner","edited","delete"],
+		rowadd:['nowrap','width=100% nowrap',,'align="center" nowrap','align="center"'],
 		rows:[],
 		rowon:0,
 		rowoff:16,
@@ -1231,7 +1240,6 @@ function renderMacros(newMacrolist) {
 		macroList.push(key);
 		macro.index = index++;
 		table.rows.push([
-			'<a href="#" title="edit" onclick="Spawn.editMacro(\''+key+'\')">E</a>',
 			'<a href="#" title="edit" onclick="Spawn.editMacro(\''+key+'\')">'+key+'</a>',
 			macro.description,
 			macro.owner,
@@ -1558,87 +1566,10 @@ function editJobCallback(job) {
 		fillFormsFromJob(job.id, false);
 		showEdit('job_edit', true);
 		refreshEditText(form_config_editor);
-		$('job_dependency_link').stopObserving('click');
-        $('job_dependency_link').observe('click', function(event) {
-			Spawn.showEdit('job_dependency',true);
-			Spawn.showEdit('job_edit',false);
-			Spawn.showDependencies(job.id);
-        });
 	} catch (e) {
 		console.log(e);
 	}
 }
-
-function showDependencies(id){
-	try {
-    if (!jobs[id]) {
-        alert('invalid job id: '+id);
-        return;
-    }
-    jQuery('span#dependency_chart_description').empty();        
-    jQuery('svg#dependency_chart_graph').empty();
-    callRPC("/jobDependencies.list?id="+id, showDependenciesCallback);
-    setPollerLive();
-    } catch (e) { console.log(e); }
-}
-
-function showDependenciesCallback(job){
-	try {
-        showEdit('job_dependency', true);
-        $('job_edit_link').stopObserving('click');
-        $('job_edit_link').observe('click', function(event) {
-            Spawn.showEdit('job_edit',true);
-            Spawn.showEdit('job_dependency',false);
-            Spawn.editJob(job.flow_id);
-        });
-        if(job.dependencies && job.dependencies.length>0){
-			flowGraph = new FlowGraph("dependency_chart_graph","dependency_chart",jobs);
-			flowGraph.loadFlow(job);
-			flowGraph.resetTransform();
-			flowGraph.setupZoomBar();
-        }
-        else{
-            $('dependency_chart_description').update("Job "+job.flow_id+" has no dependents.");
-        }
-    } catch (e) {
-        console.log(e);
-    }
-}
-
-function renderRoot(r, n) {
-    /* the Raphael set is obligatory, containing all you want to display */
-    var set = r.set().push(
-        /* custom objects go here */
-//        r.rect(n.point[0]-30, n.point[1]-13, 62, 26)
-//            .attr({"fill": "#FFF", "stroke-width": 2, r : "9px"}))
-		r.circle(n.point[0], n.point[1], 22)
-            .attr({"fill": "#FFF", "stroke-width": 2,"tooltip":"test"}))
-            .push(r.text(n.point[0], n.point[1] + 34, n.label)
-                .attr({"font-size":"10px","font-weight":"bold","font-size":"12pt","color":"#000"}));
-    /* custom tooltip attached to the set */
-//    set.items.forEach(
-//        function(el) {
-//            el.tooltip(r.set().push(r.rect(0, 0, 30, 30)
-//                .attr({"fill": "#FFF", "stroke-width": 1, r : "9px"})))});
-    return set;
-};
-
-function renderDependent(r, n) {
-    /* the Raphael set is obligatory, containing all you want to display */
-    var set = r.set().push(
-        /* custom objects go here */
-		r.circle(n.point[0], n.point[1], 22)
-            .attr({"fill": "#FFF", "stroke-width": 2,"tooltip":"test"}))
-            .push(r.text(n.point[0], n.point[1] + 34, n.label)
-                .attr({"font-size":"12px","font-weight":"bold","font-size":"12pt","color":"#000"}));
-    /* custom tooltip attached to the set */
-//    set.items.forEach(
-//        function(el) {
-//            el.tooltip(r.set().push(r.rect(0, 0, 30, 30)
-//                .attr({"fill": "#FFF", "stroke-width": 1, r : "9px"})))});
-    return set;
-};
-
 
 function cloneJobCallback(job) {
 	try {
@@ -2040,9 +1971,9 @@ function showJobNodesCallback(job,focus) {
 	var uuid = job.id;
 	$('job_nodes').innerHTML = "---";
 	if (!job) {
-		$('sel_job_id').value = '-';
-		$('sel_job_desc').innerHTML = '-';
-		$('sel_job_owner').innerHTML = '-';
+//		$('sel_job_id').value = '-';
+//		$('sel_job_desc').value = '-';
+//		$('sel_job_owner').value = '-';
 		$('sel_job_action').innerHTML = '<button>noop</button>';
 		$('sel_job_edit').onclick = '';
 		$('sel_job_clone').onclick = '';
@@ -2052,15 +1983,16 @@ function showJobNodesCallback(job,focus) {
 	$('sel_job_edit').onclick = function() { editJob(uuid); };
 	$('sel_job_clone').onclick = function() { cloneJob(uuid); };
 	$('sel_job_rebalance').onclick = function() { rebalanceJob(uuid); };
-	$('sel_job_id').value = uuid;
-	$('sel_job_desc').innerHTML = job.description;
-	$('sel_job_owner').innerHTML = job.owner || '-';
-	$('sel_job_action').innerHTML =
-		'<button onclick="return Spawn.checkJobDirs(\''+uuid+'\',1)">Check Dirs</button>' +
-		'<button onclick="return Spawn.fixJobDirs(\''+uuid+'\',1)">Fix Dirs</button>' +
-		'<button onclick="Spawn.setJobRunnable(\''+uuid+'\','+job.disabled+')">'+(job.disabled?'En':'Dis')+'able</button>' +
-		'<button onclick="Spawn.stopJob(\''+uuid+'\',1)">Kill</button>' +
-		'<button onclick="Spawn.deleteJob(\''+uuid+'\')">Delete</button>' ;
+//	$('sel_job_id').value = uuid;
+//	$('sel_job_desc').value = job.description;
+//	$('sel_job_owner').value = job.owner || '-';
+	$('sel_job_action').innerHTML = [
+		'<button onclick="return Spawn.checkJobDirs(\''+uuid+'\',1)">&#x2713; FS</button>',
+		'<button onclick="return Spawn.fixJobDirs(\''+uuid+'\',1)">Fix FS</button>',
+		'<button onclick="Spawn.setJobRunnable(\''+uuid+'\','+job.disabled+')">'+(job.disabled?'En':'Dis')+'able</button>',
+		'<button onclick="Spawn.stopJob(\''+uuid+'\',1)">Kill</button>',
+		'<button onclick="Spawn.deleteJob(\''+uuid+'\')">Delete</button>'
+    ].join('\n');
 	var nodes = job.nodes;
 	var table = {
 		allscroll:true,
@@ -2071,6 +2003,7 @@ function showJobNodesCallback(job,focus) {
 		rows:[],
 		rowon:0,
 		rowoff:16,
+        title:"Nodes for job '"+job.id+"'"
 	};
 	var diffport = false;
 	var lastport = 0;
@@ -2107,9 +2040,9 @@ function showJobNodesCallback(job,focus) {
 	}
 	renderTable('job_nodes', table, false);
 	showHide('job_nodes', true);
-	if(focus){
-		jQuery("#sel_job_id").focus().select();
-	}
+//	if (focus){
+//		jQuery("#sel_job_id").focus().select();
+//	}
 }
 
 function descriptionForErrorCode(code) {
@@ -2432,7 +2365,6 @@ window.Spawn = {
 	setJobsRunnable : setJobsRunnable,
 	clearJobFilter : clearJobFilter,
 	setJobFilter : setJobFilter,
-	showDependencies: showDependencies,
 
 	dropHost : dropHost,
 	rebalanceHost : rebalanceHost,

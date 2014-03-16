@@ -31,47 +31,33 @@
 </head>
 <body onload="Spawn.init()">
 	<div id="top">Cluster Task Manager</div>
-	<div id="mode">
-		<div id="filter">
-			filter <input id="form_filter" name="desc_filter" size=10 onKeyUp="Spawn.setJobFilter(null,event);return true;" autocapitalize="off" autocorrect="off">
-			<span id="filter_list"></span>
-			<button id="b_filt_run" onclick="Spawn.setJobFilter('RUN')">run</button>
-			<button id="b_filt_err" onclick="Spawn.setJobFilter('ERR')">err</button>
-			<button id="b_filt_done" onclick="Spawn.setJobFilter('DONE')">done</button>
-			<button id="b_filt_x" onclick="Spawn.clearJobFilter()">x</button>
-		</div>
-		<button id="btn_commands" onclick="Spawn.showTab('commands');">Commands</button>
-		<button id="btn_macros" onclick="Spawn.showTab('macros');">Macros</button>
-		<button id="btn_alias" onclick="Spawn.showTab('alias');">Alias</button>
-		<button id="btn_jobs" onclick="Spawn.showTab('jobs');">Jobs</button>
-		<button id="btn_hosts" onclick="Spawn.showTab('hosts');">Hosts</button>
-		<button id="btn_zk" onclick="Spawn.showTab('zk');">Zk</button>
-		<button id="btn_mesh" onclick="Spawn.showTab('mesh');">Mesh</button>
-		<button onclick="Spawn.refresh();return false;">Refresh</button>
-		<button onclick="Spawn.toggleQuiesce();return false;" id="quiesce">Quiesce</button>
-		<div id="owner">i am <input id="form_iam" name="iam" size=10 onKeyUp="Spawn.setIAM();return true;" autocapitalize="off" autocorrect="off"></div>
-	</div>
-	<div class="status">
-		<span><span>hosts </span><label id="status_hosts">-</label></span>
-		<span><span>jobs </span><label id="status_jobs">-</label></span>
-		<span><span>tasks </span><label id="status_tasks">-</label></span>
-		&nbsp;&nbsp;&nbsp;
-		<span><span>queued </span><label id="status_queued">-</label></span>
-		<span><span>queued error </span><label id="status_queued_error">-</label></span>
-		<span><span>running </span><label id="status_running">-</label></span>
-		<span><span>avail task slots </span><label id="status_avail_slots">-</label></span>
-		&nbsp;&nbsp;&nbsp;
-		<span><span>disk </span><a id="status_disk_title" title="0"><label id="status_disk_pct">-</label>%</a></span>
-	</div>
+    <div id="middle">
+    <table width="100%">
+        <tr>
+            <td id="left">
+                <div class="side-title">Edit</div>
+                <div class="side-panel">
+                    <button id="btn_commands" onclick="Spawn.showTab('commands');">Commands</button>
+                    <button id="btn_macros" onclick="Spawn.showTab('macros');">Macros</button>
+                    <button id="btn_alias" onclick="Spawn.showTab('alias');">Aliases</button>
+                    <button id="btn_jobs" onclick="Spawn.showTab('jobs');">Jobs</button>
+                </div>
+                <div class="side-separator"></div>
+                <div class="side-title">Browse</div>
+                <div class="side-panel">
+                    <button id="btn_hosts" onclick="Spawn.showTab('hosts');">Hosts</button>
+                    <button id="btn_zk" onclick="Spawn.showTab('zk');">Zk</button>
+                    <button id="btn_mesh" onclick="Spawn.showTab('mesh');">Mesh</button>
+                </div>
+            </td>
+            <td id="center">
+
 	<div id="tab_commands">
+        <div class="new_bar"><button onclick="Spawn.newCommand()">+</button></div>
 		<div id="commands_list" class="lrpad"></div>
-		<div class="addnew"><button onclick="Spawn.newCommand()">create new command</button></div>
-		<table id="command_detail" class="detail">
-			<tr>
-				<td><div id="command_jobs"></div></td>
-			</tr>
-		</table>
-		<div id="command_edit">
+        <div class="vertical-spacer"></div>
+        <div id="command_jobs" class="lrpad"></div>
+		<div id="command_edit" class="edit_window">
 			<form method="post" action="/XXX/command.put" target="_blank">
 				<table class="render" id="command_submit">
 					<tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('command_edit',false);">X</a>&nbsp;</th></tr>
@@ -87,9 +73,9 @@
 		</div>
 	</div>
 	<div id="tab_macros">
+        <div class="new_bar"><button onclick="Spawn.newMacro()">+</button></div>
 		<div id="macros_list" class="lrpad"></div>
-		<div class="addnew"><button onclick="Spawn.newMacro()">create new macro</button></div>
-		<div id="macro_edit">
+		<div id="macro_edit" class="edit_window">
 			<form method="post" action="/XXX/macro.put" target="_blank" id="form_macro_put">
 				<table class="render" id="macro_submit">
 					<tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('macro_edit',false);">X</a>&nbsp;</th></tr>
@@ -110,9 +96,9 @@
 		</div>
 	</div>
 	<div id="tab_alias">
+        <div class="new_bar"><button onclick="Spawn.newAlias()">+</button></div>
 		<div id="alias_list" class="lrpad"></div>
-		<div class="addnew"><button onclick="Spawn.newAlias()">create new alias</button></div>
-		<div id="alias_edit">
+		<div id="alias_edit" class="edit_window">
 			<form method="post" action="/XXX/alias.put" target="_blank">
 				<table class="render" id="alias_submit">
 					<tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('alias_edit',false);">X</a>&nbsp;</th></tr>
@@ -127,112 +113,67 @@
 		</div>
 	</div>
 	<div id="tab_jobs">
+        <div class="new_bar">
+            <div id="job_filter_box">
+                filter <input id="form_filter" name="desc_filter" size=10 onKeyUp="Spawn.setJobFilter(null,event);return true;" autocapitalize="off" autocorrect="off">
+                <span id="filter_list"></span>
+                <button id="b_filt_run" onclick="Spawn.setJobFilter('RUN')">run</button>
+                <button id="b_filt_err" onclick="Spawn.setJobFilter('ERR')">err</button>
+                <button id="b_filt_done" onclick="Spawn.setJobFilter('DONE')">done</button>
+                <button id="b_filt_x" onclick="Spawn.clearJobFilter()">x</button>
+            </div>
+            <div>
+                <button onclick="Spawn.newJob()">+</button>
+                <button id="sel_job_edit">edit</button>
+                <button id="sel_job_clone">clone</button>
+                <button id="sel_job_rebalance">rebalance</button>
+                <span class="vertical-spacer"></span>
+                <span id="sel_job_action"></span>
+            </div>
+  		</div>
 		<div id="jobs_list" class="lrpad"></div>
-		<div class="addnew2">
-			<button onclick="Spawn.newJob()">create new job</button>
-		</div>
-		<div class="status" style="text-align:right;vertical-align:middle">
-			<div style="display:inline-block;float:left">
-				<button id="sel_job_edit">edit</button>
-				<button id="sel_job_clone">clone</button>
-				<button id="sel_job_rebalance">rebalance</button>
-				&nbsp;&nbsp;				
-				<span>
-					<span>job </span>
-					<input id="sel_job_id" class="readonly" type="text" value="" readonly="readonly"></input>
-				</span>
-				<span><span>description </span><label id="sel_job_desc">-</label></span>
-				<span><span>owner </span><label id="sel_job_owner">-</label></span>
-			</div>
-			<div id="sel_job_action"><button>noop</button></div>
-		</div>
-		<table id="job_detail" class="detail">
-			<tr>
-				<td><div id="job_nodes"></div></td>
-				<td id="jlfill">
-					<div id="job_logs_border">
-						<div id="job_log_control">
-							profile
-							<div class="boxit">
-								<button id="job_profile_dump" onClick="Spawn.dumpJobProfile()">dump</button>
-								<input id="job_profile_on" type="radio" name="profile" value="1" onClick="Spawn.setJobProfiling()">on
-								<input id="job_profile_off" type="radio" name="profile" value="0" onClick="Spawn.setJobProfiling()" checked>off
-							</div>
-							&nbsp;
-							log
-							<div class="boxit">
-								<input id="job_log_stdout" type="radio" name="std" value="out" onClick="Spawn.showJobLogs()" checked>stdout
-								<input id="job_log_stderr" type="radio" name="std" value="err" onClick="Spawn.showJobLogs()">stderr
-								&nbsp;
-								<input id="job_log_head" type="radio" name="log" value="head" onClick="Spawn.showJobLogs()">head
-								<input id="job_log_tail" type="radio" name="log" value="tail" onClick="Spawn.showJobLogs()" checked>tail
-							</div>
-							&nbsp;
-							lines
-							<input id="job_log_lines" size=6 onKeyUp="Spawn.updateJobLog(event); return false">
-						</div>
-						<iframe id="job_logs" src="about:blank"></iframe>
-					</div>
-				</td>
-			</tr>
-		</table>
+        <div class="vertical-spacer"></div>
+        <div id="job_nodes" class="lrpad"></div>
+        <div class="vertical-spacer"></div>
+        <table id="job_detail" class="detail"><tr>
+            <td id="jlfill">
+                <div id="job_logs_border">
+                    <div id="job_log_control">
+                        profile
+                        <div class="boxit">
+                            <button id="job_profile_dump" onClick="Spawn.dumpJobProfile()">dump</button>
+                            <input id="job_profile_on" type="radio" name="profile" value="1" onClick="Spawn.setJobProfiling()">on
+                            <input id="job_profile_off" type="radio" name="profile" value="0" onClick="Spawn.setJobProfiling()" checked>off
+                        </div>
+                        &nbsp;
+                        log
+                        <div class="boxit">
+                            <input id="job_log_stdout" type="radio" name="std" value="out" onClick="Spawn.showJobLogs()" checked>stdout
+                            <input id="job_log_stderr" type="radio" name="std" value="err" onClick="Spawn.showJobLogs()">stderr
+                            &nbsp;
+                            <input id="job_log_head" type="radio" name="log" value="head" onClick="Spawn.showJobLogs()">head
+                            <input id="job_log_tail" type="radio" name="log" value="tail" onClick="Spawn.showJobLogs()" checked>tail
+                        </div>
+                        &nbsp;
+                        lines
+                        <input id="job_log_lines" size=6 onKeyUp="Spawn.updateJobLog(event); return false">
+                    </div>
+                    <iframe id="job_logs" src="about:blank"></iframe>
+                </div>
+            </td>
+        </tr></table>
 		<div id="job_profile">
 			<table id="job_profile_modal">
 				<tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('job_profile',false);">X</a>&nbsp;</th></tr>
 				<tr><td><div id="job_profile_table"></div></td></tr>
 			</table>
 		</div>
-		<div id="job_dependency">
-			<table class="render" id="job_dependency_table" width="907px" height="500px" >
-				<tr>
-					<th colspan=2 align=right style="overflow:hidden;padding-top:5px;">
-						<div>
-							<div style="width:50%;float:left;text-align:left;">
-								&nbsp;&nbsp;
-								<a href="#" id="job_edit_link">edit</a>
-								&nbsp;|&nbsp;
-								<a href="#" class="selected">dependency graph</a>
-							</div>
-							<div style="width:50%;float:right;text-align:right;">
-								<a class="hide_edit" href="#" onclick="Spawn.showEdit('job_dependency',false);">X</a>&nbsp;
-							</div>
-						</div>
-					</th>
-				</tr>
-				<tr>
-					<td style="vertical-align: top;width:860px;height:400;">
-						<!--<div id="dependency_chart"></div>-->
-						<div id="dependency_chart" >	 
-							<span id="dependency_chart_description"></span>  
-							<div 
-				       	   		id="graphTab" 
-				       	   		onmousedown="flowGraph.moveGraph(this, event, 'down')" 
-				       	   		onmouseup="flowGraph.moveGraph(this, event, 'up')" 
-				       	   		onmouseover="flowGraph.mouseFocus('true')" 
-				       	   		onmouseout="flowGraph.mouseFocus('false')" >    	   	
-								<svg 
-									id="dependency_chart_graph" 
-									xmlns="http://www.w3.org/2000/svg" 
-									version="1.1">
-								</svg>	
-							</div>		
-						</div>
-					</td>
-				</tr>
-			</table>
-		</div>
-		<div id="job_edit">
+		<div id="job_edit" class="edit_window">
 			<form method="get" action="/XXX/job.submit" target="_blank">
 				<table class="render" id="job_submit" width="907px" height="686px">
 					<tr>
 						<th colspan=2 align=right style="overflow:hidden;padding-top:5px;">
 							<div>
-								<div style="width:50%;float:left;text-align:left;">
-									&nbsp;&nbsp;
-									<a href="#" class="selected">edit</a>
-									&nbsp;|&nbsp;
-									<a href="#" id="job_dependency_link" >dependency graph</a>
-								</div>
 								<div style="width:50%;float:right;text-align:right;">
 									<a class="hide_edit" href="#" onclick="Spawn.showEdit('job_edit',false);">X</a>&nbsp;
 								</div>
@@ -324,27 +265,63 @@
 		</div>
 	</div>
 	<div id="tab_hosts">
+        <div class="new_bar"></div>
 		<div id="hosts_list" class="lrpad"></div>
-		<div class="addnew"></div>
-		<table id="host_detail" class="detail">
-			<tr>
-				<td><div id="host_tasks"></div></td>
-				<td width=100%">&nbsp;<td>
-			</tr>
-		</table>
-	</div>
-	<div id="tab_zk">
-		<label>path</label><div id="zk_path" class="lrpad"></div>
-		<label>children</label><div id="zk_children" class="lrpad"></div>
-		<label>value</label><div id="zk_value" class="lrpad"></div>
-		<div class="addnew"></div>
+		<div class="vertical-spacer"></div>
+        <div id="host_tasks" class="lrpad"></div>
+    </div>
+	<div id="tab_zk" class="tree-nav">
+        <div class="new_bar"></div>
+		<label class="tree-label">path</label>
+        <div id="zk_path" class="lrpad tree-data"></div>
+        <div class="tree-spacer"></div>
+		<label class="tree-label">children</label>
+        <div id="zk_children" class="lrpad tree-data"></div>
+        <div class="tree-spacer"></div>
+		<label class="tree-label">value</label>
+        <div id="zk_value" class="lrpad tree-data"></div>
 	</div>
 	<div id="tab_mesh">
-		<label>path</label><div id="mesh_path" class="lrpad"></div>
-		<label>children</label><div id="mesh_children" class="lrpad"></div>
-		<label>value</label><div id="mesh_value" class="lrpad"></div>
-		<div class="addnew"></div>
+        <div class="new_bar"></div>
+		<label class="tree-label">path</label>
+        <div id="mesh_path" class="lrpad tree-data"></div>
+        <div class="tree-spacer"></div>
+		<label class="tree-label">children</label>
+        <div id="mesh_children" class="lrpad tree-data"></div>
+        <div class="tree-spacer"></div>
+		<label class="tree-label">value</label>
+        <div id="mesh_value" class="lrpad tree-data"></div>
 	</div>
-	<div id="event_count"></div>
+
+            </td>
+            <td id="right">
+                <div class="side-title">Control</div>
+                <div class="side-panel">
+                    <button onclick="Spawn.refresh();return false;">Refresh</button>
+                    <button onclick="Spawn.toggleQuiesce();return false;" id="quiesce">Quiesce</button>
+                </div>
+                <div class="side-separator"></div>
+                <div class="side-title">Settings</div>
+                <div class="side-panel">
+                    <div id="owner">username <input id="form_iam" name="iam" size=10 onKeyUp="Spawn.setIAM();return true;" autocapitalize="off" autocorrect="off"></div>
+                </div>
+            </td>
+        </tr>
+    </table>
+    </div>
+    <div id="bottom">
+        <span id="block-100"></span>
+        <span><span>hosts </span><label id="status_hosts">-</label></span>
+        <span><span>jobs </span><label id="status_jobs">-</label></span>
+        <span><span>tasks </span><label id="status_tasks">-</label></span>
+        &nbsp;&nbsp;&nbsp;
+        <span><span>queued </span><label id="status_queued">-</label></span>
+        <span><span>queued error </span><label id="status_queued_error">-</label></span>
+        <span><span>running </span><label id="status_running">-</label></span>
+        <span><span>avail task slots </span><label id="status_avail_slots">-</label></span>
+        &nbsp;&nbsp;&nbsp;
+        <span><span>disk </span><a id="status_disk_title" title="0"><label id="status_disk_pct">-</label>%</a></span>
+        <div id="event_count">live</div>
+    </div>
 </body>
 </html>

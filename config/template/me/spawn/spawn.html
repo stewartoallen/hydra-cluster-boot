@@ -32,296 +32,303 @@
 <body onload="Spawn.init()">
 	<div id="top">Cluster Task Manager</div>
     <div id="middle">
-    <table width="100%">
-        <tr>
-            <td id="left">
-                <div class="side-title">Edit</div>
-                <div class="side-panel">
-                    <button id="btn_commands" onclick="Spawn.showTab('commands');">Commands</button>
-                    <button id="btn_macros" onclick="Spawn.showTab('macros');">Macros</button>
-                    <button id="btn_alias" onclick="Spawn.showTab('alias');">Aliases</button>
-                    <button id="btn_jobs" onclick="Spawn.showTab('jobs');">Jobs</button>
-                </div>
-                <div class="side-separator"></div>
-                <div class="side-title">Browse</div>
-                <div class="side-panel">
-                    <button id="btn_hosts" onclick="Spawn.showTab('hosts');">Hosts</button>
-                    <button id="btn_zk" onclick="Spawn.showTab('zk');">Zk</button>
-                    <button id="btn_mesh" onclick="Spawn.showTab('mesh');">Mesh</button>
-                </div>
-            </td>
-            <td id="center">
-
-	<div id="tab_commands">
-        <div class="new_bar"><button onclick="Spawn.newCommand()">+</button></div>
-		<div id="commands_list" class="lrpad"></div>
-        <div class="vertical-spacer"></div>
-        <div id="command_jobs" class="lrpad"></div>
-		<div id="command_edit" class="edit_window">
-			<form method="post" action="/XXX/command.put" target="_blank">
-				<table class="render" id="command_submit">
-					<tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('command_edit',false);">X</a>&nbsp;</th></tr>
-					<tr><th>label</th><td><input id="form_command_label" name="label" size=20 autocapitalize="off" autocorrect="off"></td></tr>
-					<tr><th>command</th><td><textarea spellcheck=false onkeydown="return Spawn.captureKey(this,event)" id="form_command_list" cols="120" rows="10"></textarea></td></tr>
-					<tr><th colspan=4>
-						<input type="hidden" name="command" id="send_command_list">
-						<input type="hidden" id="form_command_owner" name="owner">
-						<input type="submit" value="Store Command" onclick="return Spawn.storeCommand()">
-					</th></tr>
-				</table>
-			</form>
-		</div>
-	</div>
-	<div id="tab_macros">
-        <div class="new_bar"><button onclick="Spawn.newMacro()">+</button></div>
-		<div id="macros_list" class="lrpad"></div>
-		<div id="macro_edit" class="edit_window">
-			<form method="post" action="/XXX/macro.put" target="_blank" id="form_macro_put">
-				<table class="render" id="macro_submit">
-					<tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('macro_edit',false);">X</a>&nbsp;</th></tr>
-					<tr><th>label</th><td><input id="form_macro_label" name="label" size=80 autocapitalize="off" autocorrect="off">
-						<span style="float:right">
-							<button onclick="$('form_bounce').style.display='';this.style.display='none';return false;">&lt;&lt;</button>
-							<span id="form_bounce" style="display:none"> bounce to <input id='form_bounce_target' name="bounce" size=20></span>
-						</span>
-					</td></tr>
-					<tr><th>description</th><td><input id="form_macro_desc" name="description" size="120" autocapitalize="off" autocorrect="off"></td></tr>
-					<tr><th>macro</th><td><div id="code_macro" class="code_mirrored"></div><input id="form_macro_body" name="macro" type="hidden"></td></tr>
-					<tr><th colspan=4>
-						<input type="hidden" id="form_macro_owner" name="owner">
-						<input type="submit" value="Store Macro" onclick="return Spawn.storeMacro()">
-					</th></tr>
-				</table>
-			</form>
-		</div>
-	</div>
-	<div id="tab_alias">
-        <div class="new_bar"><button onclick="Spawn.newAlias()">+</button></div>
-		<div id="alias_list" class="lrpad"></div>
-		<div id="alias_edit" class="edit_window">
-			<form method="post" action="/XXX/alias.put" target="_blank">
-				<table class="render" id="alias_submit">
-					<tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('alias_edit',false);">X</a>&nbsp;</th></tr>
-					<tr><th>alias</th><td><input id="form_alias_alias" name="alias" size=40 autocapitalize="off" autocorrect="off"></td></tr>
-					<tr><th>job(s)</th><td><textarea id="form_alias_jobs_edit" name="job" cols="60" rows="5"></textarea></td></tr>
-					<tr><th colspan=4>
-						<input type="hidden" id="form_alias_jobs" name="jobs">
-						<input type="submit" value="Store Alias" onclick="return Spawn.storeAlias()">
-					</th></tr>
-				</table>
-			</form>
-		</div>
-	</div>
-	<div id="tab_jobs">
-        <div class="new_bar">
-            <div id="job_filter_box">
-                filter <input id="form_filter" name="desc_filter" size=10 onKeyUp="Spawn.setJobFilter(null,event);return true;" autocapitalize="off" autocorrect="off">
-                <span id="filter_list"></span>
-                <button id="b_filt_run" onclick="Spawn.setJobFilter('RUN')">run</button>
-                <button id="b_filt_err" onclick="Spawn.setJobFilter('ERR')">err</button>
-                <button id="b_filt_done" onclick="Spawn.setJobFilter('DONE')">done</button>
-                <button id="b_filt_x" onclick="Spawn.clearJobFilter()">x</button>
-            </div>
-            <div>
-                <button onclick="Spawn.newJob()">+</button>
-                <button id="sel_job_edit">edit</button>
-                <button id="sel_job_clone">clone</button>
-                <button id="sel_job_rebalance">rebalance</button>
-                <span class="vertical-spacer"></span>
-                <span id="sel_job_action"></span>
-            </div>
-  		</div>
-		<div id="jobs_list" class="lrpad"></div>
-        <div class="vertical-spacer"></div>
-        <div id="job_nodes" class="lrpad"></div>
-        <div class="vertical-spacer"></div>
-        <table id="job_detail" class="detail"><tr>
-            <td id="jlfill">
-                <div id="job_logs_border">
-                    <div id="job_log_control">
-                        profile
-                        <div class="boxit">
-                            <button id="job_profile_dump" onClick="Spawn.dumpJobProfile()">dump</button>
-                            <input id="job_profile_on" type="radio" name="profile" value="1" onClick="Spawn.setJobProfiling()">on
-                            <input id="job_profile_off" type="radio" name="profile" value="0" onClick="Spawn.setJobProfiling()" checked>off
-                        </div>
-                        &nbsp;
-                        log
-                        <div class="boxit">
-                            <input id="job_log_stdout" type="radio" name="std" value="out" onClick="Spawn.showJobLogs()" checked>stdout
-                            <input id="job_log_stderr" type="radio" name="std" value="err" onClick="Spawn.showJobLogs()">stderr
-                            &nbsp;
-                            <input id="job_log_head" type="radio" name="log" value="head" onClick="Spawn.showJobLogs()">head
-                            <input id="job_log_tail" type="radio" name="log" value="tail" onClick="Spawn.showJobLogs()" checked>tail
-                        </div>
-                        &nbsp;
-                        lines
-                        <input id="job_log_lines" size=6 onKeyUp="Spawn.updateJobLog(event); return false">
+        <table width="100%">
+            <tr>
+                <td id="left">
+                    <div class="side-title">Edit</div>
+                    <div class="side-panel">
+                        <button id="btn_commands" onclick="Spawn.showTab('commands');">Commands</button>
+                        <button id="btn_macros" onclick="Spawn.showTab('macros');">Macros</button>
+                        <button id="btn_alias" onclick="Spawn.showTab('alias');">Aliases</button>
+                        <button id="btn_jobs" onclick="Spawn.showTab('jobs');">Jobs</button>
                     </div>
-                    <iframe id="job_logs" src="about:blank"></iframe>
-                </div>
-            </td>
-        </tr></table>
-		<div id="job_profile">
-			<table id="job_profile_modal">
-				<tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('job_profile',false);">X</a>&nbsp;</th></tr>
-				<tr><td><div id="job_profile_table"></div></td></tr>
-			</table>
-		</div>
-		<div id="job_edit" class="edit_window">
-			<form method="get" action="/XXX/job.submit" target="_blank">
-				<table class="render" id="job_submit" width="907px" height="686px">
-					<tr>
-						<th colspan=2 align=right style="overflow:hidden;padding-top:5px;">
-							<div>
-								<div style="width:50%;float:right;text-align:right;">
-									<a class="hide_edit" href="#" onclick="Spawn.showEdit('job_edit',false);">X</a>&nbsp;
-								</div>
-							</div>
-						</th>
-					</tr>
-					<tr>
-						<th>running</th>
-						<td>
-							<label>command</label> <select id="select_job_command" name="command"></select>
-							<label>time per run</label> <input id="form_job_maxrun" name="maxrun" size=5>
-							<label>run interval</label> <input id="form_job_rekick" name="rekick" size=5>
-							<label>priority</label> <input id="form_job_priority" name="priority" size=5>
-							<label>minion type</label> <input id="form_job_minionType" name="minionType" size=5>
-						</td>
-					</tr>
-					<tr>
-						<th>cluster</th>
-						<td>
-							<label>hourlyBackups</label> <input id="form_job_hourlyBackups" name="hourlyBackups" size=5>
-							<label>dailyBackups</label> <input id="form_job_dailyBackups" name="dailyBackups" size=5>
-							<label>weeklyBackups</label> <input id="form_job_weeklyBackups" name="weeklyBackups" size=5>
-							<label>monthlyBackups</label> <input id="form_job_monthlyBackups" name="monthlyBackups" size=5>
-							<br>
-							<label>replicas</label> <input id="form_job_replicas" name="replicas" size=5>
-                            <label>readOnlyReplicas</label> <input id="form_job_readOnlyReplicas" name="readOnlyReplicas" size=5>
-							<label>dontAutoBalanceMe</label> <input id="form_job_dontAutoBalanceMe" name="dontAutoBalanceMe" size=5>
-							<label>maxSimulRunning</label> <input id="form_job_maxSimulRunning" name="maxSimulRunning" size=5>
-						</td>
-					</tr>
-					<tr>
-						<th>description</th>
-						<td><input id="form_job_desc" name="description" size=120 autocapitalize="off" autocorrect="off"></td>
-					</tr>
-					<tr>
-						<th>query</th>
-						<td>
-							<label><input id="form_job_qc_canQuery" type="checkbox" checked> enable</label>
-							<label><input id="form_job_qc_queryTraceLevel" type="checkbox"> trace</label>
-							<label> c. failure threshold</label> <input id="form_job_qc_consecutiveFailureThreshold" name="qc_consecutiveFailureThreshold" size=5>
-						</td>
-					</tr>
-					<tr id="tr_job_tasks">
-						<th>tasks</th>
-						<td>
-							<table><tr><td nowrap>
-								<label>count</label>
-								<input id="form_job_nodes" name="nodes" size=3 value=1>
-							</td>
-								<td nowrap>
-									<a href="javascript:toggle('select_job_hosts')">choose job hosts</a>
-								</td>
-								<td nowrap>
-									<div id="select_job_hosts" style="display: none"></div>
-								</td></tr></table>
-						</td>
-					</tr>
-					<tr>
-						<th>configuration</th>
-						<td><div id="code_config" class="code_mirrored"></div><input id="form_job_conf" name="config" type="hidden"></td>
-					</tr>
-					<tr>
-						<th>event</th>
-						<td>
-							<label>success</label> <input id="form_job_ondone" name="ondone" size=31>
-							<label>fail</label> <input id="form_job_onerror" name="onerror" size=31>
-							<label>kill match</label> <input id="form_job_logkill" name="logkill" size=31>
-						</td>
-					</tr>
-					<tr id="tr_job_parameters">
-						<th>parameters</th>
-						<td id="form_job_params"></td>
-					</tr>
-					<tr><th colspan=2>
-						<input type="hidden" name="id" id="send_id">
-                        <input type="hidden" name="auth" id="send_auth">
-						<input type="hidden" name="hosts" id="send_hosts">
-						<input type="hidden" name="spawn" id="send_spawn">
-						<input type="hidden" name="enable" id="send_enable">
-						<input type="hidden" name="qc_canQuery" id="send_queryOK">
-						<input type="hidden" name="qc_queryTraceLevel" id="send_queryTrace">
-						<input type="hidden" id="form_job_owner" name="owner">
-						<input id="form_job_save" type="submit" value="Save" onclick="return Spawn.submitJob(false,false)">
-						<input id="form_job_clone" type="submit" value="Clone" onclick="return Spawn.submitJob(true,false)">
-						<input id="form_job_create" type="submit" value="Create" onclick="return Spawn.submitJob(true,false)">
-					</th></tr>
-				</table>
-			</form>
-		</div>
-	</div>
-	<div id="tab_hosts">
-        <div class="new_bar"></div>
-		<div id="hosts_list" class="lrpad"></div>
-		<div class="vertical-spacer"></div>
-        <div id="host_tasks" class="lrpad"></div>
-    </div>
-	<div id="tab_zk" class="tree-nav">
-        <div class="new_bar"></div>
-		<label class="tree-label">path</label>
-        <div id="zk_path" class="lrpad tree-data"></div>
-        <div class="tree-spacer"></div>
-		<label class="tree-label">children</label>
-        <div id="zk_children" class="lrpad tree-data"></div>
-        <div class="tree-spacer"></div>
-		<label class="tree-label">value</label>
-        <div id="zk_value" class="lrpad tree-data"></div>
-	</div>
-	<div id="tab_mesh">
-        <div class="new_bar"></div>
-		<label class="tree-label">path</label>
-        <div id="mesh_path" class="lrpad tree-data"></div>
-        <div class="tree-spacer"></div>
-		<label class="tree-label">children</label>
-        <div id="mesh_children" class="lrpad tree-data"></div>
-        <div class="tree-spacer"></div>
-		<label class="tree-label">value</label>
-        <div id="mesh_value" class="lrpad tree-data"></div>
-	</div>
-
-            </td>
-            <td id="right">
-                <div class="side-title">Control</div>
-                <div class="side-panel">
-                    <button onclick="Spawn.refresh();return false;">Refresh</button>
-                    <button onclick="Spawn.toggleQuiesce();return false;" id="quiesce">Quiesce</button>
-                </div>
-                <div class="side-separator"></div>
-                <div class="side-title">Settings</div>
-                <div class="side-panel">
-                    <div id="owner">username <input id="form_iam" name="iam" size=10 onKeyUp="Spawn.setIAM();return true;" autocapitalize="off" autocorrect="off"></div>
-                </div>
-            </td>
-        </tr>
-    </table>
+                    <div class="side-separator"></div>
+                    <div class="side-title">Browse</div>
+                    <div class="side-panel">
+                        <button id="btn_hosts" onclick="Spawn.showTab('hosts');">Hosts</button>
+                        <button id="btn_zk" onclick="Spawn.showTab('zk');">Zk</button>
+                        <button id="btn_mesh" onclick="Spawn.showTab('mesh');">Mesh</button>
+                    </div>
+                </td>
+                <td id="center">
+                    <div id="tab_commands">
+                        <div class="new_bar"><button onclick="Spawn.newCommand()">+</button></div>
+                        <div id="commands_list" class="lrpad"></div>
+                        <div class="spacer"></div>
+                        <div id="command_jobs" class="lrpad"></div>
+                        <div id="command_edit" class="edit_window">
+                            <form method="post" action="/XXX/command.put" target="_blank">
+                                <table class="render" id="command_submit">
+                                    <tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('command_edit',false);">X</a>&nbsp;</th></tr>
+                                    <tr><th>label</th><td><input id="form_command_label" name="label" size=20 autocapitalize="off" autocorrect="off"></td></tr>
+                                    <tr><th>command</th><td><textarea spellcheck=false onkeydown="return Spawn.captureKey(this,event)" id="form_command_list" cols="120" rows="10"></textarea></td></tr>
+                                    <tr><th colspan=4>
+                                        <input type="hidden" name="command" id="send_command_list">
+                                        <input type="hidden" id="form_command_owner" name="owner">
+                                        <input type="submit" value="Store Command" onclick="return Spawn.storeCommand()">
+                                    </th></tr>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="tab_macros">
+                        <div class="new_bar"><button onclick="Spawn.newMacro()">+</button></div>
+                        <div id="macros_list" class="lrpad"></div>
+                        <div id="macro_edit" class="edit_window">
+                            <form method="post" action="/XXX/macro.put" target="_blank" id="form_macro_put">
+                                <table class="render" id="macro_submit">
+                                    <tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('macro_edit',false);">X</a>&nbsp;</th></tr>
+                                    <tr><th>label</th><td><input id="form_macro_label" name="label" size=80 autocapitalize="off" autocorrect="off">
+                                        <span style="float:right">
+                                            <button onclick="$('form_bounce').style.display='';this.style.display='none';return false;">&lt;&lt;</button>
+                                            <span id="form_bounce" style="display:none"> bounce to <input id='form_bounce_target' name="bounce" size=20></span>
+                                        </span>
+                                    </td></tr>
+                                    <tr><th>description</th><td><input id="form_macro_desc" name="description" size="120" autocapitalize="off" autocorrect="off"></td></tr>
+                                    <tr><th>macro</th><td><div id="code_macro" class="code_mirrored"></div><input id="form_macro_body" name="macro" type="hidden"></td></tr>
+                                    <tr><th colspan=4>
+                                        <input type="hidden" id="form_macro_owner" name="owner">
+                                        <input type="submit" value="Store Macro" onclick="return Spawn.storeMacro()">
+                                    </th></tr>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="tab_alias">
+                        <div class="new_bar"><button onclick="Spawn.newAlias()">+</button></div>
+                        <div id="alias_list" class="lrpad"></div>
+                        <div id="alias_edit" class="edit_window">
+                            <form method="post" action="/XXX/alias.put" target="_blank">
+                                <table class="render" id="alias_submit">
+                                    <tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('alias_edit',false);">X</a>&nbsp;</th></tr>
+                                    <tr><th>alias</th><td><input id="form_alias_alias" name="alias" size=40 autocapitalize="off" autocorrect="off"></td></tr>
+                                    <tr><th>job(s)</th><td><textarea id="form_alias_jobs_edit" name="job" cols="60" rows="5"></textarea></td></tr>
+                                    <tr><th colspan=4>
+                                        <input type="hidden" id="form_alias_jobs" name="jobs">
+                                        <input type="submit" value="Store Alias" onclick="return Spawn.storeAlias()">
+                                    </th></tr>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="tab_jobs">
+                        <div class="new_bar">
+                            <div id="job_filter_box">
+                                filter <input id="form_filter" name="desc_filter" size=10 onKeyUp="Spawn.setJobFilter(null,event);return true;" autocapitalize="off" autocorrect="off">
+                                <span id="filter_list"></span>
+                                <button id="b_filt_run" onclick="Spawn.setJobFilter('RUN')">run</button>
+                                <button id="b_filt_err" onclick="Spawn.setJobFilter('ERR')">err</button>
+                                <button id="b_filt_done" onclick="Spawn.setJobFilter('DONE')">done</button>
+                                <button id="b_filt_x" onclick="Spawn.clearJobFilter()">x</button>
+                            </div>
+                            <div>
+                                <button onclick="Spawn.newJob()">+</button>
+                                <button id="sel_job_edit">edit</button>
+                                <button id="sel_job_clone">clone</button>
+                                <button id="sel_job_rebalance">rebalance</button>
+                                <span class="spacer"></span>
+                                <span id="sel_job_action"></span>
+                            </div>
+                        </div>
+                        <div id="jobs_list" class="lrpad"></div>
+                        <div class="spacer"></div>
+                        <div id="job_nodes" class="lrpad"></div>
+                        <div class="spacer"></div>
+                        <table id="job_detail" class="detail"><tr>
+                            <td id="jlfill">
+                                <div id="job_logs_border">
+                                    <div id="job_log_control">
+                                        profile
+                                        <div class="boxit">
+                                            <button id="job_profile_dump" onClick="Spawn.dumpJobProfile()">dump</button>
+                                            <input id="job_profile_on" type="radio" name="profile" value="1" onClick="Spawn.setJobProfiling()">on
+                                            <input id="job_profile_off" type="radio" name="profile" value="0" onClick="Spawn.setJobProfiling()" checked>off
+                                        </div>
+                                        &nbsp;
+                                        log
+                                        <div class="boxit">
+                                            <input id="job_log_stdout" type="radio" name="std" value="out" onClick="Spawn.showJobLogs()" checked>stdout
+                                            <input id="job_log_stderr" type="radio" name="std" value="err" onClick="Spawn.showJobLogs()">stderr
+                                            &nbsp;
+                                            <input id="job_log_head" type="radio" name="log" value="head" onClick="Spawn.showJobLogs()">head
+                                            <input id="job_log_tail" type="radio" name="log" value="tail" onClick="Spawn.showJobLogs()" checked>tail
+                                        </div>
+                                        &nbsp;
+                                        lines
+                                        <input id="job_log_lines" size=6 onKeyUp="Spawn.updateJobLog(event); return false">
+                                    </div>
+                                    <iframe id="job_logs" src="about:blank"></iframe>
+                                </div>
+                            </td>
+                        </tr></table>
+                        <div id="job_profile">
+                            <table id="job_profile_modal">
+                                <tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('job_profile',false);">X</a>&nbsp;</th></tr>
+                                <tr><td><div id="job_profile_table"></div></td></tr>
+                            </table>
+                        </div>
+                        <div id="job_edit" class="edit_window">
+                            <form method="get" action="/XXX/job.submit" target="_blank">
+                                <table class="render" id="job_submit" width="907px" height="686px">
+                                    <tr>
+                                        <th colspan=2 align=right style="overflow:hidden;padding-top:0px;">
+                                            <div style="position:relative">
+                                                <div style="width:50%;float:right;text-align:right;">
+                                                    <a class="hide_edit" href="#" onclick="Spawn.showEdit('job_edit',false);">X</a>&nbsp;
+                                                </div>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                    <tr>
+                                        <th>running</th>
+                                        <td>
+                                            <label>command</label> <select id="select_job_command" name="command"></select>
+                                            <label>max time</label> <input id="form_job_maxrun" name="maxrun" size=5>
+                                            <label>rekick interval</label> <input id="form_job_rekick" name="rekick" size=5>
+                                            <label>priority</label> <input id="form_job_priority" name="priority" size=5>
+                                            <label>minion type</label> <input id="form_job_minionType" name="minionType" size=5>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>backups</th>
+                                        <td>
+                                            <label>hourly</label>
+                                            <input id="form_job_hourlyBackups" name="hourlyBackups" size=5>
+                                            <label>daily</label>
+                                            <input id="form_job_dailyBackups" name="dailyBackups" size=5>
+                                            <label>weekly</label>
+                                            <input id="form_job_weeklyBackups" name="weeklyBackups" size=5>
+                                            <label>monthly</label>
+                                            <input id="form_job_monthlyBackups" name="monthlyBackups" size=5>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>replicas</th>
+                                        <td>
+                                            <label>replicas</label>
+                                            <input id="form_job_replicas" name="replicas" size=5>
+                                            <label>read only</label>
+                                            <input id="form_job_readOnlyReplicas" name="readOnlyReplicas" size=5>
+                                            <label>don't balance</label>
+                                            <input id="form_job_dontAutoBalanceMe" name="dontAutoBalanceMe" size=5>
+                                            <label>max parallel</label>
+                                            <input id="form_job_maxSimulRunning" name="maxSimulRunning" size=5>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>description</th>
+                                        <td><input id="form_job_desc" name="description" size=120 autocapitalize="off" autocorrect="off"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>query</th>
+                                        <td>
+                                            <label><input id="form_job_qc_canQuery" type="checkbox" checked> enable</label>
+                                            <label><input id="form_job_qc_queryTraceLevel" type="checkbox"> trace</label>
+                                            <label> c. failure threshold</label> <input id="form_job_qc_consecutiveFailureThreshold" name="qc_consecutiveFailureThreshold" size=5>
+                                        </td>
+                                    </tr>
+                                    <tr id="tr_job_tasks">
+                                        <th>tasks</th>
+                                        <td>
+                                            <table><tr>
+                                                <td nowrap>
+                                                    <label>count</label>
+                                                    <input id="form_job_nodes" name="nodes" size=3 value=1>
+                                                </td>
+                                                <td nowrap><a href="javascript:toggle('select_job_hosts')">choose job hosts</a></td>
+                                                <td nowrap><div id="select_job_hosts" style="display: none"></div></td>
+                                            </tr></table>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>configuration</th>
+                                        <td><div id="code_config" class="code_mirrored"></div><input id="form_job_conf" name="config" type="hidden"></td>
+                                    </tr>
+                                    <tr>
+                                        <th>events</th>
+                                        <td>
+                                            <label>on success</label> <input id="form_job_ondone" name="ondone" size=31>
+                                            <label>on fail</label> <input id="form_job_onerror" name="onerror" size=31>
+                                            <label>kill match</label> <input id="form_job_logkill" name="logkill" size=31>
+                                        </td>
+                                    </tr>
+                                    <tr id="tr_job_parameters">
+                                        <th>parameters</th>
+                                        <td id="form_job_params"></td>
+                                    </tr>
+                                    <tr><th colspan=2>
+                                        <input type="hidden" name="id" id="send_id">
+                                        <input type="hidden" name="auth" id="send_auth">
+                                        <input type="hidden" name="hosts" id="send_hosts">
+                                        <input type="hidden" name="spawn" id="send_spawn">
+                                        <input type="hidden" name="enable" id="send_enable">
+                                        <input type="hidden" name="qc_canQuery" id="send_queryOK">
+                                        <input type="hidden" name="qc_queryTraceLevel" id="send_queryTrace">
+                                        <input type="hidden" id="form_job_owner" name="owner">
+                                        <input id="form_job_save" type="submit" value="Save" onclick="return Spawn.submitJob(false,false)">
+                                        <input id="form_job_clone" type="submit" value="Clone" onclick="return Spawn.submitJob(true,false)">
+                                        <input id="form_job_create" type="submit" value="Create" onclick="return Spawn.submitJob(true,false)">
+                                    </th></tr>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                    <div id="tab_hosts">
+                        <div class="new_bar"></div>
+                        <div id="hosts_list" class="lrpad"></div>
+                        <div class="spacer"></div>
+                        <div id="host_tasks" class="lrpad"></div>
+                    </div>
+                    <div id="tab_zk" class="tree-nav">
+                        <div class="new_bar"></div>
+                        <label class="tree-label">path</label>
+                        <div id="zk_path" class="lrpad tree-data"></div>
+                        <div class="tree-spacer"></div>
+                        <label class="tree-label">children</label>
+                        <div id="zk_children" class="lrpad tree-data"></div>
+                        <div class="tree-spacer"></div>
+                        <label class="tree-label">value</label>
+                        <div id="zk_value" class="lrpad tree-data"></div>
+                    </div>
+                    <div id="tab_mesh">
+                        <div class="new_bar"></div>
+                        <label class="tree-label">path</label>
+                        <div id="mesh_path" class="lrpad tree-data"></div>
+                        <div class="tree-spacer"></div>
+                        <label class="tree-label">children</label>
+                        <div id="mesh_children" class="lrpad tree-data"></div>
+                        <div class="tree-spacer"></div>
+                        <label class="tree-label">value</label>
+                        <div id="mesh_value" class="lrpad tree-data"></div>
+                    </div>
+                    <div class="side-separator"></div>
+                </td>
+                <td id="right">
+                    <div class="side-title">Control</div>
+                    <div class="side-panel">
+                        <button onclick="Spawn.refresh();return false;">Refresh</button>
+                        <button onclick="Spawn.toggleQuiesce();return false;" id="quiesce">Quiesce</button>
+                    </div>
+                    <div class="side-separator"></div>
+                    <div class="side-title">Settings</div>
+                    <div class="side-panel">
+                        <button onclick="Spawn.setUser()">User</button>
+                        <button onclick="Spawn.setAuth()">Auth</button>
+                    </div>
+                    <div id="event_count">live</div>
+                </td>
+            </tr>
+        </table>
     </div>
     <div id="bottom">
-        <span id="block-100"></span>
         <span><span>hosts </span><label id="status_hosts">-</label></span>
         <span><span>jobs </span><label id="status_jobs">-</label></span>
         <span><span>tasks </span><label id="status_tasks">-</label></span>
-        &nbsp;&nbsp;&nbsp;
         <span><span>queued </span><label id="status_queued">-</label></span>
-        <span><span>queued error </span><label id="status_queued_error">-</label></span>
+        <span><span>errored </span><label id="status_queued_error">-</label></span>
         <span><span>running </span><label id="status_running">-</label></span>
-        <span><span>avail task slots </span><label id="status_avail_slots">-</label></span>
-        &nbsp;&nbsp;&nbsp;
+        <span><span>free slots </span><label id="status_avail_slots">-</label></span>
         <span><span>disk </span><a id="status_disk_title" title="0"><label id="status_disk_pct">-</label>%</a></span>
-        <div id="event_count">live</div>
     </div>
 </body>
 </html>

@@ -3,7 +3,6 @@
 (function() {
 
 var initonce = false,
-	iam = '',
     auth = '',
 	filter = '',
 	showHost = null,
@@ -101,14 +100,7 @@ function init() {
             forms[i].action = rpcroot + act.substring(act.indexOf("/XXX")+4);
         }
 		showTab(settings[tabSetting] || 'jobs');
-		iam = $('form_iam').value;
-		if (iam != '') {
-			settings['iam'] = iam;
-		}
-		if (settings['iam']) {
-			iam = settings['iam'];
-			$('form_iam').value = iam;
-		}
+		checkUser();
 		if (settings[settings[tabSetting]+'filter']) {
 			filter = settings[settings[tabSetting]+'filter'];
 			$('form_filter').value = filter;
@@ -121,10 +113,6 @@ function init() {
 		}
 		refresh();
 		eventPollSetup();
-		if (iam == '') {
-			$('form_iam').value = prompt('Please provide your user name');
-			setIAM();
-		}
 		if (settings['zkPath']) {
 			zkStack = settings['zkPath'].split('/');
 			getZk();
@@ -260,7 +248,7 @@ var nextcb = 0;
 
 function callRPC(path, callback) {
 	var fname = 'jsonp_cb'+(nextcb++);
-	path = rpcroot + path + '&user='+settings["iam"]+'&auth='+auth+'&cbfunc-arg="'+fname+'"&cbfunc=Spawn.cbfuncs.'+fname;
+	path = rpcroot + path + '&user='+getUser()+'&auth='+auth+'&cbfunc-arg="'+fname+'"&cbfunc=Spawn.cbfuncs.'+fname;
 
 	var script = document.createElement('script');
 	script.id = fname;
@@ -444,10 +432,8 @@ function showEdit(e,b) {
 	$(e).style.display = b ? 'block' : 'none';
 	if (b) {
 		editing = e;
-        $('modal').display = 'inline';
 	} else {
 		editing = null;
-        $('modal').display = 'none';
 	}
 }
 
@@ -818,9 +804,23 @@ function refresh() {
 	getAliases();
 }
 
-function setIAM() {
-	iam = $('form_iam').value;
-	settings['iam'] = iam;
+function checkUser() {
+    if (!settings['iam']) {
+        setUser();
+    }
+}
+
+function getUser() {
+    return settings['iam'];
+}
+
+function setUser() {
+    settings['iam'] = prompt('Provide User Name',settings['iam']) || settings['iam'];
+    checkUser();
+}
+
+function setAuth() {
+    auth = prompt('Provide Spawn Auth Key',auth) || auth;
 }
 
 /* stop or restart job scheduling */
@@ -964,7 +964,7 @@ function getCommands() {
 
 function fillFormsFromCommand(key) {
 	var cmd = key ? commands[key] : {label:'',command:[]};
-	$('form_command_owner').value = iam;
+	$('form_command_owner').value = getUser();
 	$('form_command_label').value = key || '';
 	$('form_command_list').value = cmd.command.join('\n');
 }
@@ -990,7 +990,7 @@ function storeCommand(id) {
 /* AJAX call spawn to delete command */
 function deleteCommand(label) {
 	if (confirm("delete command "+label+" ?")) {
-		callRPC('/command.delete?label='+encodeURIComponent(label)+"&owner="+iam, function(rpc) { rpcCallback(rpc); getCommands(); });
+		callRPC('/command.delete?label='+encodeURIComponent(label)+"&owner="+getUser(), function(rpc) { rpcCallback(rpc); getCommands(); });
 	}
 	return false;
 }
@@ -1169,7 +1169,7 @@ function getMacros() {
 function fillFormsFromMacro(key) {
 	var macro = key ? macros[key] : {label:'',body:[]};
 	$('form_bounce_target').value = '';
-	$('form_macro_owner').value = iam;
+	$('form_macro_owner').value = getUser();
 	$('form_macro_label').value = key || '';
 	$('form_macro_desc').value = macro.description || '';
 	form_macro_editor.setValue(macro.macro || '');
@@ -1266,7 +1266,7 @@ function getHostsCallback(hostlist) {
 /* AJAX call spawn to delete command */
 function deleteMacro(label) {
 	if (confirm("delete macro "+label+" ?")) {
-		callRPC('/macro.delete?label='+encodeURIComponent(label)+"&owner="+iam, function(rpc) { rpcCallback(rpc); getMacros(); });
+		callRPC('/macro.delete?label='+encodeURIComponent(label)+"&owner="+getUser(), function(rpc) { rpcCallback(rpc); getMacros(); });
 	}
 	return false;
 }
@@ -1611,7 +1611,7 @@ function deleteJob(id) {
 		alert('no such job '+id);
 		return;
 	}
-	if (iam != job.owner && !confirm('are you the owner of this job?')) {
+	if (getUser() != job.owner && !confirm('are you the owner of this job?')) {
 		return;
 	}
 	if (confirm("delete job '"+job.description+"'  ["+id+"] ?")) {
@@ -1697,7 +1697,7 @@ function fillFormsFromJob(uuid, clone) {
 	//$('form_job_conf').value = job.config || '';
 	form_config_editor.setValue(job.config || '');
     $('send_auth').value = auth;
-	$('form_job_owner').value = $('form_iam').value || job.owner;
+	$('form_job_owner').value = getUser() || job.owner;
 	$('form_job_desc').value = job.description || 'describe this job';
 	$('form_job_nodes').value = job.nodes.length == 0 ? 1 : job.nodes.length;
 	$('form_job_ondone').value = job.onComplete || '';
@@ -2003,7 +2003,7 @@ function showJobNodesCallback(job,focus) {
 		rows:[],
 		rowon:0,
 		rowoff:16,
-        title:"Nodes for job '"+job.id+"'"
+        title:"Tasks for job '"+job.id+"'"
 	};
 	var diffport = false;
 	var lastport = 0;
@@ -2327,11 +2327,12 @@ window.Spawn = {
 	refresh : refresh,
 	parse : parse,
 
-	setIAM : setIAM,
-	toggleQuiesce : toggleQuiesce,
+    setAuth : setAuth,
+	setUser : setUser,
+    showTab : showTab,
+    showEdit : showEdit,
 	sortTable : sortTable,
-	showEdit : showEdit,
-	showTab : showTab,
+    toggleQuiesce : toggleQuiesce,
 
 	newCommand : newCommand,
 	editCommand : editCommand,

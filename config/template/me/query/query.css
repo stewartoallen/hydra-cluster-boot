@@ -1,12 +1,18 @@
-body,div,table { padding:0px; margin:0px; border:0px; font-family:helvetica,arial,sans-serif; font-size:small }
-#mode button { border:1px solid gray; background-color:#fff }
+pre { font-family:courier,fixed }
+a:link, a:visited, a:active { text-decoration:none }
+a:hover { text-decoration:none; color:#fff; background-color:#55f }
+td { vertical-align:top }
+
+.num { text-align:right; font-family:courier,fixed }
+.padme { padding:5px }
 .cachetable table { border:1px solid gray; background-color:#fff }
 .cachetable table tr { border:1px solid #ccc; background-color:#ddd }
 .cachetable table td { border:1px solid #ddd; background-color:#eee }
 .cachetable table td a { text-align:center }
-.padme { padding:5px }
+.close_hosts { float:right }
+.spacer { position:relative; width:10px; height:10px }
+
 #conf { font-family:courier,fixed; font-size:small }
-#top { padding:5px; background:#eee; border-bottom:1px solid black; text-align:center }
 #mode { padding:5px; background:#ddd; border-bottom:1px solid black; text-align:center }
 #setup { display:none } 
 #cache { display:none } 
@@ -14,6 +20,7 @@ body,div,table { padding:0px; margin:0px; border:0px; font-family:helvetica,aria
 #table_query { border:1px solid blue }
 #table_query th { background:#ddd; padding-left:2px; padding-right:2px }
 #table_query td { background:#eee }
+#table_query input { text-transform:none; width:100% }
 #table_setup { border:1px solid blue }
 #table_setup th { background:#ddd; padding-left:2px; padding-right:2px }
 #table_setup td { background:#eee }
@@ -27,43 +34,12 @@ body,div,table { padding:0px; margin:0px; border:0px; font-family:helvetica,aria
 #table_results th { background:#ddd; padding-left:2px; padding-right:2px }
 #table_results td { background:#eee }
 
-a:link, a:visited, a:active { text-decoration:none }
-a:hover { color:#fff; background-color:#55f; text-decoration:none }
+#browse { position:relative; width:100% }
+#browse-left { position:relative; width:33%; display:inline-block; vertical-align:top; min-width:400px }
+#browse-right { position:relative; width:66%; display:inline-block; vertical-align:top; text-align:right; overflow:auto }
 
-input { width:100% }
-td { vertical-align:top }
-
-.num { text-align:right; font-family:courier,fixed }
-
-#bro_left {
-	float:left;
-	width:50%;
-}
-
-#bro_left_inner { padding-right:5px }
-
-#bro_right {
-	float:right;
-	width:50%;
-}
-
-#nodeinfo {
-	display:none;
-	font-family:"courier";
-	font-size:small;
-	white-space:pre;
-	background-color:#ddd;
-	height:100px;
-	overflow:auto;
-}
-
-#nodelist {
-	overflow:auto;
-}
-
-#queryinfo {
-	overflow:auto;
-}
+#queryinfo { overflow:auto }
+#nodelist { overflow:auto }
 
 #saved {
 	overflow:auto;
@@ -100,111 +76,24 @@ td { vertical-align:top }
 	color:#734;
 }
 
-.pe_cell {
-	border:1px solid gray;
-}
-
-.pe_op {
-	background-color:#bbf;
-	font-weight:bold;
-}
-
-.pe_term {
-	background-color:#ddf;
-	color:#449;
-	font-weight:bold;
-}
-
-.pe_disabled {
-	font-weight:bold;
-	background-color:#f00;
-}
-
-.pe_name {
-	background-color:#696;
-	color:#fff;
-}
-
-.pe_const {
-	font-weight:bold;
-	background-color:#696;
-	color:#fff;
-}
-
-.pe_call {
-	background-color:#eef;
-}
-
-.pe_event {
-	background-color:#fef;
-}
-
-.pe_feature {
-	background-color:#8f8;
-	font-weight:bold;
-}
-
-.pe_list {
-	background-color:#fee;
-	border:1px solid #faa;
-}
-
-.pe_each {
-	background-color:#efe;
-	border:1px solid #afa;
-}
-
-.pe_value {
-	background-color:#ffe;
-	border:1px solid #ffa;
-}
-
-.pe_row_even {
-	background-color:#eee;
-}
-
-.pe_row_odd {
-	background-color:#e1e1e1;
-}
-
-/*#browse{
-	padding-top: 5px;
-	padding-left: 5px;
-	padding-right: 5px;
-	padding-bottom:0px;
-}*/
-
-#runningqueries{
+#runningqueries {
 	padding-top:5px;
 	padding-left: 5px;
 	padding-right: 5px;
 }
-#completedqueries{
+#completedqueries {
 	padding-top:5px;
 	padding-left: 5px;
 	padding-right: 5px;
 }
-
-.left {
-	float:left;
-	/*width:50%;*/
-}
-
-.left_inner { padding-right:5px }
-
-.right {
-	float:left;
-	/*width:50%;*/
-}
-
-.right_inner { padding-right:5px }
+#completed { height: 60%; overflow:auto; }
+#queries { height:60%; overflow:auto; }
 
 div.status{
 	position: relative;
 	padding: 5px;
 	background: #F3F3F3;
 	border-bottom: 1px solid black;
-/*	text-align: center;*/
 	margin-bottom: 10px;
 }
 .status span {
@@ -225,14 +114,4 @@ div.status{
 	padding-right: 3px;
 	background: white;
 }
-.close_hosts{
-	float:right;
-}
-#completed{
-	height: 60%;
-	overflow:scroll;
-}
-#queries{
-	height:60%;
-	overflow: scroll;
-}
+

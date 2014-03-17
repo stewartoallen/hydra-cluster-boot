@@ -1,21 +1,11 @@
 <html>
 <head>
     <title>Cluster Boot Service</title>
+    <link rel="stylesheet" href="lib/common.css" type="text/css" />
     <style>
-        body,div,table { padding:0px; margin:0px; border:0px; font-family:helvetica,arial,sans-serif; font-size:small }
-        #top { position:relative; padding:5px; background:#eee; border-bottom:1px solid black; text-align:center }
-        #middle { position:relative }
-        #bottom { position:relative; padding:5px; background:#eee; border-top:1px solid black; text-align:center }
-        #left { padding:5px; background:#f5f5f5; border-right:1px solid black; vertical-align:top }
         #left button { width:40px }
-        #left-title { border-bottom:1px dashed black; text-align:center; white-space:nowrap; font-weight:bold; padding-bottom:5px; margin-bottom:5px }
-        #left-footer { border-top:1px dashed black; min-width:250px; text-align:center; padding-top: 5px }
-        #right { padding:5px; background:#f5f5f5; border-left:1px solid black; vertical-align:top }
-        #right-title { border-bottom:1px dashed black; text-align:center; white-space:nowrap; font-weight:bold; padding-bottom:5px }
         #right-body table td { white-space:nowrap; border:1px solid gray; background-color:white; padding:3px }
         #right-body table th { white-space:nowrap; font-weight:normal; text-align:left; padding:3px }
-        #right-footer { border-top:1px dashed black; text-align:center; padding-top: 5px }
-        #center { width:100%; vertical-align:top }
         #account { list-style-type: none; padding:5px; margin:5px }
         #account li { padding:2px; margin:2px }
         #account li a { background-color:transparent; border:1px solid white; padding:2px; }
@@ -34,19 +24,45 @@
         <table width="100%">
             <tr>
                 <td id="left">
-                    <div id="left-title">Clusters</div>
-                    <div id="left-body"></div>
-                    <div id="left-footer" style="">
+                    <div class="side-title">Clusters</div>
+                    <div class="side-panel" id="left-body"></div>
+                    <div class="side-title"></div>
+                    <div class="side-panel">
                         <button onclick="cluster.add()">+</button>
                     </div>
                 </td>
                 <td id="center">
-                    <div id="cluster">{% include "me/cluster.html" %}</div>
+                    <div id="cluster">
+                        <table>
+                            <tr><th><label>About</label></th><td id="cluster-about"></td></tr>
+                            <tr><th><label>Boot Node</label></th><td id="cluster-hint"></td></tr>
+                            <tr><td></td><td><div class="separator"></div></td></tr>
+                            <tr><th><label>Actions</label></th><td>
+                                <button onclick="cluster.manage()">manage</button>
+                                <button onclick="cluster.clone()">clone</button>
+                                <button onclick="cluster.delete()">delete</button>
+                            </td></tr>
+                            <tr><th><label>Settings</label></th><td>
+                                <button onclick="cluster.setAbout()">about</button>
+                                <button onclick="cluster.setAuthKey()">auth</button>
+                                <button onclick="cluster.setImageRoot()">image</button>
+                                <button onclick="cluster.setLocal()" id="cluster-set-local">local</button>
+                                <button onclick="cluster.setShortHost()" id="cluster-set-naming">short host names</button>
+                            </td></tr>
+                            <tr><td></td><td><div class="separator"></div></td></tr>
+                            <tr><th><label>Process Config</label></th><td id="cluster-configs"></td></tr>
+                            <tr><th><label>Node Templates</label></th><td id="cluster-templates"></td></tr>
+                            <tr><th><label>Required Nodes</label></th><td id="cluster-required"></td></tr>
+                            <tr><td></td><td><div class="separator"></div></td></tr>
+                            <tr><th><label>Registered Nodes</label></th><td id="cluster-registered"></td></tr>
+                        </table>
+                    </div>
                 </td>
                 <td id="right">
-                    <div id="right-title"></div>
-                    <div id="right-body"></div>
-                    <div id="right-footer"></div>
+                    <div class="side-title" id="right-title"></div>
+                    <div class="side-panel" id="right-body"></div>
+                    <div class="side-title"></div>
+                    <div class="side-panel" id="right-footer"></div>
                 </td>
             </tr>
         </table>

@@ -80,11 +80,11 @@ function showTab(tab) {
         var display = $(tabs[i]);
         if (tabs[i] == tab) {
             display.style.display = 'block';
-            button.style.backgroundColor = '#fea';
+//            button.style.backgroundColor = '#fea';
             storeValue(tabSetting,tab);
         } else {
             display.style.display = 'none';
-            button.style.backgroundColor = '#fff';
+//            button.style.backgroundColor = '#fff';
         }
         //console.log(tabs[i]);
     }
@@ -494,6 +494,7 @@ function renderQueryValue(v) {
         } else {
             var str = UTF8.decode(v).replace(/</g,'&lt;').replace(/>/g,'&gt;');
             if (v.match(/{.*}/)) {
+                if (str.length > 40) str = JSON.stringify(JSON.parse(str),null,4);
                 str = prettyPrintOne(str,"js");
             }
             return '<td>'+str+'</td>';

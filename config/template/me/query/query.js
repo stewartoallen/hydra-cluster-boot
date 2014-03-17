@@ -6,7 +6,6 @@ var busyimg = '<img width="32" height="32" src="spinner.gif">',
     nodinfsho = 0,
     queries = [],
     render = 1,
-    maxnav = dbGet('browse.max',25),
     tabs = ['completed-queries','browse','running-queries'],
     tabSetting = "query.tab",
     // dict of query string kv-pairs
@@ -37,13 +36,18 @@ try {
 
 /* escape ++ */
 function esc(v) {
-    return encodeURIComponent(v || '').replace('-','%2d');;
+    return encodeURIComponent(v || '').replace('-','%2d');
 }
 
 /* unescape ++ */
 function unesc(v) {
     return decodeURIComponent(v || '');
 }
+
+var nav = {
+    getMax : function() { return dbGet('query.browse_max',100) },
+    setMax : function(max) { dbSet('query.browse_max',max) }
+};
 
 var cbfuncs = {};
 var nextcb = 0;
@@ -123,7 +127,7 @@ function fcsnum(n) {
 
 /* decodes state from local storage */
 function storedQueriesDecode() {
-    var lsq = db['queries'] || null;
+    var lsq = db['query.stored_queries'] || db['queries'] || null;
     queries = [];
     if (lsq) {
         lsq = lsq.split(',');
@@ -143,7 +147,7 @@ function storedQueriesEncode() {
         var q = queries[i];
         qc.push(esc([esc(q.name),esc(q.query),esc(q.ops),esc(q.rops)].join(":")));
     }
-    db['queries'] = qc;
+    db['query.stored_queries'] = qc;
 }
 
 /* sets or clears a cookie and re-encodes the lot */
@@ -180,7 +184,7 @@ function navToQuery(src,exec) {
     if (src) {
         queryToFields({query:navp + ':+json'});
     } else {
-        queryToFields({query:navp + '/('+maxnav+')+:+count,+nodes,+mem',rops:'gather=ksaa',ops:'gather=ksaau;sort=0:s:a;title=key,count,nodes,mem,merge'});
+        queryToFields({query:navp + '/('+nav.getMax()+')+:+count,+nodes,+mem',rops:'gather=ksaa',ops:'gather=ksaau;sort=0:s:a;title=key,count,nodes,mem,merge'});
     }
     if (exec) {
         doFormQuery();
@@ -315,7 +319,7 @@ function queriesRescan() {
 
 /* sent rpc to get a list of hosts for a query from QueryMaster */
 function queryHostsRescan(uuid,job) {
-    var tab=dbGet(tabSetting);
+    var tab = dbGet(tabSetting);
     var request = callRPC('/host/list', ['uuid='+uuid], function(data) { renderQueryHosts(data,tab); });
     switch (tab) {
         case 'completed-queries':
@@ -520,7 +524,7 @@ function treeNavStack() {
     $('treenav').innerHTML = navt;
     navp = navstack.length > 1 ? navstack.slice(1).join("/") : "";
     $('nodelist').innerHTML = busyimg;
-    doQuery({query:navp + '/('+maxnav+')+:+count,+nodes,+mem',ops:'gather=ksaau;sort=0:s:a',other:qappend},renderNavQuery,true);
+    doQuery({query:navp + '/('+nav.getMax()+')+:+count,+nodes,+mem',ops:'gather=ksaau;sort=0:s:a',other:qappend},renderNavQuery,true);
     if (navstack.length > 0 && dbGet('raw') == '1') doQuery({query:navp+':+json',other:qappend}, navNodeRaw, true);
 }
 
@@ -702,7 +706,11 @@ window.QM = {
     closeRunningHosts: closeRunningHosts,
     closeCompletedHosts: closeCompletedHosts,
 
-	cbfuncs:cbfuncs
+	cbfuncs:cbfuncs,
+    setPreviewLimit:function() {
+        console.log({nav:nav,db:db});
+        nav.setMax(prompt("Tree Preview Limit", nav.getMax()) || nav.getMax());
+    }
 };
 
 })();

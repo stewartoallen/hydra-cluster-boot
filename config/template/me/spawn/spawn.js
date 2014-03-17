@@ -2,11 +2,11 @@
 // TODO implement page reload/refresh afer # events and # mouse idle time
 (function() {
 
-var initonce = false,
-    auth = '',
+var initOnce = false,
+    rpcAuth = '',
 	filter = '',
 	showHost = null,
-	editing = null;
+	editing = null,
     clusterData = null,
 	params = {},
 	aliases = {},
@@ -42,14 +42,14 @@ var initonce = false,
     tabSetting = "spawn.tab",
 	setup = {},
 	scroll = {},
-	settings = window.localStorage || {},
+	db = localStorage || {},
 	console = window.console || { log:function() { } },
 	clientID = Math.floor(Math.random()*1000000),
 	currentJob = {checked:{},respawn:false,nodes:[]},
-	isCompact = navigator.userAgent.match(/iPad/i) != null || settings['compact'] == 1 || settings['compact'] == true,
-	hostDomain = settings['host.domain'] || '',
-	lineWrap = settings['line.wrap'] == 'true' || settings['line.wrap'] == 1 || false,
-	paramWrap = !(settings['param.wrap'] == 'false' || settings['param.wrap'] == 0) || isCompact, 
+	isCompact = navigator.userAgent.match(/iPad/i) != null || db['compact'] == 1 || db['compact'] == true,
+	hostDomain = db['host.domain'] || '',
+	lineWrap = db['line.wrap'] == 'true' || db['line.wrap'] == 1 || false,
+	paramWrap = !(db['param.wrap'] == 'false' || db['param.wrap'] == 0) || isCompact,
 	sizeK = 1024,
 	sizeM = sizeK * 1024,
 	sizeG = sizeM * 1024,
@@ -78,7 +78,7 @@ function parse(json,defval) {
 /* called on page load  */
 function init() {
 	try {
-		if (initonce)
+		if (initOnce)
 		{
 			return;
 		}
@@ -87,11 +87,11 @@ function init() {
 			enablePolling = false;
 		}
         if (params.cluster) {
-            var clusterString = settings['cluster-'+params.cluster];
+            var clusterString = db['cluster-'+params.cluster];
             if (clusterString) {
                 clusterData = JSON.parse(clusterString);
                 if (!clusterData.isLocal) rpcroot="http://"+firstKey(clusterData.proc.spawn)+":5050"
-                auth = clusterData.authKey;
+                rpcAuth = clusterData.authKey;
             }
         }
         var forms = document.getElementsByTagName('form');
@@ -99,22 +99,22 @@ function init() {
             var act = forms[i].action;
             forms[i].action = rpcroot + act.substring(act.indexOf("/XXX")+4);
         }
-		showTab(settings[tabSetting] || 'jobs');
+		showTab(db[tabSetting] || 'jobs');
 		checkUser();
-		if (settings[settings[tabSetting]+'filter']) {
-			filter = settings[settings[tabSetting]+'filter'];
+		if (db[db[tabSetting]+'filter']) {
+			filter = db[db[tabSetting]+'filter'];
 			$('form_filter').value = filter;
 		}
 		for (var i=0; i<window.localStorage.length; i++) {
 			var key = window.localStorage.key(i);
 			if (key.indexOf("sort_col_") == 0) {
-				sortColumn[key.substring(9)] = settings[key];
+				sortColumn[key.substring(9)] = db[key];
 			}
 		}
 		refresh();
 		eventPollSetup();
-		if (settings['zkPath']) {
-			zkStack = settings['zkPath'].split('/');
+		if (db['zkPath']) {
+			zkStack = db['zkPath'].split('/');
 			getZk();
 		} else {
 			zkTruncate(0);
@@ -124,7 +124,7 @@ function init() {
 		if (!form_config_editor) form_config_editor = CodeMirror($('code_config'), {lineWrapping:lineWrap, mode:{name:"javascript",json:true}});
 		if (!form_macro_editor) form_macro_editor = CodeMirror($('code_macro'), {lineWrapping:lineWrap, mode:{name:"javascript",json:true}});
 		// there can be only one
-		initonce = true;
+		initOnce = true;
 		// ipad specifics
 		if (isCompact) {
 			$('b_filt_run').style.display = 'none';
@@ -185,7 +185,7 @@ function windowKeyDown(evt) {
 	}
 	switch (evt.keyCode)
 	{
-		case 8: if (settings[tabSetting] == 'jobs') { deleteJob(settings['showJob']); evt.stopPropagation(); return false; } break;
+		case 8: if (db[tabSetting] == 'jobs') { deleteJob(db['showJob']); evt.stopPropagation(); return false; } break;
 		case 27: if (editing) { showEdit(editing,false); evt.stopPropagation(); return false; } break; // esc to close edit window
 	}
 }
@@ -210,10 +210,10 @@ function windowKeyPress(evt) {
 		case 122: showTab('zk'); break; // z
 		case 114: refresh(); break; // 'r'
 		case 116: toggleQuiesce(); break; // t
-		case 101: if (settings[tabSetting] == 'jobs') editJob(settings['showJob']); break; // e
-		case 113: if (settings[tabSetting] == 'jobs') toggleQuiesce(); break; // 'q' (TODO open query winow -- http://'+setup.queryHost+'/query/index.html?job='+job.id)
-		case 115: if (settings[tabSetting] == 'jobs') stopJob(settings['showJob'],0); break; // s
-		case 107: if (settings[tabSetting] == 'jobs') rekickJob(settings['showJob']); break; // k
+		case 101: if (db[tabSetting] == 'jobs') editJob(db['showJob']); break; // e
+		case 113: if (db[tabSetting] == 'jobs') toggleQuiesce(); break; // 'q' (TODO open query winow -- http://'+setup.queryHost+'/query/index.html?job='+job.id)
+		case 115: if (db[tabSetting] == 'jobs') stopJob(db['showJob'],0); break; // s
+		case 107: if (db[tabSetting] == 'jobs') rekickJob(db['showJob']); break; // k
 	}
 }
 
@@ -248,7 +248,7 @@ var nextcb = 0;
 
 function callRPC(path, callback) {
 	var fname = 'jsonp_cb'+(nextcb++);
-	path = rpcroot + path + '&user='+getUser()+'&auth='+auth+'&cbfunc-arg="'+fname+'"&cbfunc=Spawn.cbfuncs.'+fname;
+	path = rpcroot + path + '&user='+getUser()+'&auth='+rpcAuth+'&cbfunc-arg="'+fname+'"&cbfunc=Spawn.cbfuncs.'+fname;
 
 	var script = document.createElement('script');
 	script.id = fname;
@@ -272,7 +272,7 @@ function rpcCallback(data) {
 
 function sortTable(id, col) {
 	sortColumn[id] = sortColumn[id] && sortColumn[id] == Math.abs(col) ? 0 - sortColumn[id] : col;
-	settings['sort_col_'+id] = sortColumn[id];
+	db['sort_col_'+id] = sortColumn[id];
 	renderTable(id);
 }
 
@@ -296,9 +296,9 @@ function renderTable(id,table,scrolling,addclass) {
 	}
 	table.rowon = table.rowon || 0;
 	table.rowoff = Math.min(table.rowoff || table.rows.length, table.rows.length);
-	if (!scrolling && settings[table.id+'-rowon']) {
+	if (!scrolling && db[table.id+'-rowon']) {
 		var diff = table.rowoff - table.rowon;
-		table.rowon = parseInt(settings[table.id+'-rowon']);
+		table.rowon = parseInt(db[table.id+'-rowon']);
 		table.rowoff = table.rowon + diff;
 	}
 	if (table.rowoff > table.rows.length) {
@@ -405,8 +405,8 @@ function renderTable(id,table,scrolling,addclass) {
 			table.rowon = maxlen - maxwin;
 		}
 		table.rowoff = table.rowon + maxwin;
-		if (settings[table.id+'-rowon'] != table.rowon) {
-			settings[table.id+'-rowon'] = table.rowon;
+		if (db[table.id+'-rowon'] != table.rowon) {
+			db[table.id+'-rowon'] = table.rowon;
 			renderTable(id,table,true,addclass);
 		}
 	};
@@ -506,9 +506,9 @@ function showTab(tab) {
 	var tab_dom = 'tab_'+tab;
 	var tab_btn = 'btn_'+tab;
 
-	$('form_filter').value = settings[tab+'filter'] || '';//set the new tab filtering value
+	$('form_filter').value = db[tab+'filter'] || '';//set the new tab filtering value
 	filter = $('form_filter').value;
-	settings[tabSetting] = tab; //save the new tab selection
+	db[tabSetting] = tab; //save the new tab selection
 	for (var i=0; i<tabs.length; i++) {
 		var dom = 'tab_'+tabs[i];
 		var btn = 'btn_'+tabs[i];
@@ -805,22 +805,22 @@ function refresh() {
 }
 
 function checkUser() {
-    if (!settings['iam']) {
+    if (!db['iam']) {
         setUser();
     }
 }
 
 function getUser() {
-    return settings['iam'];
+    return db['iam'];
 }
 
 function setUser() {
-    settings['iam'] = prompt('Provide User Name',settings['iam']) || settings['iam'];
+    db['iam'] = prompt('Provide User Name',db['iam']) || db['iam'];
     checkUser();
 }
 
 function setAuth() {
-    auth = prompt('Provide Spawn Auth Key',auth) || auth;
+    rpcAuth = prompt('Provide Spawn Auth Key',rpcAuth) || rpcAuth;
 }
 
 /* stop or restart job scheduling */
@@ -937,7 +937,7 @@ function getZk() {
 	}
 	$('zk_path').innerHTML = renderPath;
 	var path = zkStack.join('/');
-	settings['zkPath'] = path;
+	db['zkPath'] = path;
 	callRPC('/zk.ls?path=/'+path, getZkLsCallback);
 	callRPC('/zk.get?path=/'+path, getZkGetCallback);
 }
@@ -1001,7 +1001,7 @@ function renderCommands(newCmdlist) {
     lastCmdlist = newCmdlist || lastCmdlist;
 	commands = lastCmdlist;
 	commandList = [];
-	var commandsFilter = settings['commandsfilter'] || '';
+	var commandsFilter = db['commandsfilter'] || '';
 	filter.setFilterValue(commandsFilter);
 	var table = {
 		allscroll:true,
@@ -1045,7 +1045,7 @@ function renderCommands(newCmdlist) {
 		$('select_job_command').innerHTML = html;
 	}
 	renderTable('commands_list', table);
-	showCommandJobs(settings['showCommand']);
+	showCommandJobs(db['showCommand']);
 	window.Spawn.commands = commands;
 }
 
@@ -1055,7 +1055,7 @@ function showCommandJobs(command) {
 		return;
 	}
 	$('command_jobs').innerHTML = "---";
-	settings['showCommand'] = command;
+	db['showCommand'] = command;
 	var table = {
 		allscroll:true,
 		id:"table_command_jobs", 
@@ -1140,7 +1140,7 @@ function renderAliases() {
 		rowoff:16,
 		filterFunction: renderAliases
 	};
-	var aliasFilter = settings['aliasfilter'] || '';
+	var aliasFilter = db['aliasfilter'] || '';
 	filter.setFilterValue(aliasFilter);
 	var index = 0;
 	for (var key in aliases) {
@@ -1214,7 +1214,7 @@ function renderMacros(newMacrolist) {
 	var filter = new ColumnFilter(["label","description","owner"]);
 	macros = newMacrolist || lastMacrolist;
 	macroList = [];
-	var macrosFilter=settings['macrosfilter'] || '';
+	var macrosFilter=db['macrosfilter'] || '';
 	filter.setFilterValue(macrosFilter);
 	var table = {
 		allscroll:true,
@@ -1386,7 +1386,7 @@ function renderHostsCall() {
 	$('status_running').innerHTML = sumrunning;
 	window.Spawn.hosts = hosts;
 	renderTable('hosts_list', table);
-	showHostTasks(settings['showHost']);
+	showHostTasks(db['showHost']);
 }
 
 function generateToggleHostLink(host, minionOnly) {
@@ -1425,7 +1425,7 @@ function showHostTasks(uuid) {
 	}
 	$('host_tasks').innerHTML = "---";
 	var host = hosts[uuid];
-	settings['showHost'] = uuid;
+	db['showHost'] = uuid;
 	var table = {
 		allscroll:true,
 		id:"table_host_tasks", 
@@ -1696,7 +1696,7 @@ function fillFormsFromJob(uuid, clone) {
 	currentJob.spawn = false;
 	//$('form_job_conf').value = job.config || '';
 	form_config_editor.setValue(job.config || '');
-    $('send_auth').value = auth;
+    $('send_auth').value = rpcAuth;
 	$('form_job_owner').value = getUser() || job.owner;
 	$('form_job_desc').value = job.description || 'describe this job';
 	$('form_job_nodes').value = job.nodes.length == 0 ? 1 : job.nodes.length;
@@ -1837,7 +1837,7 @@ function renderJobsCall() {
 	var filterList = {};
 	var tasks = 0;
 	var joblist = lastJoblist;
-	var jobFilter = settings['jobsfilter'] || '';
+	var jobFilter = db['jobsfilter'] || '';
 	filter.setFilterValue(jobFilter);
 	for (var i=0; i<joblist.length; i++) {
 		var job = joblist[i],
@@ -1909,7 +1909,7 @@ function renderJobsCall() {
 			setup.queryHost && job.queryConfig && job.queryConfig.canQuery ? '<a href="http://{{boothost}}/me/query/query.html?cluster={{cluster}}&job='+job.id+'" title="query job" target="_morgoth">Q</a>' : '',
 			'<a href="#" title="rekick" onclick="Spawn.rekickJob(\''+job.id+'\'); return false;">R</a>',
 			'<a href="#" title="stop" onclick="Spawn.stopJob(\''+job.id+'\',0); return false;">S</a>',
-            '<a href="http://'+setup.spawnHost+'/job.expand?id='+job.id+'&auth='+auth+'" title="expand">D</a>',
+            '<a href="http://'+setup.spawnHost+'/job.expand?id='+job.id+'&auth='+rpcAuth+'" title="expand">D</a>',
 			'<a href="#" title="inspect" onclick="Spawn.showJobNodes(\''+job.id+'\',true,true); return false;">'+pithy+'</a>',
 			'<a href="#" title="edit" onclick="Spawn.editJob(\''+job.id+'\'); return false;">'+job.description+'</a>',
 			job.creator ? '<a href="#" title="owner:'+job.owner+'">'+job.creator+'</a>' : '',
@@ -1941,13 +1941,13 @@ function renderJobsCall() {
 	$('filter_list').innerHTML = html + '</select>';
 	$('status_jobs').innerHTML = joblist.length;
 	$('status_tasks').innerHTML = tasks;
-	showJobNodes(settings['showJob']);
+	showJobNodes(db['showJob']);
 	window.Spawn.jobs = jobs;
 	renderTable('jobs_list',table);
 }
 
 function showJobNodes(uuid,force,focus) {
-	settings['showJob'] = uuid;
+	db['showJob'] = uuid;
 	if (!force && lastJob && lastJob.id == uuid) {
 		//console.log('skip job call on '+uuid);
 		showJobNodesCallback(null);
@@ -2187,7 +2187,7 @@ function setJobProfiling() {
 function showJobLogs(host, port, job, node) {
 	lastLog = host ? {host:host, port:port, job:job, node:node} : lastLog;
 	if (lastLog.host) {
-		var lines = $('job_log_lines').value || settings['loglines'] || 15;
+		var lines = $('job_log_lines').value || db['loglines'] || 15;
 		var which = $('job_log_head').checked ? 'head' : 'tail';
 		var url = 'about:blank';
 		if ($('job_log_stdout').checked) {
@@ -2197,7 +2197,7 @@ function showJobLogs(host, port, job, node) {
 		}
 		$('job_logs').src = url;
 		showHide('job_logs_border', true);
-		settings['loglines'] = lines;
+		db['loglines'] = lines;
 	}
 }
 
@@ -2206,8 +2206,8 @@ function setJobFilter(val,ev) {
 	if (val || (e && e.keyCode == 13)) {
 		filter = val || $('form_filter').value;
 		$('form_filter').value = filter;
-		settings[settings[tabSetting]+'filter'] = filter;
-		var table = $('table_'+settings[tabSetting]);
+		db[db[tabSetting]+'filter'] = filter;
+		var table = $('table_'+db[tabSetting]);
 		if(table && filterFunctions[table.id])
 			filterFunctions[table.id].call();
 		else
@@ -2219,8 +2219,8 @@ function setJobFilter(val,ev) {
 function clearJobFilter() {
 	filter = '';
 	$('form_filter').value = filter;
-	settings[settings[tabSetting]+'filter'] = filter;
-	var table = $('table_'+settings[tabSetting]);
+	db[db[tabSetting]+'filter'] = filter;
+	var table = $('table_'+db[tabSetting]);
     if(table && filterFunctions[table.id])
         filterFunctions[table.id].call();
     else

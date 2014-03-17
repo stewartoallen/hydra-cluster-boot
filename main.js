@@ -17,6 +17,20 @@ var params = {
     boothost : [os.hostname(),8007].join(":")
 };
 
+if (!String.prototype.endsWith) {
+    Object.defineProperty(String.prototype, 'endsWith', {
+        enumerable: false,
+        configurable: false,
+        writable: false,
+        value: function (searchString, position) {
+            position = position || this.length;
+            position = position - searchString.length;
+            var lastIndex = this.lastIndexOf(searchString);
+            return lastIndex !== -1 && lastIndex === position;
+        }
+    });
+}
+
 /**
  * TODO
  * add simple config (db) mem caching layer
@@ -165,8 +179,12 @@ var prefix = {
         return http.sendFile(res, filePath);
     },
     "/me/" : function(req, res, url) {
-        url.pathname = "/render"+url.pathname;
-        return prefix["/render/"](req, res, url);
+        if (url.pathname.endsWith(".html") || url.pathname.endsWith(".js")) {
+            url.pathname = "/render"+url.pathname;
+            return prefix["/render/"](req, res, url);
+        } else {
+            return http.sendFile(res,"config/template"+url.pathname);
+        }
     },
     "/render/" : function(req, res, url) {
         var filePath = url.pathname;

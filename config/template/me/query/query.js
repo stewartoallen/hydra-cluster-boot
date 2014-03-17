@@ -1,18 +1,18 @@
 (function() {
 
 var busyimg = '<img width="32" height="32" src="spinner.gif">',
-    store = window.localStorage || {},
+    db = localStorage || {},
     navstack = [ "" ],
     nodinfsho = 0,
     queries = [],
     render = 1,
-    maxnav = fetchValue('browse.max',25),
+    maxnav = dbGet('browse.max',25),
     tabs = ['completed-queries','browse','running-queries','setup'],
     tabSetting = "query.tab",
     // dict of query string kv-pairs
     qs = document.location.search.slice(1),
     qkv = qs.parseQuery(),
-    jobid = qkv['job'] || fetchValue('job'),
+    jobid = qkv['job'] || dbGet('job'),
     // dict of hash kv-pairs
     hs = document.location.hash.slice(1),
     hkv = {},
@@ -80,13 +80,10 @@ function showTab(tab) {
         var display = $(tabs[i]);
         if (tabs[i] == tab) {
             display.style.display = 'block';
-//            button.style.backgroundColor = '#fea';
-            storeValue(tabSetting,tab);
+            dbSet(tabSetting,tab);
         } else {
             display.style.display = 'none';
-//            button.style.backgroundColor = '#fff';
         }
-        //console.log(tabs[i]);
     }
     stopHostPolling();
     stopLiveQueryPolling();
@@ -125,7 +122,7 @@ function fcsnum(n) {
 
 /* decodes state from local storage */
 function storedQueriesDecode() {
-    var lsq = store['queries'] || null;
+    var lsq = db['queries'] || null;
     queries = [];
     if (lsq) {
         lsq = lsq.split(',');
@@ -145,18 +142,18 @@ function storedQueriesEncode() {
         var q = queries[i];
         qc.push(esc([esc(q.name),esc(q.query),esc(q.ops),esc(q.rops)].join(":")));
     }
-    store['queries'] = qc;
+    db['queries'] = qc;
 }
 
 /* sets or clears a cookie and re-encodes the lot */
-function storeValue(c,v) {
-    store[c] = v;
+function dbSet(c,v) {
+    db[c] = v;
     storedQueriesEncode();
 }
 
 /* retrieves a cookie or returns a default if not set */
-function fetchValue(c,dv) {
-    return store[c] || dv;
+function dbGet(c,dv) {
+    return db[c] || dv;
 }
 
 /* create quuery object from input fields */
@@ -267,7 +264,7 @@ function storedQueriesShow() {
 
 /* called by <return> in input field */
 function submitQuery(val,event,json) {
-    storeValue("qother",$('qother').value);
+    dbSet("qother",$('qother').value);
     // only trigger query on a return/enter keypress
     switch (window.event ? window.event.keyCode : event ? event.which : 0) {
         case 13: doFormQuery(); return false;
@@ -318,7 +315,7 @@ function queriesRescan() {
 
 /* sent rpc to get a list of hosts for a query from QueryMaster */
 function queryHostsRescan(uuid,job) {
-    var tab=fetchValue(tabSetting);
+    var tab=dbGet(tabSetting);
     var request = callRPC('/host/list', ['uuid='+uuid], function(data) { renderQueryHosts(data,tab); });
     switch (tab) {
         case 'completed-queries':
@@ -358,7 +355,7 @@ function renderQueryHosts(hosts,tab){
         finished+=(h.finished=="true"?1:0);
     }
     html += '</table>';
-    // var tab=fetchValue(tabSetting);
+    // var tab=dbGet(tabSetting);
     switch (tab) {
         case 'completed-queries':
             $('completedhosts').innerHTML = html;
@@ -520,7 +517,7 @@ function treeNavStack() {
     navp = navstack.length > 1 ? navstack.slice(1).join("/") : "";
     $('nodelist').innerHTML = busyimg;
     doQuery({query:navp + '/('+maxnav+')+:+count,+nodes,+mem',ops:'gather=ksaau;sort=0:s:a',other:$('qother').value},renderNavQuery,true);
-    if (navstack.length > 0 && fetchValue('raw') == '1') doQuery({query:navp+':+json',other:$('qother').value}, navNodeRaw, true);
+    if (navstack.length > 0 && dbGet('raw') == '1') doQuery({query:navp+':+json',other:$('qother').value}, navNodeRaw, true);
 }
 
 /* pop nav stack */
@@ -646,7 +643,7 @@ function init() {
     params = decodeParams();
 
     if (params.cluster) {
-        var clusterString = store['cluster-'+params.cluster];
+        var clusterString = db['cluster-'+params.cluster];
         if (clusterString) {
             clusterData = JSON.parse(clusterString);
             if (!clusterData.isLocal) rpcroot="http://"+firstKey(clusterData.proc.qmaster)+":2222"
@@ -661,7 +658,7 @@ function init() {
     $('query').value  = hkv.query  || '';
     $('qops').value   = hkv.ops    || '';
     $('qrops').value  = hkv.rops   || '';
-    $('qother').value = hkv.qother || fetchValue('qother', '');
+    $('qother').value = hkv.qother || dbGet('qother', '');
     
     if ($('query').value) {
         doFormQuery();
@@ -670,8 +667,8 @@ function init() {
     treeNavStack();
     storedQueriesShow();
 
-    showTab(fetchValue(tabSetting,'browse'));
-    storeValue('job',jobid);
+    showTab(dbGet(tabSetting,'browse'));
+    dbSet('job',jobid);
 }
 
 window.QM = {

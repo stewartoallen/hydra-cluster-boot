@@ -17,26 +17,26 @@ td { vertical-align:top }
 #setup { display:none } 
 #cache { display:none } 
 #running-queries { display:none }
-#table_query { border:1px solid blue }
+#table_query { border:1px solid #555 }
 #table_query th { background:#ddd; padding-left:2px; padding-right:2px }
 #table_query td { background:#eee }
 #table_query input { text-transform:none; width:100% }
-#table_setup { border:1px solid blue }
+#table_setup { border:1px solid #555 }
 #table_setup th { background:#ddd; padding-left:2px; padding-right:2px }
 #table_setup td { background:#eee }
-#table_nav { border:1px solid green }
+#table_nav { border:1px solid #555 }
 #table_nav th { background:#ddd; padding-left:2px; padding-right:2px }
 #table_nav td { background:#eee }
-#table_queries { border:0px solid purple; width:100% }
+#table_queries { border:0px solid #555; width:100% }
 #table_queries th { background:#ddd; padding-left:2px; padding-right:2px }
 #table_queries td { background:#eee }
-#table_results { border:1px solid black; margin-top:5px }
+#table_results { border:1px solid #555; margin-top:5px }
 #table_results th { background:#ddd; padding-left:2px; padding-right:2px }
 #table_results td { background:#eee }
 
 #browse { position:relative; width:100% }
 #browse-left { position:relative; width:33%; display:inline-block; vertical-align:top; min-width:400px }
-#browse-right { position:relative; width:66%; display:inline-block; vertical-align:top; text-align:right; overflow:auto }
+#browse-right { position:relative; width:66%; display:inline-block; vertical-align:top; text-align:left; overflow:auto }
 
 #queryinfo { overflow:auto }
 #nodelist { overflow:auto }

@@ -24,22 +24,14 @@
     <table width="100%" cellspacing="2" cellpadding="0">
         <tr>
             <td id="left">
-                <div class="side-title">View</div>
+                <div class="side-title">Query</div>
                 <div class="side-panel">
                     <button id='b_browse' onclick="QM.showTab('browse');">Browse</button>
                     <button id='b_running-queries' onclick="QM.showTab('running-queries');">Running</button>
                     <button id='b_completed-queries' onclick="QM.showTab('completed-queries');">Cache</button>
-                    <button id='b_setup' onclick="QM.showTab('setup');">Settings</button>
                 </div>
             </td>
             <td id="center">
-                <div id="setup" class="padme">
-                    <table id="table_setup" width=100%>
-                        <tr><th width=5% nowrap>query append</th><td><input id="qother" type="text" onkeyup="return QM.submitQuery(this.value,event)"/></td></tr>
-                        <tr><th width=5% nowrap>to object</th><td><input id="q2o" type="text" onkeyup="return QM.queryCodec(this.value,event,'encode')"/></td></tr>
-                        <tr><th width=5% nowrap>to query</th><td><input id="o2q" type="text" onkeyup="return QM.queryCodec(this.value,event,'decode')"/></td></tr>
-                    </table>
-                </div>
                 <div id="completed-queries" class="">
                     <div id="completed" class="cachetable"></div>
                     <div id="completedstatus" class="status" style="display:none;">
@@ -87,7 +79,7 @@
                             <div id="nodelist"></div>
                         </td>
                         <td id="browse-right">
-                            <table id="table_query" cellspacing=1 cellpadding=1 border=0 width=100%>
+                            <table id="table_query" cellspacing=1 cellpadding=1 border=0 width=100% class="render">
                                 <tr><th width=5%>name</th><td><input id="qname" type="text" onkeypress="return QM.submitQuery(this.value,event)"/></td></tr>
                                 <tr><th width=5%>query</th><td><input id="query" type="text" onkeypress="return QM.submitQuery(this.value,event)"/></td></tr>
                                 <tr><th width=5%>ops</th><td><input id="qops" type="text" onkeypress="return QM.submitQuery(this.value,event)"/></td></tr>
@@ -103,7 +95,6 @@
                                 <button onclick="return QM.toggleGraphOptions()">toggle graph options</button>
                                 <div id="graph_type_buttons"></div>
                                 <div id="graph_config"></div>
-                                <div id="graph_debug"></div>
                                 <div id="graph_display"></div>
                             </div>
                             <div id="queryinfo"></div>
@@ -116,6 +107,11 @@
                 <div class="side-panel">
                     <button>Disable</button>
                     <button>TTL</button>
+                </div>
+                <div class="side-separator"></div>
+                <div class="side-title">Options</div>
+                <div class="side-panel">
+                    <button>Trace</button>
                 </div>
             </td>
         </tr>

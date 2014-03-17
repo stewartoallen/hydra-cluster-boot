@@ -137,6 +137,10 @@ function init() {
 	}
 }
 
+var firstKey = function(o) {
+    for (var key in o) return key;
+};
+
 function refreshEditText(cm) {
 	cm.setValue(cm.getValue());
 }

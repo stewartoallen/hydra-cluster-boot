@@ -7,11 +7,12 @@ var busyimg = '<img width="32" height="32" src="spinner.gif">',
     queries = [],
     render = 1,
     maxnav = dbGet('browse.max',25),
-    tabs = ['completed-queries','browse','running-queries','setup'],
+    tabs = ['completed-queries','browse','running-queries'],
     tabSetting = "query.tab",
     // dict of query string kv-pairs
     qs = document.location.search.slice(1),
     qkv = qs.parseQuery(),
+    qappend = '',
     jobid = qkv['job'] || dbGet('job'),
     // dict of hash kv-pairs
     hs = document.location.hash.slice(1),
@@ -194,7 +195,7 @@ function navNodeRaw(data) {
 
 /* rpc callback : render node child list */
 function renderNavQuery(r) {
-	var t = '<table id="table_nav"><tr><th>node</th><th>count</th><th>nodes</th><th>mem</th><th>merge</th></tr>';
+	var t = '<table id="table_nav" class="render"><tr><th>node</th><th>count</th><th>nodes</th><th>mem</th><th>merge</th></tr>';
 	for (var i=0; i<r.length; i++) {
 		var d = UTF8.decode(r[i][0]);
 		var s = d.replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -209,7 +210,7 @@ function renderNavQuery(r) {
 /* get the real query url */
 function queryRaw() {
     var query = fieldsToQuery();
-    query.other = $('qother').value;
+    query.other = qappend;
     var path = '/query/call?'+packQuery([['path',query.query],['ops',query.ops],['rops',query.rops],['format','json'],["job",jobid],['filename',query.name],["sender","spawn"],query.other]);
     alert(path);
     //console.log(path);
@@ -219,7 +220,7 @@ function queryRaw() {
 /* export current query as csv */
 function queryCSV() {
     var query = fieldsToQuery();
-    query.other = $('qother').value;
+    query.other = qappend;
     window.open('/query/call?'+packQuery([['path',query.query],['ops',query.ops],['rops',query.rops],['format','csv'],["job",jobid],['filename',query.name],["sender","spawn"],query.other]));
     return false;
 }
@@ -243,14 +244,14 @@ function queryDelete(i) {
 function querySet(i,exec) {
     var q = queries[i];
     queryToFields(q);
-    window.localStorage['lastQuery'] = packQuery([['path',q.query],['ops',q.ops],['rops',q.rops],['format','json'],['filename',q.name],$('qother').value]);
+    window.localStorage['lastQuery'] = packQuery([['path',q.query],['ops',q.ops],['rops',q.rops],['format','json'],['filename',q.name],qappend]);
     if (exec) doFormQuery();
     return false;
 }
 
 /* render queries into box */
 function storedQueriesShow() {
-    var txt = '<table id="table_queries">';
+    var txt = '<table id="table_queries" class="render">';
     for (var i=0; i<queries.length; i++) {
         txt += '<tr>';
         txt += '<th><a title="delete" href="#" onclick="QM.queryDelete('+i+');return false;">&times;</a></th>';
@@ -264,7 +265,7 @@ function storedQueriesShow() {
 
 /* called by <return> in input field */
 function submitQuery(val,event,json) {
-    dbSet("qother",$('qother').value);
+    dbSet("qother",qappend);
     // only trigger query on a return/enter keypress
     switch (window.event ? window.event.keyCode : event ? event.which : 0) {
         case 13: doFormQuery(); return false;
@@ -303,12 +304,11 @@ function queriesRescan() {
         queryHostsRescan($('sel_run_uuid').innerHTML, $('sel_run_job').innerHTML);
     }
     //setup polling for new live queries    
-    if(liveQueryPolling==null){
-        liveQueryPolling=setInterval(function() {
+    if (liveQueryPolling == null) {
+        liveQueryPolling = setInterval(function() {
 			callRPC('/query/list', [], renderLiveQueries(data))
 		}, 5000);
-    }
-    else{
+    } else {
         liveQueryPolling.start();
     }
 }
@@ -341,7 +341,7 @@ function queryHostsRescan(uuid,job) {
 
 function renderQueryHosts(hosts,tab){
     // console.log("unsorted:"+hosts);
-    var html = '<table><tr><th>';
+    var html = '<table class="render"><tr><th>';
     html += ['hostname','lines','start time',(tab=='runningqueries'? 'run time':'end time'),'finished'].join('</th><th>')+'</th></tr>';
     var finished=0;
     if(hosts.length>0) {
@@ -440,7 +440,7 @@ function limit(txt,chars) {
 
 /* cache entry list render */
 function renderCacheList(list,div,kill) {
-    var html = '<table><tr><th>';
+    var html = '<table class="render"><tr><th>';
     html += ['submit','uuid','alias','job','path','ops','run','lines','kill'].join('</th><th>')+'</th></tr>';
     for (var i=0; i<list.length; i++) {
         var le = list[i];
@@ -455,7 +455,7 @@ function renderCacheList(list,div,kill) {
 function doFormQuery() {
     $('queryinfo').innerHTML = busyimg;
     var q = fieldsToQuery();
-    q.other = $('qother').value;
+    q.other = qappend;
     doQuery(q, renderFormQueryResults, true);
     document.location.hash = '#'+esc(esc(Object.toQueryString(q)));
     return false;
@@ -465,7 +465,7 @@ function doFormQuery() {
 function renderFormQueryResults(table) {
     var src = '';
     if (render != 0) {
-        src = '<table id="table_results">';
+        src = '<table id="table_results" class="render">';
         for (var i=0; i<table.length; i++) {
             var row = table[i];
             src += '<tr>';
@@ -491,7 +491,11 @@ function renderQueryValue(v) {
         } else {
             var str = UTF8.decode(v).replace(/</g,'&lt;').replace(/>/g,'&gt;');
             if (v.match(/{.*}/)) {
-                if (str.length > 40) str = JSON.stringify(JSON.parse(str),null,4);
+                try {
+                    if (str.length > 40) str = JSON.stringify(JSON.parse(str),null,4);
+                } catch (e) {
+                    console.log(['error',e,str.substring(0,200)+'...']);
+                }
                 str = prettyPrintOne(str,"js");
             }
             return '<td>'+str+'</td>';
@@ -516,8 +520,8 @@ function treeNavStack() {
     $('treenav').innerHTML = navt;
     navp = navstack.length > 1 ? navstack.slice(1).join("/") : "";
     $('nodelist').innerHTML = busyimg;
-    doQuery({query:navp + '/('+maxnav+')+:+count,+nodes,+mem',ops:'gather=ksaau;sort=0:s:a',other:$('qother').value},renderNavQuery,true);
-    if (navstack.length > 0 && dbGet('raw') == '1') doQuery({query:navp+':+json',other:$('qother').value}, navNodeRaw, true);
+    doQuery({query:navp + '/('+maxnav+')+:+count,+nodes,+mem',ops:'gather=ksaau;sort=0:s:a',other:qappend},renderNavQuery,true);
+    if (navstack.length > 0 && dbGet('raw') == '1') doQuery({query:navp+':+json',other:qappend}, navNodeRaw, true);
 }
 
 /* pop nav stack */
@@ -550,9 +554,9 @@ function toggleGraphOptions() {
 
 function chooseGraph(type) {
     var config = '';
-    config += '<table id="graph_config" cellspacing=1 cellpadding=1 border=0 width=100%>';
-    config += '<tr><td>X Columns</td><td><input id="xcols" type="text" value="0"/></td></tr>';
-    config += '<tr><td>Y Columns</td><td><input id="ycols" type="text" value="1"/></td></tr>';
+    config += '<table id="graph_config_table" cellspacing=1 cellpadding=1 border=0 width=100% class="render">';
+    config += '<tr><th>X Columns</th><td><input id="xcols" type="text" value="0"/></td></tr>';
+    config += '<tr><th>Y Columns</th><td><input id="ycols" type="text" value="1"/></td></tr>';
     config += '</table>';
     config += '<button onclick="QM.graphIt(\'' + type + '\')">graph it</button>';
     $('graph_config').innerHTML = config;
@@ -601,7 +605,7 @@ function renderLineGraph(table) {
 
 function graphIt(type) {
     var q = fieldsToQuery();
-    q.other = $('qother').value;
+    q.other = qappend;
     if (type == 'line') {
         doQuery(q, renderLineGraph, true);
     }
@@ -637,6 +641,9 @@ function closeCompletedHosts(){
     hide('completedstatus');
 }
 
+var firstKey = function(o) {
+    for (var key in o) return key;
+};
 
 /* called on page load  */
 function init() {
@@ -658,7 +665,7 @@ function init() {
     $('query').value  = hkv.query  || '';
     $('qops').value   = hkv.ops    || '';
     $('qrops').value  = hkv.rops   || '';
-    $('qother').value = hkv.qother || dbGet('qother', '');
+    qappend = hkv.qother || dbGet('qother', '');
     
     if ($('query').value) {
         doFormQuery();

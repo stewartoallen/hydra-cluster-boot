@@ -124,6 +124,7 @@
                             </div>
                             <div>
                                 <button onclick="Spawn.newJob()">+</button>
+                                <span class="spacer"></span>
                                 <button id="sel_job_edit">edit</button>
                                 <button id="sel_job_clone">clone</button>
                                 <button id="sel_job_rebalance">rebalance</button>
@@ -139,14 +140,7 @@
                             <td id="jlfill">
                                 <div id="job_logs_border">
                                     <div id="job_log_control">
-                                        profile
-                                        <div class="boxit">
-                                            <button id="job_profile_dump" onClick="Spawn.dumpJobProfile()">dump</button>
-                                            <input id="job_profile_on" type="radio" name="profile" value="1" onClick="Spawn.setJobProfiling()">on
-                                            <input id="job_profile_off" type="radio" name="profile" value="0" onClick="Spawn.setJobProfiling()" checked>off
-                                        </div>
-                                        &nbsp;
-                                        log
+                                        <label>log</label>
                                         <div class="boxit">
                                             <input id="job_log_stdout" type="radio" name="std" value="out" onClick="Spawn.showJobLogs()" checked>stdout
                                             <input id="job_log_stderr" type="radio" name="std" value="err" onClick="Spawn.showJobLogs()">stderr
@@ -155,7 +149,7 @@
                                             <input id="job_log_tail" type="radio" name="log" value="tail" onClick="Spawn.showJobLogs()" checked>tail
                                         </div>
                                         &nbsp;
-                                        lines
+                                        <label>lines</label>
                                         <input id="job_log_lines" size=6 onKeyUp="Spawn.updateJobLog(event); return false">
                                     </div>
                                     <iframe id="job_logs" src="about:blank"></iframe>
@@ -179,6 +173,10 @@
                                                 </div>
                                             </div>
                                         </th>
+                                    </tr>
+                                    <tr>
+                                        <th>description</th>
+                                        <td><input id="form_job_desc" name="description" size=120 autocapitalize="off" autocorrect="off"></td>
                                     </tr>
                                     <tr>
                                         <th>running</th>
@@ -215,10 +213,6 @@
                                             <label>max parallel</label>
                                             <input id="form_job_maxSimulRunning" name="maxSimulRunning" size=5>
                                         </td>
-                                    </tr>
-                                    <tr>
-                                        <th>description</th>
-                                        <td><input id="form_job_desc" name="description" size=120 autocapitalize="off" autocorrect="off"></td>
                                     </tr>
                                     <tr>
                                         <th>query</th>

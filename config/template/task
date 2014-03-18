@@ -51,6 +51,6 @@ eval exec ${JAVA_CMD:-java} \
 	-Dmapper.tree.type=1 \
 	${EXTARGS} \
 	${LOG4J_OPT} \
-	${HYDRA_EXE} \
+	${HYDRA_EXE_TASK} \
 	task $*
 

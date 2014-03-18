@@ -32,17 +32,12 @@ table.profile tr:hover a:visited { color: #369 }
 table.profile th { background:#999; white-space:nowrap }
 table.profile td { background:#eee; border-bottom:1px solid #eee; white-space:nowrap }
 
-table.detail tbody { border:0px; margin:0px; padding:0px; }
-table.detail tr { border:0px; margin:0px; padding:0px; }
-table.detail td { vertical-align:top; border:0px; margin:0px; padding:0px; }
-table.detail td#jlfill { width:100%; }
-
 table label { background-color:#eee; border:1px solid #ccc; padding:1px; padding-left:3px; padding-right:3px; margin-left:2px }
 
-#job_detail { width:100%; height:100%; border-spacing:0px; border:0px; margin:0px; padding:0px; }
-#job_logs_border { display:none; margin-left:5px; margin-right:5px; border: 1px solid gray; padding:5px; overflow:none }
-#job_log_control { position:relative; top:2px; right:2px; float:right; }
-#job_logs { width:100%; height:300px; border:1px dashed gray; margin-right:5px; margin-top:5px; overflow:none }
+#job_log { position:relative; width:99%; height:100%; border:1px solid black; margin:5px; display:none }
+#job_log_control { position:relative; padding:3px }
+#job_log_border { position:relative; margin-left:5px; margin-right:5px; margin-bottom:5px; border:1px dashed gray; padding:5px }
+#job_log_detail { position:relative; height:300px; overflow:auto; font-family:monospace; white-space:pre-wrap }
 
 #host_detail { width:100%; height:100%; border-spacing:0px; border:0px; margin:0px; padding:0px; }
 #host_logs_border { display:none; margin-left:5px; border: 1px solid gray; padding:5px; overflow:auto }

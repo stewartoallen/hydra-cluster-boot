@@ -136,28 +136,24 @@
                         <div class="spacer"></div>
                         <div id="job_nodes" class="lrpad"></div>
                         <div class="spacer"></div>
-                        <table id="job_detail" class="detail"><tr>
-                            <td id="jlfill">
-                                <div id="job_logs_border">
-                                    <div id="job_log_control">
-                                        <label>log</label>
-                                        <div class="boxit">
-                                            <input id="job_log_stdout" type="radio" name="std" value="out" onClick="Spawn.showJobLogs()" checked>stdout
-                                            <input id="job_log_stderr" type="radio" name="std" value="err" onClick="Spawn.showJobLogs()">stderr
-                                            &nbsp;
-                                            <input id="job_log_head" type="radio" name="log" value="head" onClick="Spawn.showJobLogs()">head
-                                            <input id="job_log_tail" type="radio" name="log" value="tail" onClick="Spawn.showJobLogs()" checked>tail
-                                        </div>
-                                        &nbsp;
-                                        <label>lines</label>
-                                        <input id="job_log_lines" size=6 onKeyUp="Spawn.updateJobLog(event); return false">
-                                    </div>
-                                    <div id="job_log_iframe">
-                                        <iframe id="job_logs" src="about:blank"></iframe>
-                                    </div>
+                        <div id="job_log">
+                            <div id="job_log_control">
+                                <label>log</label>
+                                <div class="boxit">
+                                    <input id="job_log_stdout" type="radio" name="std" value="out" onClick="Spawn.showJobLogs()" checked>stdout
+                                    <input id="job_log_stderr" type="radio" name="std" value="err" onClick="Spawn.showJobLogs()">stderr
+                                    &nbsp;
+                                    <input id="job_log_head" type="radio" name="log" value="head" onClick="Spawn.showJobLogs()">head
+                                    <input id="job_log_tail" type="radio" name="log" value="tail" onClick="Spawn.showJobLogs()" checked>tail
                                 </div>
-                            </td>
-                        </tr></table>
+                                &nbsp;
+                                <label>lines</label>
+                                <input id="job_log_lines" size=6 onKeyUp="Spawn.updateJobLog(event); return false">
+                            </div>
+                            <div id="job_log_border">
+                                <div id="job_log_detail"></div>
+                            </div>
+                        </div>
                         <div id="job_profile">
                             <table id="job_profile_modal">
                                 <tr><th colspan=4 align=right><a class="hide_edit" href="#" onclick="Spawn.showEdit('job_profile',false);">X</a>&nbsp;</th></tr>

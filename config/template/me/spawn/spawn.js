@@ -111,6 +111,7 @@ function init() {
 				sortColumn[key.substring(9)] = db[key];
 			}
 		}
+        $('job_log_lines').value = db['spawn.log_lines'] || 50;
 		refresh();
 		eventPollSetup();
 		if (db['zkPath']) {
@@ -2184,30 +2185,26 @@ function setJobProfiling() {
 	} else {
 		url = "http://"+host+":"+port+"/profile?enable=0";
 	}
-	$('job_logs').src = url;
-	showHide('job_logs_border', true);
+	showHide('job_log', true);
 }
 
 /* set url for job log iframe */
 function showJobLogs(host, port, job, node) {
 	lastLog = host ? {host:host, port:port, job:job, node:node} : lastLog;
 	if (lastLog.host) {
-		var lines = $('job_log_lines').value || db['loglines'] || 15;
+		var lines = $('job_log_lines').value || db['spawn.log_lines'];
 		var which = $('job_log_head').checked ? 'head' : 'tail';
 		var url = 'about:blank';
-		if ($('job_log_stdout').checked) {
-			url = "http://"+lastLog.host+":"+lastLog.port+"/job."+which+"?id="+lastLog.job+"&node="+lastLog.node+"&lines="+lines+"&out=1&err=0&html="+encodeURIComponent("<b>stdout</b><pre>{% raw %}{{out}}{% endraw %}</pre>");
-		} else {
-			url = "http://"+lastLog.host+":"+lastLog.port+"/job."+which+"?id="+lastLog.job+"&node="+lastLog.node+"&lines="+lines+"&out=0&err=1&html="+encodeURIComponent("<b>stderr</b><pre>{% raw %}{{err}}{% endraw %}</pre>");
-		}
-        var rpc = "/job.log?id="+lastLog.job+"&node="+lastLog.node+"&lines="+lines;
+        var stdout = $('job_log_stdout').checked;
+        var rpc = "/job.log?id="+lastLog.job+"&node="+lastLog.node+"&lines="+lines+"&out="+(stdout?"1":"0");
         var rpcopt = { cbparam:"callback", host:"http://"+lastLog.host+":"+lastLog.port };
-        // TODO move to all rpc-base and eliminate iframe
-        callRPC(rpc+"&out=1", function(logs) { console.log(["logs.out",logs]); }, rpcopt);
-        callRPC(rpc+"&out=0", function(logs) { console.log(["logs.err",logs]); }, rpcopt);
-		$('job_logs').src = url;
-		showHide('job_logs_border', true);
-		db['loglines'] = lines;
+        showHide('job_log', true);
+        callRPC(rpc+"&out=1", function(logs) {
+            var div = $('job_log_detail');
+            div.innerHTML = logs.out;
+            div.scrollTop = div.scrollHeight;
+        }, rpcopt);
+		db['spawn.log_lines'] = lines;
 	}
 }
 

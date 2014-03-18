@@ -6,6 +6,7 @@ function fail() {
 }
 
 # setup environment
+export HYDRA_RUN=${HYDRA_IMAGE}
 export RUNBIN="${HYDRA_IMAGE}/bin"
 export PIDDIR="${HYDRA_IMAGE}/etc/pid"
 export HYDRA_JAR="${HYDRA_IMAGE}/lib/hydra.jar"

@@ -1701,9 +1701,7 @@ function fillFormsFromJob(uuid, clone) {
 	currentJob.checked = {};
 	currentJob.create = false;
 	currentJob.spawn = false;
-	//$('form_job_conf').value = job.config || '';
 	form_config_editor.setValue(job.config || '');
-//    $('send_auth').value = rpcAuth;
 	$('form_job_owner').value = getUser() || job.owner;
 	$('form_job_desc').value = job.description || 'describe this job';
 	$('form_job_nodes').value = job.nodes.length == 0 ? 1 : job.nodes.length;

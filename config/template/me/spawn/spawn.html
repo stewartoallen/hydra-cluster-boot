@@ -152,7 +152,9 @@
                                         <label>lines</label>
                                         <input id="job_log_lines" size=6 onKeyUp="Spawn.updateJobLog(event); return false">
                                     </div>
-                                    <iframe id="job_logs" src="about:blank"></iframe>
+                                    <div id="job_log_iframe">
+                                        <iframe id="job_logs" src="about:blank"></iframe>
+                                    </div>
                                 </div>
                             </td>
                         </tr></table>
@@ -253,7 +255,7 @@
                                     </tr>
                                     <tr><th colspan=2>
                                         <input type="hidden" name="id" id="send_id">
-                                        <input type="hidden" name="auth" id="send_auth">
+                                        <!-- <input type="hidden" name="auth" id="send_auth"> -->
                                         <input type="hidden" name="hosts" id="send_hosts">
                                         <input type="hidden" name="spawn" id="send_spawn">
                                         <input type="hidden" name="enable" id="send_enable">

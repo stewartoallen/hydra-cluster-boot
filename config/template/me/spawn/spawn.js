@@ -97,7 +97,7 @@ function init() {
         var forms = document.getElementsByTagName('form');
         for (var i=0; i<forms.length; i++) {
             var act = forms[i].action;
-            forms[i].action = rpcroot + act.substring(act.indexOf("/XXX")+4);
+            forms[i].action = rpcroot + act.substring(act.indexOf("/XXX")+4) + "?auth=" + rpcAuth;
         }
 		showTab(db[tabSetting] || 'jobs');
 		checkUser();
@@ -250,9 +250,12 @@ function jsonp(url) {
 var cbfuncs = {};
 var nextcb = 0;
 
-function callRPC(path, callback) {
+function callRPC(path, callback, options) {
+    if (!options) options = {};
+    callbackArg = options.cbparam || "cbfunc";
+    rpcHost = options.host || rpcroot;
 	var fname = 'jsonp_cb'+(nextcb++);
-	path = rpcroot + path + '&user='+getUser()+'&auth='+rpcAuth+'&cbfunc-arg="'+fname+'"&cbfunc=Spawn.cbfuncs.'+fname;
+	path = rpcHost + path + '&user='+getUser()+'&auth='+rpcAuth+'&cbfunc-arg="'+fname+'"&'+callbackArg+'=Spawn.cbfuncs.'+fname;
 
 	var script = document.createElement('script');
 	script.id = fname;
@@ -261,8 +264,8 @@ function callRPC(path, callback) {
 
 	cbfuncs[fname] = function(data, topic, func) {
 		if (callback) callback(data);
-		delete cbfuncs[func];
-		document.getElementById(func).remove();
+		delete cbfuncs[fname];
+		document.getElementById(fname).remove();
 	};
 	
 	var head = document.getElementsByTagName("head")[0];
@@ -1700,7 +1703,7 @@ function fillFormsFromJob(uuid, clone) {
 	currentJob.spawn = false;
 	//$('form_job_conf').value = job.config || '';
 	form_config_editor.setValue(job.config || '');
-    $('send_auth').value = rpcAuth;
+//    $('send_auth').value = rpcAuth;
 	$('form_job_owner').value = getUser() || job.owner;
 	$('form_job_desc').value = job.description || 'describe this job';
 	$('form_job_nodes').value = job.nodes.length == 0 ? 1 : job.nodes.length;
@@ -2199,6 +2202,11 @@ function showJobLogs(host, port, job, node) {
 		} else {
 			url = "http://"+lastLog.host+":"+lastLog.port+"/job."+which+"?id="+lastLog.job+"&node="+lastLog.node+"&lines="+lines+"&out=0&err=1&html="+encodeURIComponent("<b>stderr</b><pre>{% raw %}{{err}}{% endraw %}</pre>");
 		}
+        var rpc = "/job.log?id="+lastLog.job+"&node="+lastLog.node+"&lines="+lines;
+        var rpcopt = { cbparam:"callback", host:"http://"+lastLog.host+":"+lastLog.port };
+        // TODO move to all rpc-base and eliminate iframe
+        callRPC(rpc+"&out=1", function(logs) { console.log(["logs.out",logs]); }, rpcopt);
+        callRPC(rpc+"&out=0", function(logs) { console.log(["logs.err",logs]); }, rpcopt);
 		$('job_logs').src = url;
 		showHide('job_logs_border', true);
 		db['loglines'] = lines;

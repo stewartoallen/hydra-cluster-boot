@@ -45,7 +45,7 @@ function unesc(v) {
 }
 
 var nav = {
-    getMax : function() { return dbGet('query.browse_max',100) },
+    getMax : function() { return dbGet('query.browse_max',50) },
     setMax : function(max) { dbSet('query.browse_max',max) }
 };
 

@@ -29,17 +29,18 @@ for dir in .bootmagic bin lib log etc/pid; do
 done
 
 function fetch() {
-    local=$1
-    remote=$2
+	local=$1
+	remote=$2
 	sizecheck=${3:0}
-    tmp=$(mktemp /tmp/curl-XXXXXX)
-    curl -f -s "${remote}?ifnotsize=${sizecheck}" > "${tmp}" && (
-        mv "${tmp}" "${local}"
-        echo "loaded"
-    ) || (
-        rm "${tmp}"
-        echo "skipped"
-    )
+	tmp=$(mktemp /tmp/curl-XXXXXX)
+	curl -f -s "${remote}?ifnotsize=${sizecheck}" > "${tmp}" && (
+		mkdir -p $(dirname "$local")
+		mv "${tmp}" "${local}"
+		echo "loaded"
+	) || (
+		rm "${tmp}"
+		echo "skipped"
+	)
 }
 
 # check for updates to required images
@@ -50,7 +51,7 @@ for image in {{images}}; do
 		echo -n "fetching $image... "
 		fetch "${local}" "${remote}"
 	) || (
-	    filesize=$(eval $SIZECMD $local)
+		filesize=$(eval $SIZECMD $local)
 		echo -n "verifying $image [$filesize]... "
 		fetch "${local}" "${remote}" ${filesize}
 	)

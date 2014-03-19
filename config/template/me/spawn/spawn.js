@@ -109,7 +109,7 @@ function init() {
 		for (var i=0; i<db.length; i++) {
 			var key = db.key(i);
 			if (key.indexOf("spawn.sort_col_") == 0) {
-				sortColumn[key.substring(9)] = db[key];
+				sortColumn[key.substring(15)] = db[key];
 			}
 		}
         $('job_log_lines').value = db['spawn.log_lines'] || 50;
@@ -2183,10 +2183,10 @@ function showJobLogs(host, port, job, node) {
 	lastLog = host ? {host:host, port:port, job:job, node:node} : lastLog;
 	if (lastLog.host) {
 		var lines = $('job_log_lines').value || db['spawn.log_lines'];
-		var which = $('job_log_head').checked ? 'head' : 'tail';
+		var offset = $('job_log_head').checked ? '0' : '-1';
 		var url = 'about:blank';
         var stdout = $('job_log_stdout').checked;
-        var rpc = "/job.log?id="+lastLog.job+"&node="+lastLog.node+"&lines="+lines+"&out="+(stdout?"1":"0");
+        var rpc = "/job.log?id="+lastLog.job+"&node="+lastLog.node+"&offset="+offset+"&lines="+lines+"&out="+(stdout?"1":"0");
         var rpcopt = { cbparam:"callback", host:"http://"+lastLog.host+":"+lastLog.port };
         showHide('job_log', true);
         callRPC(rpc+"&out=1", function(logs) {

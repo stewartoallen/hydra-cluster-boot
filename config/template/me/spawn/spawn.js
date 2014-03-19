@@ -92,6 +92,7 @@ function init() {
                 clusterData = JSON.parse(clusterString);
                 if (!clusterData.isLocal) rpcroot="http://"+firstKey(clusterData.proc.spawn)+":5050"
                 rpcAuth = clusterData.authKey;
+                $('status_cluster').innerHTML = clusterData.about;
             }
         }
         var forms = document.getElementsByTagName('form');
@@ -105,9 +106,9 @@ function init() {
 			filter = db[db[tabSetting]+'filter'];
 			$('form_filter').value = filter;
 		}
-		for (var i=0; i<window.localStorage.length; i++) {
-			var key = window.localStorage.key(i);
-			if (key.indexOf("sort_col_") == 0) {
+		for (var i=0; i<db.length; i++) {
+			var key = db.key(i);
+			if (key.indexOf("spawn.sort_col_") == 0) {
 				sortColumn[key.substring(9)] = db[key];
 			}
 		}
@@ -190,7 +191,7 @@ function windowKeyDown(evt) {
 	}
 	switch (evt.keyCode)
 	{
-		case 8: if (db[tabSetting] == 'jobs') { deleteJob(db['showJob']); evt.stopPropagation(); return false; } break;
+		case 8: if (db[tabSetting] == 'jobs') { deleteJob(db['spawn.job_show']); evt.stopPropagation(); return false; } break;
 		case 27: if (editing) { showEdit(editing,false); evt.stopPropagation(); return false; } break; // esc to close edit window
 	}
 }
@@ -215,10 +216,10 @@ function windowKeyPress(evt) {
 		case 122: showTab('zk'); break; // z
 		case 114: refresh(); break; // 'r'
 		case 116: toggleQuiesce(); break; // t
-		case 101: if (db[tabSetting] == 'jobs') editJob(db['showJob']); break; // e
+		case 101: if (db[tabSetting] == 'jobs') editJob(db['spawn.job_show']); break; // e
 		case 113: if (db[tabSetting] == 'jobs') toggleQuiesce(); break; // 'q' (TODO open query winow -- http://'+setup.queryHost+'/query/index.html?job='+job.id)
-		case 115: if (db[tabSetting] == 'jobs') stopJob(db['showJob'],0); break; // s
-		case 107: if (db[tabSetting] == 'jobs') rekickJob(db['showJob']); break; // k
+		case 115: if (db[tabSetting] == 'jobs') stopJob(db['spawn.job_show'],0); break; // s
+		case 107: if (db[tabSetting] == 'jobs') rekickJob(db['spawn.job_show']); break; // k
 	}
 }
 
@@ -280,7 +281,7 @@ function rpcCallback(data) {
 
 function sortTable(id, col) {
 	sortColumn[id] = sortColumn[id] && sortColumn[id] == Math.abs(col) ? 0 - sortColumn[id] : col;
-	db['sort_col_'+id] = sortColumn[id];
+	db['spawn.sort_col_'+id] = sortColumn[id];
 	renderTable(id);
 }
 
@@ -525,10 +526,8 @@ function showTab(tab) {
 		}
 		if (tab_dom != dom) {
 			$(dom).style.display = 'none';
-//			$(btn).style.backgroundColor = '';
 		} else {
 			$(dom).style.display = 'block';
-//			$(btn).style.backgroundColor = '#d0d0f0';
 		}
 	}
 }
@@ -696,7 +695,6 @@ function eventPollSetup() {
 }
 
 function eventPollCallback(obj,topic) {
-	//console.log(['event poll callback', obj, topic, typeof obj, Array.isArray(obj)]);
 	eventPoller = null;
 	eventPollSetup();
     if (Array.isArray(obj)) {
@@ -707,7 +705,6 @@ function eventPollCallback(obj,topic) {
 }
 
 function eventUpdater(update) {
-	//console.log(['event updater', update]);
 	// if there is a poller running or events are disabled, push to queue
 	if (queuePoller != null) {
 		queuedEvents.push(update);
@@ -1080,7 +1077,7 @@ function showCommandJobs(command) {
 		var job = getJob(joblist[i]);
 		table.rows.push([
 			'<a href="#" onclick="Spawn.showJobNodes(\''+job.id+'\',true);Spawn.showTab(\'jobs\')">'+job.id+'</a>',
-			job.description,
+			job.description
 		]);
 	}
 	renderTable('command_jobs', table, false);
@@ -1947,19 +1944,21 @@ function renderJobsCall() {
 	$('filter_list').innerHTML = html + '</select>';
 	$('status_jobs').innerHTML = joblist.length;
 	$('status_tasks').innerHTML = tasks;
-	showJobNodes(db['showJob']);
+	showJobNodes(db['spawn.job_show']);
 	window.Spawn.jobs = jobs;
 	renderTable('jobs_list',table);
 }
 
 function showJobNodes(uuid,force,focus) {
-	db['showJob'] = uuid;
+    var same = (uuid == db['spawn.job_show']);
+	db['spawn.job_show'] = uuid;
 	if (!force && lastJob && lastJob.id == uuid) {
 		//console.log('skip job call on '+uuid);
 		showJobNodesCallback(null);
 	} else {
 		callRPC("/job.get?id="+uuid, function(job) { safeCall(showJobNodesCallback,job,focus); });
 	}
+    if (!same) showHide('job_log', false);
 	setPollerLive();
 }
 
@@ -1977,9 +1976,6 @@ function showJobNodesCallback(job,focus) {
 	var uuid = job.id;
 	$('job_nodes').innerHTML = "---";
 	if (!job) {
-//		$('sel_job_id').value = '-';
-//		$('sel_job_desc').value = '-';
-//		$('sel_job_owner').value = '-';
 		$('sel_job_action').innerHTML = '<button>noop</button>';
 		$('sel_job_edit').onclick = '';
 		$('sel_job_clone').onclick = '';
@@ -1989,9 +1985,6 @@ function showJobNodesCallback(job,focus) {
 	$('sel_job_edit').onclick = function() { editJob(uuid); };
 	$('sel_job_clone').onclick = function() { cloneJob(uuid); };
 	$('sel_job_rebalance').onclick = function() { rebalanceJob(uuid); };
-//	$('sel_job_id').value = uuid;
-//	$('sel_job_desc').value = job.description;
-//	$('sel_job_owner').value = job.owner || '-';
 	$('sel_job_action').innerHTML = [
 		'<button onclick="return Spawn.checkJobDirs(\''+uuid+'\',1)">&#x2713; FS</button>',
 		'<button onclick="return Spawn.fixJobDirs(\''+uuid+'\',1)">Fix FS</button>',
@@ -2046,9 +2039,6 @@ function showJobNodesCallback(job,focus) {
 	}
 	renderTable('job_nodes', table, false);
 	showHide('job_nodes', true);
-//	if (focus){
-//		jQuery("#sel_job_id").focus().select();
-//	}
 }
 
 function descriptionForErrorCode(code) {

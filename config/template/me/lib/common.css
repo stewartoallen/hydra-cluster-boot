@@ -7,6 +7,10 @@ body,div,table { padding:0px; margin:0px; border:0px; font-family:helvetica,aria
 #right { position:relative; padding:5px; background:#f5f5f5; border-left:1px solid black; vertical-align:top }
 #bottom { position:relative; padding:5px; background:#eee; border-top:1px solid black; text-align:center }
 
+#bottom span { padding:3px }
+#bottom span span { border:0px }
+#bottom span label { border-left:1px solid #bbb; border-top:1px solid #bbb; border-right:1px solid #ddd; border-bottom:1px solid #ddd; padding-left:5px; padding-right:5px; background:white }
+
 .side-title { border-bottom:1px dashed black; text-align:center; white-space:nowrap; font-weight:bold; padding-bottom:5px; margin-bottom:5px }
 .side-panel { text-align:center }
 .side-panel button { width:100% }

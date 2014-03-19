@@ -3,6 +3,11 @@ a:link, a:visited, a:active { text-decoration:none }
 a:hover { text-decoration:none; color:#fff; background-color:#55f }
 td { vertical-align:top }
 
+#bottom table {
+    margin-left:auto;
+    margin-right:auto;
+}
+
 .num { text-align:right; font-family:courier,fixed }
 .padme { padding:5px }
 .cachetable table { border:1px solid gray; background-color:#fff }

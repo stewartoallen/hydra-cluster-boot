@@ -4,9 +4,6 @@ a:link { text-decoration:none }
 a:hover { text-decoration:underline }
 
 #bottom { position:relative; padding:5px; background:#eee; border-top:1px solid black; text-align:center }
-#bottom span { padding:3px }
-#bottom span span { border:0px }
-#bottom span label { border-left:1px solid #bbb; border-top:1px solid #bbb; border-right:1px solid #ddd; border-bottom:1px solid #ddd; padding-left:5px; padding-right:5px; background:white }
 #job_filter_box { float:right }
 #job_filter_bar { padding:5px; margin-top:10px; }
 #job_control_extra { position:relative; padding:5px; margin:5px; text-align:right; vertical-align:middle }

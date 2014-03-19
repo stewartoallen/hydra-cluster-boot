@@ -659,6 +659,8 @@ function init() {
             clusterData = JSON.parse(clusterString);
             if (!clusterData.isLocal) rpcroot="http://"+firstKey(clusterData.proc.qmaster)+":2222"
             auth = clusterData.authKey;
+            $('status_cluster').innerHTML = clusterData.about;
+            $('status_job').innerHTML = jobid;
         }
     }
 

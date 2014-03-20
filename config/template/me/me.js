@@ -197,7 +197,7 @@ var cluster = {
     },
 
     manage:function() {
-        window.open('http://{{boothost}}/me/spawn/spawn.html?cluster='+clusterNode.id,'_spawn');
+        window.open('http://{{boothost}}/me/spawn/spawn.html?cluster='+clusterNode.id,'_spawn_'+clusterNode.id);
     },
 
     setAbout:function() {

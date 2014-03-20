@@ -94,9 +94,8 @@ var account = {
                     url:"/api/get_cluster",
                     data:{id:clusters[i]},
                     success:function(data,status,xhr) {
-                        data = decode(data);
-                        var about = data.about;
-                        $('#'+cid).html(about.length < 30 ? about : about.substring(0,30)+"...");
+                        var about = decode(data).about;
+                        if (about) $('#'+cid).html(about.length < 30 ? about : about.substring(0,30)+"...");
                     }
                 });
             })();

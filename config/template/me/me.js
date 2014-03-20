@@ -87,6 +87,19 @@ var account = {
             cluster.select($('#'+clusterSelect)[0]);
             clusterSelect = null;
         }
+        for (var i=0; i<clusters.length; i++) {
+            (function(){
+                var cid = clusters[i];
+                $.ajax({
+                    url:"/api/get_cluster",
+                    data:{id:clusters[i]},
+                    success:function(data,status,xhr) {
+                        data = decode(data);
+                        $('#'+cid).html(data.about);
+                    }
+                });
+            })();
+        }
     }
 };
 
@@ -100,7 +113,7 @@ var cluster = {
         }
         $.ajax({
             url:"/api/get_cluster",
-            data:{id:node.text},
+            data:{id:node.id},
             success:function(data,status,xhr) {
                 util.clearRightPanel();
                 cluster.render(decode(data));

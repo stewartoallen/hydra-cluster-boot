@@ -95,7 +95,8 @@ var account = {
                     data:{id:clusters[i]},
                     success:function(data,status,xhr) {
                         data = decode(data);
-                        $('#'+cid).html(data.about);
+                        var about = data.about;
+                        $('#'+cid).html(about.length < 30 ? about : about.substring(0,30)+"...");
                     }
                 });
             })();

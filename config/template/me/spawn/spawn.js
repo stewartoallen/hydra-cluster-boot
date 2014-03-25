@@ -2188,8 +2188,9 @@ function showJobLogs(host, port, job, node) {
         var stdout = $('job_log_stdout').checked;
         var rpc = "/job.log?id="+lastLog.job+"&node="+lastLog.node+"&offset="+offset+"&lines="+lines+"&out="+(stdout?"1":"0");
         var rpcopt = { cbparam:"callback", host:"http://"+lastLog.host+":"+lastLog.port };
-        showHide('job_log', true);
+        $('job_log_detail').innerHTML = '';
         callRPC(rpc+"&out=1", function(logs) {
+            showHide('job_log', true);
             var div = $('job_log_detail');
             div.innerHTML = logs.out;
             div.scrollTop = div.scrollHeight;

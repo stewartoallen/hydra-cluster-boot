@@ -120,6 +120,9 @@ var config = {
     getJS : function(arr, callback) {
         config.get(arr, null, function(err, data) {
             if (err) return callback(err);
+            if (data == null || data.length == 0) {
+                return callback("{error:'empty cluster data'}");
+            }
             callback(null, eval(["(",data,")"].join("")));
         });
     },

@@ -10,4 +10,4 @@
 # add hydra bin dir to path so processes can inherit
 export PATH=${PATH}:${HYDRA_IMAGE}/bin
 
-bash <(curl -s "http://${HYDRA_BOOT}/render/proc?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}") $*
+exec bash <(curl -s "http://${HYDRA_BOOT}/render/proc?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}") $*

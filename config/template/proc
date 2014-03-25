@@ -49,7 +49,7 @@ case $1 in
 		;;
 	task)
 		shift
-		bash <(curl -s "http://${HYDRA_BOOT}/render/task?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}") $*
+		exec bash <(curl -s "http://${HYDRA_BOOT}/render/task?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}") $*
 		exit
 		;;
 esac

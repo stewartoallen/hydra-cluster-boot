@@ -98,7 +98,7 @@ function init() {
         var forms = document.getElementsByTagName('form');
         for (var i=0; i<forms.length; i++) {
             var act = forms[i].action;
-            forms[i].action = rpcroot + act.substring(act.indexOf("/XXX")+4) + "?auth=" + rpcAuth;
+            forms[i].action = rpcroot + act.substring(act.indexOf("/XXX")+4) + "?auth=" + rpcAuth + "&user=" + getUser();
         }
 		showTab(db[tabSetting] || 'jobs');
 		checkUser();

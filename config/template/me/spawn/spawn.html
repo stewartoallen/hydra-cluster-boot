@@ -5,9 +5,11 @@
 	<meta key="revision" value="$Revision$">
 	<link rel="shortcut icon" href="favicon.ico" />
     <link rel="stylesheet" href="../lib/common.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../lib/prettify.css"/>
 	<link rel="stylesheet" href="spawn.css" type="text/css" />
 	<link rel="stylesheet" href="codemirror/codemirror.css">
 	<script type="text/javascript" src="../lib/prototype.js"></script>
+    <script type="text/javascript" src="../lib/prettify.js"></script>
 	<script type="text/javascript" src="../lib/json2.js"></script>
 	<script type="text/javascript" src="../lib/utf8.js"></script>
 	<script type="text/javascript" src="../lib/date.js"></script>
@@ -286,7 +288,7 @@
                         <label class="tree-label">value</label>
                         <div id="zk_value" class="lrpad tree-data"></div>
                     </div>
-                    <div id="tab_mesh">
+                    <div id="tab_mesh" class="tree-nav">
                         <div class="new_bar"></div>
                         <label class="tree-label">path</label>
                         <div id="mesh_path" class="lrpad tree-data"></div>

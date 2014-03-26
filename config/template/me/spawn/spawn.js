@@ -880,6 +880,25 @@ function setHostlist(hostlist) {
 }
 
 // ------------------------------------------------------------------------------------------
+// VFS Browsers
+// ------------------------------------------------------------------------------------------
+
+function formatData(data, div) {
+    if (data == null) {
+        $(div).innerHTML = '';
+        return;
+    }
+    if (typeof data == 'object') {
+        if (data.message) {
+            $(div).innerHTML = '<div style="font-family:monospace">'+data.message+'</div>';
+            return;
+        }
+        data = JSON.stringify(data,null,3);
+    }
+    $(div).innerHTML = prettyPrintOne(data,"js");
+}
+
+// ------------------------------------------------------------------------------------------
 // Mesh Browser
 // ------------------------------------------------------------------------------------------
 
@@ -897,10 +916,18 @@ function meshPush(index) {
 
 function getMesh() {
 	var path = meshStack.length > 0 ? meshStack[meshStack.length-1] : {name:''};
-	var renderPath = '<a href="#" onclick="Spawn.meshTruncate('+(Math.max(meshStack.length-1,0))+')">'+(path.uuid ? path.name : '...')+'</a>';
+    var renderPath = '<a href="#" onclick="Spawn.meshTruncate(0)">...</a>';
+    for (var i=0; i<meshStack.length; i++) {
+        var name = meshStack[i].name.split('/');
+        renderPath += ' / <a href="#" onclick="Spawn.meshTruncate('+(i+1)+')">'+name[name.length-1]+'</a>';
+    }
 	$('mesh_path').innerHTML = renderPath;
 	callRPC('/mesh.ls?path='+path.name+'/*', getMeshLsCallback);
-	if (path.uuid) callRPC('/mesh.get?path='+path.name+'&uuid='+path.uuid, getMeshGetCallback);
+	if (path.uuid) {
+        callRPC('/mesh.get?path='+path.name+'&uuid='+path.uuid, getMeshGetCallback);
+    } else {
+        $('mesh_value').innerHTML = '';
+    }
 }
 
 function getMeshLsCallback(newMeshLS) {
@@ -910,13 +937,14 @@ function getMeshLsCallback(newMeshLS) {
 	});
 	var renderList = '<table>';
 	for (var i=0; i<meshLS.length; i++) {
-		renderList += '<tr><td>'+meshLS[i].uuid+'</td><td><a href="#" onclick="Spawn.meshPush('+i+')">'+meshLS[i].name+'</a></td></tr>';
+        var name = meshLS[i].name.split('/');
+		renderList += '<tr><th>'+meshLS[i].uuid+'</th><td><a href="#" onclick="Spawn.meshPush('+i+')">'+name[name.length-1]+'</a></td></tr>';
 	}
 	$('mesh_children').innerHTML = renderList+'</table>';
 }
 
 function getMeshGetCallback(data) {
-	$('mesh_value').innerHTML = JSON.stringify(data);
+    formatData(data,'mesh_value');
 }
 
 // ------------------------------------------------------------------------------------------
@@ -956,7 +984,7 @@ function getZkLsCallback(o) {
 }
 
 function getZkGetCallback(data) {
-	$('zk_value').innerHTML = JSON.stringify(data);
+    formatData(data,'zk_value');
 }
 
 // ------------------------------------------------------------------------------------------

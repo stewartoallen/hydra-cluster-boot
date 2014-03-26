@@ -127,13 +127,6 @@ function init() {
 		if (!form_macro_editor) form_macro_editor = CodeMirror($('code_macro'), {lineWrapping:lineWrap, mode:{name:"javascript",json:true}});
 		// there can be only one
 		initOnce = true;
-		// ipad specifics
-		if (isCompact) {
-			$('b_filt_run').style.display = 'none';
-			$('b_filt_err').style.display = 'none';
-			$('b_filt_done').style.display = 'none';
-			$('b_filt_x').style.display = 'none';
-		}
 	} catch (e) {
 		console.log(['init',e]);
 	}
@@ -550,18 +543,15 @@ function hostFailInfo(uuid, deadFs) {
 
 function hostFailInfoCallback(data) {
 	uuids = data.uuids;
-	if (data.fatal)
-	{
-		alert("fatal warning for failing " + uuids + ": " + data.fatal + "; fail aborted");
-		return;
+	if (data.fatal) {
+		alert("WARNING! Spawn says failing " + uuids + " means " + data.fatal);
 	}
-	var msg = "are you sure you want to fail " + uuids + "?\n";
-	msg += "after failing, cluster will go from " + fpercent(data.prefail) + "% disk used to " + fpercent(data.postfail) + "%.\n";	
-	if (data.warning)
-	{
+	var msg = "Are you sure you want to fail " + uuids + "?\n";
+	msg += "Cluster will go from " + fpercent(data.prefail) + "% disk used to " + fpercent(data.postfail) + "%.\n";
+	if (data.warning) {
 		msg += "Warning: " + data.warning;
 	}
-	if(confirm(msg)) {
+	if (confirm(msg)) {
 		failHost(uuids, data.deadFs)
 	}
 }
@@ -1832,39 +1822,23 @@ function renderJobsCall() {
 		id:"table_jobs",
 		filterFunction: renderJobs,
 		labeladd:[
-			,,,,
-			'nowrap',"width=100%",,
+			'','nowrap',"width=100%",'',
 			'title="nodes"','title="running"','title="done"','title="errored"'],
-		label: isCompact ? [
-			"qr","kk","st",
-			"job id","description",
-			"N","R","D","E",
-			"status",
-			"rK","mT",
-			"pr","bk","rp","rorp","files","bytes"] : [
-			"query","kick","stop","d'load",
-			"job id","description","creator",
+		label: [
+			"query","job id","description","creator",
 			"N","R","D","E",
 			"status","submit",
 			"start","end","reK","maxT",
 			"pri","bak","rep","rorp","files","bytes"],
-		rowadd: isCompact ? [
-			'class=center','class=center','class=center',
-			"nowrap","nowrap",
-			"class=num","class=num","class=num","class=num",
-			'nowrap class="center"',
-			'class="center"','class="center"',
-			'class="center"','class="center"','class="center"','class="num center"','class="num center"'
-		] : [
-			'class=center','class=center','class=center','class=center',
-			"nowrap","nowrap","nowrap",
-			"class=num","class=num","class=num","class=num",
+		rowadd: [
+			'class=center',
+			"nowrap","nowrap","nowrap","class=num","class=num","class=num","class=num",
 			'nowrap class="center"','class="center" nowrap',
 			'class="center" nowrap','class="center" nowrap','class="center"','class="center"',
 			'class="center"','class="center"','class="center"','class="num center"','class="num center"'],
 		rows:[],
 		rowon:0,
-		rowoff:16,
+		rowoff:16
 	};
 	var filterList = {};
 	var tasks = 0;
@@ -1921,27 +1895,9 @@ function renderJobsCall() {
 		if (run == done && run < job.nodes) {
 			state = 'blocked';
 		}
-		table.rows.push(isCompact ? [
+		table.rows.push([
 			setup.queryHost && job.queryConfig && job.queryConfig.canQuery ? '<a href="http://{{boothost}}/me/query/query.html?cluster={{cluster}}&job='+job.id+'" title="query job" target="_morgoth">Q</a>' : '',
-			'<a href="#" title="rekick" onclick="Spawn.rekickJob(\''+job.id+'\'); return false;">R</a>',
-			'<a href="#" title="stop" onclick="Spawn.stopJob(\''+job.id+'\',0); return false;">S</a>',
-			'<a href="#" title="inspect" onclick="Spawn.showJobNodes(\''+job.id+'\',true,true); return false;">'+pithy+'</a>',
-			'<a href="#" title="edit" onclick="Spawn.editJob(\''+job.id+'\'); return false;">'+job.description+'</a>',
-		        job.nodes,run,done,err,
-   		        (job.state == 5 ? '<a href="#" title="'+state+'">ERROR</a>' : state) + (job.disabled ? ' (D)' : ''),
-			job.rekickTimeout || '-',
-			job.maxRunTime || '-',
-			job.priority || '-',
-			job.dailyBackups || '-',
-			job.replicas || '-',
-			job.readOnlyReplicas || '-',
-			[fnum(files,true),files],
-			[fnum(bytes,true),bytes],
-		] : [
-			setup.queryHost && job.queryConfig && job.queryConfig.canQuery ? '<a href="http://{{boothost}}/me/query/query.html?cluster={{cluster}}&job='+job.id+'" title="query job" target="_morgoth">Q</a>' : '',
-			'<a href="#" title="rekick" onclick="Spawn.rekickJob(\''+job.id+'\'); return false;">R</a>',
-			'<a href="#" title="stop" onclick="Spawn.stopJob(\''+job.id+'\',0); return false;">S</a>',
-            '<a href="http://'+setup.spawnHost+'/job.expand?id='+job.id+'&auth='+rpcAuth+'" title="expand">D</a>',
+//            '<a href="http://'+setup.spawnHost+'/job.expand?id='+job.id+'&auth='+rpcAuth+'" title="expand">D</a>',
 			'<a href="#" title="inspect" onclick="Spawn.showJobNodes(\''+job.id+'\',true,true); return false;">'+pithy+'</a>',
 			'<a href="#" title="edit" onclick="Spawn.editJob(\''+job.id+'\'); return false;">'+job.description+'</a>',
 			job.creator ? '<a href="#" title="owner:'+job.owner+'">'+job.creator+'</a>' : '',
@@ -2016,15 +1972,16 @@ function showJobNodesCallback(job,focus) {
 		return;
 	}
 	$('sel_job_edit').onclick = function() { editJob(uuid); };
+    $('sel_job_kick').onclick = function() { editJob(uuid); };
+    $('sel_job_stop').onclick = function() { stopJob(uuid,0); };
+    $('sel_job_kill').onclick = function() { stopJob(uuid,1); };
 	$('sel_job_clone').onclick = function() { cloneJob(uuid); };
-	$('sel_job_rebalance').onclick = function() { rebalanceJob(uuid); };
-	$('sel_job_action').innerHTML = [
-		'<button onclick="return Spawn.checkJobDirs(\''+uuid+'\',1)">&#x2713; FS</button>',
-		'<button onclick="return Spawn.fixJobDirs(\''+uuid+'\',1)">Fix FS</button>',
-		'<button onclick="Spawn.setJobRunnable(\''+uuid+'\','+job.disabled+')">'+(job.disabled?'En':'Dis')+'able</button>',
-		'<button onclick="Spawn.stopJob(\''+uuid+'\',1)">Kill</button>',
-		'<button onclick="Spawn.deleteJob(\''+uuid+'\')">Delete</button>'
-    ].join('\n');
+	$('sel_job_balance').onclick = function() { rebalanceJob(uuid); };
+    $('sel_job_fsck').onclick = function() { checkJobDirs(uuid); };
+   	$('sel_job_fsfix').onclick = function() { fixJobDirs(uuid); };
+    $('sel_job_able').onclick = function() { setJobRunnable(uuid,job.disabled); };
+    $('sel_job_able').innerHTML = job.disabled ? 'enable' : 'disable';
+    $('sel_job_delete').onclick = function() { deleteJob(uuid); };
 	var nodes = job.nodes;
 	var table = {
 		allscroll:true,

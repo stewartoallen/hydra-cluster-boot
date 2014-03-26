@@ -530,8 +530,14 @@ var api = {
                 if (err || !cluster) return callback("invalid cluster id");
                 var newCluster = JSON.parse(query.data);
                 // preserve running cluster process state data
-                if (newCluster.proc == 'delete') {
-                    newCluster.proc = {};
+                if (typeof newCluster.proc == 'string') {
+                    var del = newCluster.proc.split(':');
+                    if (del.length == 1) {
+                        newCluster.proc = {};
+                    } else {
+                        newCluster.proc = cluster.proc;
+                        delete newCluster.proc[del[1]];
+                    }
                 } else {
                     newCluster.proc = cluster.proc;
                 }

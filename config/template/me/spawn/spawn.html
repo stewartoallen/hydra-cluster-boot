@@ -124,12 +124,16 @@
                             </div>
                             <div>
                                 <button onclick="Spawn.newJob()">+</button>
-                                <span class="spacer"></span>
-                                <button id="sel_job_edit">edit</button>
-                                <button id="sel_job_clone">clone</button>
-                                <button id="sel_job_rebalance">rebalance</button>
-                                <span class="spacer"></span>
-                                <span id="sel_job_action"></span>
+                                <span id="sel_job">
+                                    <span class="spacer"></span>
+                                    <input id="sel_job_id" readonly="true" size=64 />
+                                    <span class="spacer"></span>
+                                    <button id="sel_job_edit">edit</button>
+                                    <button id="sel_job_clone">clone</button>
+                                    <button id="sel_job_rebalance">rebalance</button>
+                                    <span class="spacer"></span>
+                                    <span id="sel_job_action"></span>
+                                </span>
                             </div>
                         </div>
                         <div id="jobs_list" class="lrpad"></div>

@@ -1440,6 +1440,7 @@ function showHostTasks(uuid) {
 		rows:[],
 		rowon:0,
 		rowoff:16,
+        title:"Tasks for node '"+uuid+"'"
 	};
 	var running = host ? host.running : [];
 	for (var i=0; i<running.length; i++) {
@@ -1965,6 +1966,10 @@ function showJobNodes(uuid,force,focus) {
 /* render list of host/nodes for a selected job */
 function showJobNodesCallback(job,focus) {
 	if (job) {
+        $('sel_job').style.display = 'inline-block';
+        $('sel_job_id').value = job.id;
+        $('sel_job_id').focus();
+        $('sel_job_id').select();
 		jobs[job.id] = job;
 		lastJob = job;
 	} else if (lastJob) {

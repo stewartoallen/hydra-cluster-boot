@@ -269,9 +269,9 @@ var cluster = {
         }
     },
 
-    clearRegistered:function() {
+    clearRegistered:function(type) {
         if (confirm("Delete all registered node data?")) {
-            clusterData.proc = 'delete';
+            clusterData.proc = type ? 'delete:'+type : 'delete';
             cluster.update();
         }
     },
@@ -291,7 +291,7 @@ var cluster = {
         }
         html.push('</table>');
         $('#right-body').html(html.join(''));
-        $('#right-footer').html("<button onclick='cluster.clearRegistered()'>clear nodes</button>");
+        $('#right-footer').html("<button onclick='cluster.clearRegistered(\""+registered+"\")'>clear nodes</button>");
     },
 
     addConfiguration:function() {

@@ -31,6 +31,8 @@ table.profile td { background:#eee; border-bottom:1px solid #eee; white-space:no
 
 table label { background-color:#eee; border:1px solid #ccc; padding:1px; padding-left:3px; padding-right:3px; margin-left:2px }
 
+#sel_job { display:none }
+
 #job_log { position:relative; width:99%; height:100%; border:1px solid black; margin:5px; display:none }
 #job_log_control { position:relative; padding:3px }
 #job_log_border { position:relative; margin-left:5px; margin-right:5px; margin-bottom:5px; border:1px dashed gray; padding:5px }

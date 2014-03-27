@@ -254,7 +254,7 @@ function callRPC(path, callback, options) {
     if (db['rpc'] == 'ajax') {
         jQuery.ajax({
             url: rpcHost + path,
-            type: "POST",
+            type: "GET",
             crossDomain: true,
             data: {
                 user: getUser(),

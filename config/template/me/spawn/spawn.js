@@ -816,6 +816,12 @@ function setUser() {
 
 function setAuth() {
     rpcAuth = prompt('Provide Spawn Auth Key',rpcAuth) || rpcAuth;
+    refresh();
+}
+
+function setHost() {
+    rpcroot = prompt('Provide Spawn HTTP Root',rpcroot) || rpcroot;
+    refresh();
 }
 
 /* stop or restart job scheduling */
@@ -2326,6 +2332,7 @@ window.Spawn = {
 	refresh : refresh,
 	parse : parse,
 
+    setHost : setHost,
     setAuth : setAuth,
 	setUser : setUser,
     showTab : showTab,

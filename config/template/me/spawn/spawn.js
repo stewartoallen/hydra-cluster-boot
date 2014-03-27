@@ -393,12 +393,13 @@ function renderTable(id,table,scrolling,addclass) {
         src.push('</tr>');
 	}
 	scroll[scrollid] = function(delta) {
-		if (delta > 0 && delta < 1) {
+ 		if (delta > 0 && delta < 1) {
 			delta = 1;
 		} else if (delta < 0 && delta > -1) {
 			delta = -1;
 		} else {
 			delta = Math.round(delta);
+            delta = delta * delta * (delta > 0 ? 1 : -1);
 		}
 		var maxwin = table.rowoff - table.rowon;
 		var maxlen = table.rows.length;

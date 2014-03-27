@@ -1547,6 +1547,7 @@ function newJob() {
 	$('form_job_create').style.display = '';
 	$('form_job_clone').style.display = 'none';
 	$('form_job_save').style.display = 'none';
+    $('form_job_download').style.display = 'none';
 	$('form_job_minionType').enable();
 	$('tr_job_tasks').style.display = '';
 	showEdit('job_edit', true);
@@ -1564,6 +1565,7 @@ function editJob(id) {
 	$('form_job_create').style.display = 'none';
 	$('form_job_clone').style.display = 'none';
 	$('form_job_save').style.display = '';
+    $('form_job_download').style.display = '';
 	$('tr_job_tasks').style.display = 'none';
 	callRPC("/job.get?id="+id, editJobCallback);
 	setPollerLive();
@@ -1579,6 +1581,7 @@ function cloneJob(id) {
 	$('form_job_create').style.display = 'none';
 	$('form_job_clone').style.display = '';
 	$('form_job_save').style.display = 'none';
+    $('form_job_download').style.display = '';
 	$('tr_job_tasks').style.display = '';
 	callRPC("/job.get?id="+id, cloneJobCallback);
 	setPollerLive();
@@ -1714,7 +1717,7 @@ function submitJob(create,spawn) {
 /* fill job submit form using job object */
 function fillFormsFromJob(uuid, clone) {
 	var job = uuid ? jobs[uuid] : {nodes:[]};
-	currentJob = job;
+ 	currentJob = job;
 	currentJob.checked = {};
 	currentJob.create = false;
 	currentJob.spawn = false;
@@ -1932,6 +1935,11 @@ function renderJobsCall() {
 	showJobNodes(db['spawn.job_show']);
 	window.Spawn.jobs = jobs;
 	renderTable('jobs_list',table);
+}
+
+function downloadJob() {
+    window.open('http://'+setup.spawnHost+'/job.expand?id='+currentJob.id+'&auth='+rpcAuth);
+    return false;
 }
 
 function showJobNodes(uuid,force,focus) {
@@ -2344,6 +2352,7 @@ window.Spawn = {
 	revertJob : revertJob,
 	rekickJob : rekickJob,
 	checkJobDirs : checkJobDirs,
+    downloadJob : downloadJob,
 	fixJobDirs : fixJobDirs,
 	deleteJob : deleteJob,
 	submitJob : submitJob,

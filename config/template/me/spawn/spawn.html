@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="../lib/prettify.css"/>
 	<link rel="stylesheet" href="spawn.css" type="text/css" />
 	<link rel="stylesheet" href="codemirror/codemirror.css">
+    <script type="text/javascript" src="../lib/jquery.js"></script>
 	<script type="text/javascript" src="../lib/prototype.js"></script>
     <script type="text/javascript" src="../lib/prettify.js"></script>
 	<script type="text/javascript" src="../lib/json2.js"></script>
@@ -322,6 +323,7 @@
                         <button onclick="Spawn.setUser()">User</button>
                         <button onclick="Spawn.setAuth()">Auth</button>
                         <button onclick="Spawn.setHost()">Host</button>
+                        <button onclick="Spawn.toggleRPC()" id="toggle-rpc">RPC</button>
                     </div>
                     <div id="event_count">live</div>
                 </td>

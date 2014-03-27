@@ -102,6 +102,7 @@ function init() {
         }
 		showTab(db[tabSetting] || 'jobs');
 		checkUser();
+        checkRPC();
 		if (db[db[tabSetting]+'filter']) {
 			filter = db[db[tabSetting]+'filter'];
 			$('form_filter').value = filter;
@@ -245,13 +246,34 @@ function jsonp(url) {
 var cbfuncs = {};
 var nextcb = 0;
 
+
 function callRPC(path, callback, options) {
     if (!options) options = {};
-    callbackArg = options.cbparam || "cbfunc";
     rpcHost = options.host || rpcroot;
-	var fname = 'jsonp_cb'+(nextcb++);
-	path = rpcHost + path + '&user='+getUser()+'&auth='+rpcAuth+'&cbfunc-arg="'+fname+'"&'+callbackArg+'=Spawn.cbfuncs.'+fname;
 
+    if (db['rpc'] == 'ajax') {
+        jQuery.ajax({
+            url: rpcHost + path,
+            type: "POST",
+            crossDomain: true,
+            data: {
+                user: getUser(),
+                auth: rpcAuth
+            },
+            dataType: "json",
+            success: function (response) {
+                callback(response);
+            },
+            error: function (xhr, status) {
+                console.log(['ERR -->', xhr, status]);
+            }
+        });
+        return;
+    }
+
+    var fname = 'jsonp_cb'+(nextcb++);
+    callbackArg = options.cbparam || "cbfunc";
+    path = rpcHost + path + '&user='+getUser()+'&auth='+rpcAuth+'&cbfunc-arg="'+fname+'"&'+callbackArg+'=Spawn.cbfuncs.'+fname;
 	var script = document.createElement('script');
 	script.id = fname;
 	script.type = 'text/javascript';
@@ -823,6 +845,23 @@ function setAuth() {
 function setHost() {
     rpcroot = prompt('Provide Spawn HTTP Root',rpcroot) || rpcroot;
     refresh();
+}
+
+function checkRPC() {
+    if (db['rpc'] == 'ajax') {
+        $('toggle-rpc').innerHTML = 'Ajax';
+    } else {
+        $('toggle-rpc').innerHTML = 'JSONp';
+    }
+}
+
+function toggleRPC() {
+    if (db['rpc'] == 'ajax') {
+        db['rpc'] = 'jsonp';
+    } else {
+        db['rpc'] = 'ajax';
+    }
+    checkRPC();
 }
 
 /* stop or restart job scheduling */
@@ -2333,6 +2372,7 @@ window.Spawn = {
 	refresh : refresh,
 	parse : parse,
 
+    toggleRPC : toggleRPC,
     setHost : setHost,
     setAuth : setAuth,
 	setUser : setUser,

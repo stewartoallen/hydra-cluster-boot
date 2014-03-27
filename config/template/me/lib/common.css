@@ -12,8 +12,8 @@ body,div,table { padding:0px; margin:0px; border:0px; font-family:helvetica,aria
 #bottom span label { border-left:1px solid #bbb; border-top:1px solid #bbb; border-right:1px solid #ddd; border-bottom:1px solid #ddd; padding-left:5px; padding-right:5px; background:white }
 
 .side-title { border-bottom:1px dashed black; text-align:center; white-space:nowrap; font-weight:bold; padding-bottom:5px; margin-bottom:5px }
-.side-panel { text-align:center }
-.side-panel button { width:100%; min-width:100% }
+.side-panel { text-align:center; min-width:75px }
+.side-panel button { width:100% }
 .side-separator { height:10px }
 .spacer { padding:10px }
 

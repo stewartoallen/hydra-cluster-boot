@@ -1544,6 +1544,7 @@ function getJobsCallback(jobslist) {
 
 function newJob() {
 	fillFormsFromJob(null, false);
+    $('job_edit_title').innerHTML = 'New Job';
 	$('form_job_create').style.display = '';
 	$('form_job_clone').style.display = 'none';
 	$('form_job_save').style.display = 'none';
@@ -1556,6 +1557,7 @@ function newJob() {
 
 /* pass job data to new job tab and switch context */
 function editJob(id) {
+    $('job_edit_title').innerHTML = 'Edit Job';
 	//console.log(['edit job', id, jobs]);
 	try {
 	if (!jobs[id]) {
@@ -1574,6 +1576,7 @@ function editJob(id) {
 
 /* pass job data to new job tab and switch context */
 function cloneJob(id) {
+    $('job_edit_title').innerHTML = 'Clone Job';
 	if (!jobs[id]) {
 		alert('invalid job id: '+id);
 		return;

@@ -44,6 +44,7 @@ table label { background-color:#eee; border:1px solid #ccc; padding:1px; padding
 #host_queue { display:none; }
 #host_logs { width:100%; }
 
+.clear { clear:both }
 .center { text-align:center }
 .right { text-align:right }
 .warm { color:#a50; font-weight:bold }
@@ -81,6 +82,8 @@ table label { background-color:#eee; border:1px solid #ccc; padding:1px; padding
 #job_profile_table { height:500px; width:500px; overflow-y:scroll; }
 #job_edit { display:none; position:absolute; top:0px; width:100%; left:-1px; }
 #job_submit { border: 5px solid #dd7d55; background:#fff; margin-left:auto; margin-right:auto; }
+#job_nodes { float:left }
+#job_info { float:left; padding-left:10px; margin-left:10px }
 
 #host_edit { display:none; position:absolute; top:0px; width:100%; left:-1px; }
 #host_submit { border: 5px solid #dd7d55; background:#fff; margin-left:auto; margin-right:auto; }
@@ -92,7 +95,7 @@ table label { background-color:#eee; border:1px solid #ccc; padding:1px; padding
 #tab_hosts { display:none }
 #tab_zk { display:none }
 #tab_mesh { display:none }
-#job_nodes { display:none; }
+#job_detail { display:none }
 
 .code_mirrored { width:800px; position:relative; }
 .CodeMirror div { font-family:monospace; }

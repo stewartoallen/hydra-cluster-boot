@@ -60,7 +60,7 @@ var initOnce = false,
 	queued=0,
     spawnqueuesize=0,
     spawnqueueerrorsize=0,
-	rpcroot="http://localhost:5050";
+	rpcRoot="http://localhost:5050";
 
 function parse(json,defval) {
 	try {
@@ -90,7 +90,9 @@ function init() {
             var clusterString = db['cluster-'+params.cluster];
             if (clusterString) {
                 clusterData = JSON.parse(clusterString);
-                if (!clusterData.isLocal) rpcroot="http://"+firstKey(clusterData.proc.spawn)+":5050"
+                if (!clusterData.isLocal && clusterData.proc.spawn) {
+                    rpcRoot = "http://"+firstKey(clusterData.proc.spawn)+":5050"
+                }
                 rpcAuth = clusterData.authKey;
                 $('status_cluster').innerHTML = clusterData.about;
             }
@@ -98,7 +100,7 @@ function init() {
         var forms = document.getElementsByTagName('form');
         for (var i=0; i<forms.length; i++) {
             var act = forms[i].action;
-            forms[i].action = rpcroot + act.substring(act.indexOf("/XXX")+4) + "?auth=" + rpcAuth + "&user=" + getUser();
+            forms[i].action = rpcRoot + act.substring(act.indexOf("/XXX")+4) + "?auth=" + rpcAuth + "&user=" + getUser();
         }
 		showTab(db[tabSetting] || 'jobs');
 		checkUser();
@@ -249,7 +251,7 @@ var nextcb = 0;
 
 function callRPC(path, callback, options) {
     if (!options) options = {};
-    rpcHost = options.host || rpcroot;
+    rpcHost = options.host || rpcRoot;
 
     if (db['rpc'] == 'ajax') {
         jQuery.ajax({
@@ -262,10 +264,14 @@ function callRPC(path, callback, options) {
             },
             dataType: "json",
             success: function (response) {
-                callback(response);
+                if (callback) {
+                    callback(response);
+                } else {
+                    console.log(['OK -->', path, options]);
+                }
             },
             error: function (xhr, status) {
-                console.log(['ERR -->', xhr, status]);
+                console.log(['ERR -->', path, options, xhr, status]);
             }
         });
         return;
@@ -843,7 +849,7 @@ function setAuth() {
 }
 
 function setHost() {
-    rpcroot = prompt('Provide Spawn HTTP Root',rpcroot) || rpcroot;
+    rpcRoot = prompt('Provide Spawn HTTP Root',rpcRoot) || rpcRoot;
     refresh();
 }
 
@@ -1349,7 +1355,7 @@ function renderHostsCall() {
 		allscroll:true,
 		id:"table_hosts", 
 		label:["#","host","port","uuid","type","state","group","score","queued","running","total","disk","rebalance","drop","fail (fs dead)", "fail (fs okay)", "toggle host", "toggle minion"],
-		rowadd:[,,,'class="center"','class="center"','class="center"','class="center"','class="center"', 'class="center"','class="center"','class="center"','class="center"','class="center"','class="center"','class="center"','class="center"','class="center"','class="center"'],
+		rowadd:[,,,,'class="center"','class="center"','class="center"','class="center"', 'class="center"','class="center"','class="center"','class="center"','class="center"','class="center"','class="center"','class="center"','class="center"','class="center"'],
 		rows:[],
 		rowon:0,
 		rowoff:17,
@@ -1873,18 +1879,15 @@ function renderJobsCall() {
 		allscroll:true,
 		id:"table_jobs",
 		filterFunction: renderJobs,
-		labeladd:[
-			'','nowrap',"width=100%",'',
-			'title="nodes"','title="running"','title="done"','title="errored"'],
+		labeladd:['','nowrap',"width=100%",''],
 		label: [
 			"query","job id","description","creator",
-			"N","R","D","E",
-			"status","submit",
+			"tasks","status","submit",
 			"start","end","reK","maxT",
 			"pri","bak","rep","rorp","files","bytes"],
 		rowadd: [
-			'class=center',
-			"nowrap","nowrap","nowrap","class=num","class=num","class=num","class=num",
+			'class=center',"nowrap","nowrap","nowrap",
+            "class=num",
 			'nowrap class="center"','class="center" nowrap',
 			'class="center" nowrap','class="center" nowrap','class="center"','class="center"',
 			'class="center"','class="center"','class="center"','class="num center"','class="num center"'],
@@ -1949,11 +1952,10 @@ function renderJobsCall() {
 		}
 		table.rows.push([
 			setup.queryHost && job.queryConfig && job.queryConfig.canQuery ? '<a href="http://{{boothost}}/me/query/query.html?cluster={{cluster}}&job='+job.id+'" title="query job" target="_morgoth">Q</a>' : '',
-//            '<a href="http://'+setup.spawnHost+'/job.expand?id='+job.id+'&auth='+rpcAuth+'" title="expand">D</a>',
 			'<a href="#" title="inspect" onclick="Spawn.showJobNodes(\''+job.id+'\',true,true); return false;">'+pithy+'</a>',
 			'<a href="#" title="edit" onclick="Spawn.editJob(\''+job.id+'\'); return false;">'+job.description+'</a>',
 			job.creator ? '<a href="#" title="owner:'+job.owner+'">'+job.creator+'</a>' : '',
-		        job.nodes,run,done,err,
+		        done + "/" + job.nodes,
    		        (job.state == 5 ? '<a href="#" title="'+state+'">ERROR</a>' : state) + (job.disabled ? ' (D)' : ''),
 			job.submitTime ? [fdate(job.submitTime),job.submitTime] : ['-',0],
 			job.startTime ? [fdate(job.startTime),job.startTime] : ['-',0],
@@ -1995,9 +1997,9 @@ function showJobNodes(uuid,force,focus) {
     var same = (uuid == db['spawn.job_show']);
 	db['spawn.job_show'] = uuid;
 	if (!force && lastJob && lastJob.id == uuid) {
-		//console.log('skip job call on '+uuid);
 		showJobNodesCallback(null);
 	} else {
+        showHide('job_detail', false);
 		callRPC("/job.get?id="+uuid, function(job) { safeCall(showJobNodesCallback,job,focus); });
 	}
     if (!same) showHide('job_log', false);
@@ -2017,6 +2019,7 @@ function showJobNodesCallback(job,focus) {
 		job = lastJob;
 	}
 	if (!(job && job.id)) {
+        showHide('job_detail', false);
 		return;
 	}
 	var uuid = job.id;
@@ -2029,7 +2032,7 @@ function showJobNodesCallback(job,focus) {
 		return;
 	}
 	$('sel_job_edit').onclick = function() { editJob(uuid); };
-    $('sel_job_kick').onclick = function() { editJob(uuid); };
+    $('sel_job_kick').onclick = function() { rekickJob(uuid); };
     $('sel_job_stop').onclick = function() { stopJob(uuid,0); };
     $('sel_job_kill').onclick = function() { stopJob(uuid,1); };
 	$('sel_job_clone').onclick = function() { cloneJob(uuid); };
@@ -2049,7 +2052,7 @@ function showJobNodesCallback(job,focus) {
 		rows:[],
 		rowon:0,
 		rowoff:16,
-        title:"Tasks for job '"+job.id+"'"
+        title:"Job Tasks"
 	};
 	var diffport = false;
 	var lastport = 0;
@@ -2085,7 +2088,7 @@ function showJobNodesCallback(job,focus) {
 		]);
 	}
 	renderTable('job_nodes', table, false);
-	showHide('job_nodes', true);
+	showHide('job_detail', true);
 }
 
 function descriptionForErrorCode(code) {

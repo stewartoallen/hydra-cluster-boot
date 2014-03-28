@@ -666,13 +666,17 @@ function fpercent(v) {
 }
 
 /* format date nice and pretty */
+function fsdate(v) {
+    if (v) {
+        var d = new Date();
+        d.setTime(v);
+        return d.toString('MM/dd HH:mm');
+    }
+    return '';
+}
+
 function fdate(v) {
-	if (v) {
-		var d = new Date();
-		d.setTime(v);
-		return '&nbsp;'+d.toString('MM/dd HH:mm')+'&nbsp;';
-	}
-	return '';
+    return '&nbsp;'+fsdate(v)+'&nbsp;';
 }
 
 /* set spawn poller to queueing mode */
@@ -1146,7 +1150,7 @@ function showCommandJobs(command) {
 	for (var i=0; i<joblist.length; i++) {
 		var job = getJob(joblist[i]);
 		table.rows.push([
-			'<a href="#" onclick="Spawn.showJobNodes(\''+job.id+'\',true);Spawn.showTab(\'jobs\')">'+job.id+'</a>',
+			'<a href="#" onclick="Spawn.showJobDetail(\''+job.id+'\',true);Spawn.showTab(\'jobs\')">'+job.id+'</a>',
 			job.description
 		]);
 	}
@@ -1517,7 +1521,7 @@ function showHostTasks(uuid) {
 		var node = running[i];
 		var job = jobs[node.id || node.jobUuid] || {id:'??',description:'??',priority:0,submitTime:0};
 		table.rows.push([
-			'<a href="#" onclick="Spawn.showJobNodes(\''+node.jobUuid+'\',true);Spawn.showTab(\'jobs\')">'+node.jobUuid+'</a>',
+			'<a href="#" onclick="Spawn.showJobDetail(\''+node.jobUuid+'\',true);Spawn.showTab(\'jobs\')">'+node.jobUuid+'</a>',
 			job.description,
 			node.nodeNumber,
 			'',
@@ -1534,7 +1538,7 @@ function showHostTasks(uuid) {
 		var node = replicating[i];
 		var job = jobs[node.id || node.jobUuid] || {id:'??',description:'??',priority:0,submitTime:0};
 		table.rows.push([
-			'<a href="#" onclick="Spawn.showJobNodes(\''+node.jobUuid+'\',true);Spawn.showTab(\'jobs\')">'+node.jobUuid+'</a>',
+			'<a href="#" onclick="Spawn.showJobDetail(\''+node.jobUuid+'\',true);Spawn.showTab(\'jobs\')">'+node.jobUuid+'</a>',
 			job.description,
 			node.nodeNumber,
 			'',
@@ -1549,7 +1553,7 @@ function showHostTasks(uuid) {
 		var node = backingup[i];
 		var job = jobs[node.id || node.jobUuid] || {id:'??',description:'??',priority:0,submitTime:0};
 		table.rows.push([
-			'<a href="#" onclick="Spawn.showJobNodes(\''+node.jobUuid+'\',true);Spawn.showTab(\'jobs\')">'+node.jobUuid+'</a>',
+			'<a href="#" onclick="Spawn.showJobDetail(\''+node.jobUuid+'\',true);Spawn.showTab(\'jobs\')">'+node.jobUuid+'</a>',
 			job.description,
 			node.nodeNumber,
 			'',
@@ -1566,7 +1570,7 @@ function showHostTasks(uuid) {
 		var job = jobs[node.id || node.jobUuid] || {id:'??',description:'??',priority:0,submitTime:0};
 		//console.log(['queued',node.id,node.jobUuid,job]);
 		table.rows.push([
-			'<a href="#" onclick="Spawn.showJobNodes(\''+node.jobUuid+'\',true);Spawn.showTab(\'jobs\')">'+node.jobUuid+'</a>',
+			'<a href="#" onclick="Spawn.showJobDetail(\''+node.jobUuid+'\',true);Spawn.showTab(\'jobs\')">'+node.jobUuid+'</a>',
 			job ? job.description : '??',
 			node.nodeNumber,
 			i,
@@ -1881,16 +1885,15 @@ function renderJobsCall() {
 		filterFunction: renderJobs,
 		labeladd:['','nowrap',"width=100%",''],
 		label: [
-			"query","job id","description","creator",
-			"tasks","status","submit",
-			"start","end","reK","maxT",
-			"pri","bak","rep","rorp","files","bytes"],
+			"query","job id","description",
+			"tasks","status","detail",
+            "submit","start","end",
+            "rekick","runs","files","bytes"],
 		rowadd: [
-			'class=center',"nowrap","nowrap","nowrap",
-            "class=num",
-			'nowrap class="center"','class="center" nowrap',
-			'class="center" nowrap','class="center" nowrap','class="center"','class="center"',
-			'class="center"','class="center"','class="center"','class="num center"','class="num center"'],
+			'class=center',"nowrap","nowrap",
+            "class=num",'nowrap class="center"','nowrap class="center"',
+            'class="center" nowrap','class="center" nowrap','class="center" nowrap','class="center"',
+            '','class="num center"','class="num center"'],
 		rows:[],
 		rowon:0,
 		rowoff:16
@@ -1902,9 +1905,6 @@ function renderJobsCall() {
 	filter.setFilterValue(jobFilter);
 	for (var i=0; i<joblist.length; i++) {
 		var job = joblist[i],
-			err = job.errored,
-			run = job.running,
-			done = job.done,
 			files = job.files,
 			bytes = job.bytes,
 			sid = job.id.split('-'),
@@ -1924,10 +1924,6 @@ function renderJobsCall() {
 		}
 		if (jobFilter.length > 0)
 		{
-			// restrict list to those containing a filter match
-			// if ((job.description+job.owner+job.creator+job.id).toLowerCase().indexOf(jobFilter.toLowerCase()) < 0 && ["ERR","RUN","DONE"].indexOf(jobFilter) < 0) {
-			// 	continue;
-			// }
 			if(!filter.match(job) && ["ERR","RUN","DONE"].indexOf(jobFilter) < 0 ){
 				continue;
 			}
@@ -1944,28 +1940,28 @@ function renderJobsCall() {
 		job.showing = true;
 		var enableJob = ' (<a href="#" title="enable job" onclick="Spawn.setJobRunnable(\''+job.id+'\',true)">off</a>)';
 	    var state = ["idle","scheduled","running","degraded","unknown","ERROR", "REBALANCE"][job.state]
+        var detail = [];
 	    if (job.state == 0 && job.wasStopped) {
-	    	state += " (STOPPED)";
+            detail.push('stopped');
 	    }
-		if (run == done && run < job.nodes) {
-			state = 'blocked';
+		if (job.running == job.done && job.running < job.nodes) {
+            detail.push('blocked');
 		}
+        if (job.disabled) {
+            detail.push('disabled');
+        }
 		table.rows.push([
 			setup.queryHost && job.queryConfig && job.queryConfig.canQuery ? '<a href="http://{{boothost}}/me/query/query.html?cluster={{cluster}}&job='+job.id+'" title="query job" target="_morgoth">Q</a>' : '',
-			'<a href="#" title="inspect" onclick="Spawn.showJobNodes(\''+job.id+'\',true,true); return false;">'+pithy+'</a>',
+			'<a href="#" title="inspect" onclick="Spawn.showJobDetail(\''+job.id+'\',true,true); return false;">'+pithy+'</a>',
 			'<a href="#" title="edit" onclick="Spawn.editJob(\''+job.id+'\'); return false;">'+job.description+'</a>',
-			job.creator ? '<a href="#" title="owner:'+job.owner+'">'+job.creator+'</a>' : '',
-		        done + "/" + job.nodes,
-   		        (job.state == 5 ? '<a href="#" title="'+state+'">ERROR</a>' : state) + (job.disabled ? ' (D)' : ''),
+            job.done + "/" + job.nodes,
+            (job.state == 5 ? '<a href="#" title="'+state+'">ERROR</a>' : state),
+            detail.length > 0 ? detail.join(',') : '-',
 			job.submitTime ? [fdate(job.submitTime),job.submitTime] : ['-',0],
 			job.startTime ? [fdate(job.startTime),job.startTime] : ['-',0],
 			job.endTime ? [fdate(job.endTime),job.endTime] : ['-',0],
 			job.rekickTimeout || '-',
-			job.maxRunTime || '-',
-			job.priority || '-',
-			job.dailyBackups || '-',
-			job.replicas || '-',
-			job.readOnlyReplicas || '-',
+			job.runCount || '-',
 			[fnum(files,true),files],
 			[fnum(bytes,true),bytes],
 		]);
@@ -1983,7 +1979,7 @@ function renderJobsCall() {
 	$('filter_list').innerHTML = html + '</select>';
 	$('status_jobs').innerHTML = joblist.length;
 	$('status_tasks').innerHTML = tasks;
-	showJobNodes(db['spawn.job_show']);
+	showJobDetail(db['spawn.job_show']);
 	window.Spawn.jobs = jobs;
 	renderTable('jobs_list',table);
 }
@@ -1993,21 +1989,20 @@ function downloadJob() {
     return false;
 }
 
-function showJobNodes(uuid,force,focus) {
+function showJobDetail(uuid,force,focus) {
     var same = (uuid == db['spawn.job_show']);
 	db['spawn.job_show'] = uuid;
 	if (!force && lastJob && lastJob.id == uuid) {
-		showJobNodesCallback(null);
+		showJobDetailCallback(null);
 	} else {
-        showHide('job_detail', false);
-		callRPC("/job.get?id="+uuid, function(job) { safeCall(showJobNodesCallback,job,focus); });
+		callRPC("/job.get?id="+uuid, function(job) { safeCall(showJobDetailCallback,job,focus); });
 	}
     if (!same) showHide('job_log', false);
 	setPollerLive();
 }
 
 /* render list of host/nodes for a selected job */
-function showJobNodesCallback(job,focus) {
+function showJobDetailCallback(job,focus) {
 	if (job) {
         $('sel_job').style.display = 'inline-block';
         $('sel_job_id').value = job.id;
@@ -2023,14 +2018,6 @@ function showJobNodesCallback(job,focus) {
 		return;
 	}
 	var uuid = job.id;
-	$('job_nodes').innerHTML = "---";
-	if (!job) {
-		$('sel_job_action').innerHTML = '<button>noop</button>';
-		$('sel_job_edit').onclick = '';
-		$('sel_job_clone').onclick = '';
-		$('sel_job_rebalance').onclick = '';
-		return;
-	}
 	$('sel_job_edit').onclick = function() { editJob(uuid); };
     $('sel_job_kick').onclick = function() { rekickJob(uuid); };
     $('sel_job_stop').onclick = function() { stopJob(uuid,0); };
@@ -2046,9 +2033,9 @@ function showJobNodesCallback(job,focus) {
 	var table = {
 		allscroll:true,
 		id:"table_job_nodes", 
-		label:["kick","node","done","state","host","bytes","revert","stop","kill"],
+		label:["kick","node","done","state","detail","host","bytes","revert","stop","kill"],
 		labeladd:[,,,],
-		rowadd:['class=center','class=center','class=center','nowrap class=center','class=center','class=center','nowrap class=center','class="center"','class="center"'],
+		rowadd:['class=center','class=center','class=center','nowrap class=center','nowrap class=center','class=center','class=center','nowrap class=center','class="center"','class="center"'],
 		rows:[],
 		rowon:0,
 		rowoff:16,
@@ -2069,17 +2056,19 @@ function showJobNodesCallback(job,focus) {
 		var host = hosts[node.hostUuid];
 		var alt = "starts:"+node.starts+" errors:"+node.errors+" files:"+fnum(node.fileCount)+" bytes:"+fnum(node.fileBytes);
 		var nodestate = ["idle","busy","error","allocated","backup","replicate", "UNKNOWN", "rebalance","revert","disk_full","swapping","queued","migrating"][node.state];
+        var detail = [];
 		if (node.state == 0 && node.wasStopped) {
-			nodestate += " (STOPPED)"
+            detail.push('stopped');
 		}
 		if (node.state == 2 && node.errorCode) {
-			nodestate += " (" + descriptionForErrorCode(node.errorCode) + ")"
+            detail.push(descriptionForErrorCode(node.errorCode))
 		}
 		table.rows.push([
 			node.state == 0 || node.state == 2 ? '<a href="#" title="rekick job" onclick="Spawn.rekickJob(\''+job.id+'\','+node.node+'); return false;">K</a>' : 'K',
 			node.node,
 		        node.runCount > 0 && node.runCount == job.runCount && (node.state == 0 || node.state == 2) ? 'Y' : '-',
 			nodestate,
+            detail.length > 0 ? detail.join(',') : '-',
 			host ? '<a href="#" title="'+alt+'" onclick="Spawn.showJobLogs(\''+host.host+hostDomain+'\','+host.port+',\''+uuid+'\','+node.node+')">'+host.host+(diffport?':'+host.port:'')+'</a>' : node.hostUuid,
 			fnum(node.fileBytes,true),
 			'<a href="#" title="revert node" onclick="Spawn.revertJob(\''+job.id+'\','+node.node+'); return false;">R</a>',
@@ -2087,6 +2076,34 @@ function showJobNodesCallback(job,focus) {
 			'<a href="#" title="force kill node" onclick="Spawn.stopJob(\''+job.id+'\',1,'+node.node+'); return false;">K</a>',
 		]);
 	}
+
+    for (var i=0; i<lastJoblist.length; i++) {
+        if (lastJoblist[i].id == job.id) {
+            var info = lastJoblist[i];
+            $('job-info-id').value = info.id;
+            $('job-info-about').value = info.description;
+            $('job-info-creator').value = info.creator;
+            $('job-info-owner').value = info.owner;
+            $('job-info-ttotal').value = info.nodes;
+            $('job-info-trun').value = info.running;
+            $('job-info-terror').value = info.errored;
+            $('job-info-tbackup').value = info.backups;
+            $('job-info-treplica').value = info.replicas;
+            $('job-info-troreplica').value = info.readOnlyReplicas;
+            $('job-info-tfiles').value = fnum(info.files,true);
+            $('job-info-tsize').value = fnum(info.bytes,true);
+            $('job-info-rtotal').value = info.runCount || 0;
+            $('job-info-rpriority').value = info.priority;
+            $('job-info-rsubmit').value = fsdate(info.submitTime);
+            $('job-info-rstart').value = fsdate(info.startTime);
+            $('job-info-rend').value = fsdate(info.endTime);
+            $('job-info-rkick').value = info.rekickTimeout || '';
+            $('job-info-rlimit').value = info.maxRunTime || '';
+            if (info.endTime) $('job-info-rspan').value = Math.round((info.endTime - info.startTime)/1000);
+            break;
+        }
+    }
+
 	renderTable('job_nodes', table, false);
 	showHide('job_detail', true);
 }
@@ -2260,7 +2277,6 @@ function setJobFilter(val,ev) {
 			filterFunctions[table.id].call();
 		else
 			console.log(table.id+" has no filter function");
-//		renderJobs();
 	}
 }
 
@@ -2273,7 +2289,6 @@ function clearJobFilter() {
         filterFunctions[table.id].call();
     else
         console.log(table.id+" has no filter function");
-//	renderJobs();
 }
 
 /* try to make sure no errors in JSON config */
@@ -2410,7 +2425,7 @@ window.Spawn = {
 	fixJobDirs : fixJobDirs,
 	deleteJob : deleteJob,
 	submitJob : submitJob,
-	showJobNodes : showJobNodes,
+	showJobDetail : showJobDetail,
 	showJobLogs : showJobLogs,
 	updateJobLog : updateJobLog,
 	setJobRunnable : setJobRunnable,

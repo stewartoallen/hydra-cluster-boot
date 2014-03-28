@@ -16,8 +16,8 @@ fi
 
 eval exec ${JAVA_CMD:-java} \
 	-server \
-	-Xmx1G \
-	-Xms1G \
+	-Xmx2G \
+	-Xms2G \
 	-XX:+AggressiveOpts \
 	-XX:+UseParallelGC \
 	-XX:+UseParallelOldGC \

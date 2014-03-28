@@ -151,43 +151,60 @@
                         <div id="job_detail" class="lrpad">
                             <div id="job_nodes"></div>
                             <div id="job_info">
-                                <!--
                                 <table class="render">
                                     <div class="table-title">Job Detail</div>
                                     <tr>
                                         <th>about</th>
                                         <td>
-                                            <label>id</label><input readonly size="15">
-                                            <label>description</label><input readonly size="40">
-                                            <label>creator</label><input readonly size="10">
-                                            <label>owner</label><input readonly size="10">
+                                            <label>id</label><input readonly size="45" id="job-info-id">
+                                            <label>creator</label><input readonly size="10" id="job-info-creator">
+                                            <label>owner</label><input readonly size="10" id="job-info-owner">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>more</th>
+                                        <td>
+                                            <label>description</label><input readonly size="85" id="job-info-about">
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>tasks</th>
                                         <td>
-                                            <label>total</label><input readonly size="4">
-                                            <label>running</label><input readonly size="4">
-                                            <label>done</label><input readonly size="4">
-                                            <label>errored</label><input readonly size="4">
-                                            <label>backups</label><input readonly size="4">
-                                            <label>replicas</label><input readonly size="4">
-                                            <label>files</label><input readonly size="8">
+                                            <label>total</label><input readonly size="4" id="job-info-ttotal">
+                                            <label>running</label><input readonly size="4" id="job-info-trun">
+                                            <label>done</label><input readonly size="4" id="job-info-tdone">
+                                            <label>errored</label><input readonly size="4" id="job-info-terror">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>disk</th>
+                                        <td>
+                                            <label>backups</label><input readonly size="4" id="job-info-tbackup">
+                                            <label>replicas</label><input readonly size="4" id="job-info-treplica">
+                                            <label>ro replicas</label><input readonly size="4" id="job-info-troreplica">
+                                            <label>files</label><input readonly size="8" id="job-info-tfiles">
+                                            <label>size</label><input readonly size="8" id="job-info-tsize">
                                         </td>
                                     </tr>
                                     <tr>
                                         <th>run</th>
                                         <td>
-                                            <label>submit</label><input readonly size="12">
-                                            <label>start</label><input readonly size="12">
-                                            <label>end</label><input readonly size="12">
-                                            <label>duration</label><input readonly size="8">
-                                            <label>rekick</label><input readonly size="5">
-                                            <label>limit</label><input readonly size="5">
+                                            <label>total runs</label><input readonly size="4" id="job-info-rtotal">
+                                            <label>priority</label><input readonly size="4" id="job-info-rpriority">
+                                            <label>rekick time (min)</label><input readonly size="5" id="job-info-rkick">
+                                            <label>limit time (min)</label><input readonly size="5" id="job-info-rlimit">
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th>last</th>
+                                        <td>
+                                            <label>submit</label><input readonly size="12" id="job-info-rsubmit">
+                                            <label>start</label><input readonly size="12" id="job-info-rstart">
+                                            <label>end</label><input readonly size="12" id="job-info-rend">
+                                            <label>duration (sec)</label><input readonly size="8" id="job-info-rspan">
                                         </td>
                                     </tr>
                                 </table>
-                                -->
                             </div>
                         </div>
                         <div class="spacer clear"></div>

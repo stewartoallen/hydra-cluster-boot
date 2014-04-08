@@ -24,6 +24,7 @@ eval exec ${JAVA_CMD:-java} \
 	-Dcs.je.cacheSize=128M \
 	-Dcs.je.cacheShared=1 \
 	-Dcs.je.deferredWrite=1 \
+	-Dhttp.socket.timeout=1000 \
 	-Dhydra.query.age.max=120000 \
 	-Dhydra.query.cache.max=4096 \
 	-Dhydra.query.concurrent.timeout=180000 \

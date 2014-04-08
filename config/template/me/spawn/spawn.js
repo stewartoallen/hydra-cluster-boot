@@ -82,6 +82,7 @@ function init() {
 		{
 			return;
 		}
+
         params = decodeParams();
 		if (params['nopoll']) {
 			enablePolling = false;
@@ -1955,7 +1956,7 @@ function renderJobsCall() {
 			'<a href="#" title="inspect" onclick="Spawn.showJobDetail(\''+job.id+'\',true,true); return false;">'+pithy+'</a>',
 			'<a href="#" title="edit" onclick="Spawn.editJob(\''+job.id+'\'); return false;">'+job.description+'</a>',
             job.done + "/" + job.nodes,
-            (job.state == 5 ? '<a href="#" title="'+state+'">ERROR</a>' : state),
+            state,
             detail.length > 0 ? detail.join(',') : '-',
 			job.submitTime ? [fdate(job.submitTime),job.submitTime] : ['-',0],
 			job.startTime ? [fdate(job.startTime),job.startTime] : ['-',0],
@@ -1993,7 +1994,7 @@ function showJobDetail(uuid,force,focus) {
     var same = (uuid == db['spawn.job_show']);
 	db['spawn.job_show'] = uuid;
 	if (!force && lastJob && lastJob.id == uuid) {
-		showJobDetailCallback(null);
+		showJobDetailCallback(uuid);
 	} else {
 		callRPC("/job.get?id="+uuid, function(job) { safeCall(showJobDetailCallback,job,focus); });
 	}
@@ -2099,7 +2100,7 @@ function showJobDetailCallback(job,focus) {
             $('job-info-rend').value = fsdate(info.endTime);
             $('job-info-rkick').value = info.rekickTimeout || '';
             $('job-info-rlimit').value = info.maxRunTime || '';
-            if (info.endTime) $('job-info-rspan').value = Math.round((info.endTime - info.startTime)/1000);
+            if (info.endTime > info.startTime) $('job-info-rspan').value = Math.round((info.endTime - info.startTime)/1000);
             break;
         }
     }

@@ -2086,7 +2086,8 @@ function showJobDetailCallback(job,focus) {
             $('job-info-creator').value = info.creator;
             $('job-info-owner').value = info.owner;
             $('job-info-ttotal').value = info.nodes;
-            $('job-info-trun').value = info.running;
+            $('job-info-trun').value = info.running - info.done;
+            $('job-info-tdone').value = info.done;
             $('job-info-terror').value = info.errored;
             $('job-info-tbackup').value = info.backups;
             $('job-info-treplica').value = info.replicas;
@@ -2100,7 +2101,7 @@ function showJobDetailCallback(job,focus) {
             $('job-info-rend').value = fsdate(info.endTime);
             $('job-info-rkick').value = info.rekickTimeout || '';
             $('job-info-rlimit').value = info.maxRunTime || '';
-            if (info.endTime > info.startTime) $('job-info-rspan').value = Math.round((info.endTime - info.startTime)/1000);
+            $('job-info-rspan').value = (info.endTime > info.startTime ? Math.round((info.endTime - info.startTime)/1000) : '');
             break;
         }
     }

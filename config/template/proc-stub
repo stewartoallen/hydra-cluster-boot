@@ -42,16 +42,40 @@ function testIsRunning() {
 function startProcess() {
 	export PROCNAME=$1; shift
 	cd ${HYDRA_IMAGE}
-	PID="${PIDDIR}/pid.${PROCNAME}"
 	LOG=log/${PROCNAME}.log
+	PID="${PIDDIR}/pid.${PROCNAME}"
+	RUN="${PIDDIR}/run.${PROCNAME}"
 	testIsRunning ${PID}
 	running=$?
 	if [ ${running} -eq 0 ]; then
 		echo "startProcess :: ${PROCNAME}"
-		echo $* > ${LOG}
-		echo "-----(( ${PROCNAME} ))-----(( $(date) ))-----" >> ${LOG}
-		nohup $* >> ${LOG} 2>&1 &
-		echo "$!" > "${PID}"
+		if [ -f "${LOG}" ]; then
+			mv "${LOG}" "${LOG}.last"
+		fi
+# provide a method to run control functions w/out respawning them
+		if [ "$1" == "once" ]; then
+			shift
+			echo $* > ${RUN} && chmod 755 ${RUN}
+			echo "-----(( ${PROCNAME} ))-----(( $(date) ))-----" > ${LOG}
+			nohup ${RUN} >> ${LOG} 2>&1 &
+			echo "$!" > "${PID}"
+		else
+cat > ${RUN} << EOF
+#!/bin/sh
+while [ -f ${RUN} ]; do
+	echo "---( ${PROCNAME} )---( starting )---( \$(date) )---"
+	$* &
+	pid=\$!
+	echo \${pid} > ${PID}
+	wait \${pid}
+	echo "---( ${PROCNAME} )---( exited )---( \$(date) )---"
+	sleep 1
+done
+echo "---( ${PROCNAME} )---( stopped )---( \$(date) )---"
+EOF
+chmod 755 ${RUN}
+nohup ${RUN} >> ${LOG} 2>&1 &
+		fi
 		echo "started ${PROCNAME}"
 		return 0
 	else
@@ -63,6 +87,10 @@ function stopProcess() {
 	echo "stopProcess :: $*"
 	cd ${HYDRA_IMAGE}
 	for process in $*; do
+		RUN="${PIDDIR}/run.${process}"
+		if [ -f ${RUN} ]; then
+			mv ${RUN} ${RUN}.stopped
+		fi
 		if [ -f ${PIDDIR}/pid.${process} ]; then
 			PID=$(cat ${PIDDIR}/pid.${process})
 			tries=1

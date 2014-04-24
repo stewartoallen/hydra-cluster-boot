@@ -9,7 +9,11 @@ function decode(str) {
 function on_ready() {
     if (!db.account) {
         db.account = prompt("Account ID");
-        location.reload();
+        if (db.account) {
+            location.reload();
+        } else {
+            alert('no valid account. reload page to re-enter');
+        }
     } else {
         account.get();
     }

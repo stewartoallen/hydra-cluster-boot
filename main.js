@@ -581,7 +581,7 @@ var exports = {
         if (server != null) {
             throw "server already initialized"
         }
-        swig.setDefaults({ loader: swig.loaders.fs('config/template' ), cache: false });
+        swig.setDefaults({ loader: swig.loaders.fs('config/template' ), cache: false, autoescape: false });
         server = require('http').createServer(function (req, res) {
             http.handle(req, res);
         }).listen(parseInt(params.boothost.split(':')[1]));

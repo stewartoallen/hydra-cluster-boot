@@ -18,10 +18,10 @@ var busyimg = '<img width="32" height="32" src="spinner.gif">',
     hkv = {},
     params = {},
     clusterData = {},
-    auth=null,
+    rpcAuth=null,
     hostUpdater=null,
     liveQueryPolling=null,
-	rpcroot="http://localhost:2222";
+	rpcRoot="http://localhost:2222";
 
 // dict of hash kv-pairs
 try {
@@ -49,15 +49,58 @@ var nav = {
     setMax : function(max) { dbSet('query.browse_max',max) }
 };
 
+function checkRPC() {
+    if (db['rpc'] == 'ajax') {
+        $('toggle-rpc').innerHTML = 'Ajax';
+    } else {
+        $('toggle-rpc').innerHTML = 'JSONp';
+    }
+}
+
+function toggleRPC() {
+    if (db['rpc'] == 'ajax') {
+        db['rpc'] = 'jsonp';
+    } else {
+        db['rpc'] = 'ajax';
+    }
+    checkRPC();
+}
+
 var cbfuncs = {};
 var nextcb = 0;
 
-function callRPC(path, args, callback) {
+function callRPC(path, args, callback, options) {
+    if (!options) options = {};
+    rpcHost = options.host || rpcRoot;
+
+    if (db['rpc'] == 'ajax') {
+        jQuery.ajax({
+            url: rpcHost + path + '?' + args.join('&'),
+            type: "GET",
+            crossDomain: true,
+            data: {
+                auth: rpcAuth
+            },
+            dataType: "json",
+            success: function (response) {
+                if (callback) {
+                    callback(response);
+                } else {
+                    console.log(['OK -->', path, options]);
+                }
+            },
+            error: function (xhr, status) {
+                console.log(['ERR -->', path, options, xhr, status]);
+            }
+        });
+        return;
+    }
+
 	var fname = 'jsonp_cb'+(nextcb++);
 	args = args || [];
 	args.push("cbfunc-arg=\""+fname+"\"");
 	args.push("cbfunc=QM.cbfuncs."+fname);
-	path = rpcroot + path + '?' + args.join('&');
+	path = rpcRoot + path + '?' + args.join('&');
 	var script = document.createElement('script');
 	script.id = fname;
 	script.type = 'text/javascript';
@@ -657,15 +700,16 @@ function init() {
         var clusterString = db['cluster-'+params.cluster];
         if (clusterString) {
             clusterData = JSON.parse(clusterString);
-            if (!clusterData.isLocal) rpcroot="http://"+firstKey(clusterData.proc.qmaster)+":2222"
-            auth = clusterData.authKey;
+            if (!clusterData.isLocal) rpcRoot="http://"+firstKey(clusterData.proc.qmaster)+":2222"
+            rpcAuth = clusterData.authKey;
             $('status_cluster').innerHTML = clusterData.about;
             $('status_job').innerHTML = jobid;
         }
     }
 
     storedQueriesDecode();
-    
+    checkRPC();
+
     // Populate query fields from URL (use hash, then query string)
     $('qname').value  = hkv.name   || '';
     $('query').value  = hkv.query  || '';
@@ -702,6 +746,7 @@ window.QM = {
     graphIt : graphIt,
     killLiveQuery : killLiveQuery,
     queryHostsRescan: queryHostsRescan,
+    toggleRPC: toggleRPC,
 
     show:show,
     hide:hide,

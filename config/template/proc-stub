@@ -40,7 +40,12 @@ function testIsRunning() {
 }
 
 function startProcess() {
+	export once=0
 	export PROCNAME=$1; shift
+	if [ "${PROCNAME}" == "once" ]; then
+		export PROCNAME=$1; shift
+		export once=1
+	fi
 	cd ${HYDRA_IMAGE}
 	LOG=log/${PROCNAME}.log
 	PID="${PIDDIR}/pid.${PROCNAME}"
@@ -53,8 +58,7 @@ function startProcess() {
 			mv "${LOG}" "${LOG}.last"
 		fi
 # provide a method to run control functions w/out respawning them
-		if [ "$1" == "once" ]; then
-			shift
+		if [ $once -eq 1 ]; then
 			echo $* > ${RUN} && chmod 755 ${RUN}
 			echo "-----(( ${PROCNAME} ))-----(( $(date) ))-----" > ${LOG}
 			nohup ${RUN} >> ${LOG} 2>&1 &

@@ -2,7 +2,8 @@ Cluster Boot Service (CBS)
 ==========================
 
 A web service that solves first-boot, start-dependency and node allocation through dynamic script
-creation for Hydra compute clusters.
+creation for Hydra compute clusters.  It also provides a unified web interface for provisioning
+clusters, managing individual clusters and tasks as well as querying job data.
 
 Getting Started
 ===============

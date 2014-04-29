@@ -1994,7 +1994,7 @@ function showJobDetail(uuid,force,focus) {
     var same = (uuid == db['spawn.job_show']);
 	db['spawn.job_show'] = uuid;
 	if (!force && lastJob && lastJob.id == uuid) {
-		showJobDetailCallback(uuid);
+		showJobDetailCallback(lastJob);
 	} else {
 		callRPC("/job.get?id="+uuid, function(job) { safeCall(showJobDetailCallback,job,focus); });
 	}

@@ -34,7 +34,6 @@ if (!String.prototype.endsWith) {
 /**
  * TODO
  * add simple config (db) mem caching layer
- * fix linux vs mac osx rabbit cmd (auto switch in boot?)
  * redo rendering to determine content-type
  * redo all rendering to have a consistent set of base objects
  */

@@ -887,6 +887,7 @@ function toggleQuiesce() {
 function setupCallback(newSetup) {
     setup = newSetup;
 	$('quiesce').innerHTML = setup.quiesce ? 'Reactivate' : 'Quiesce';
+    $('top').setStyle(setup.quiesce ? {'background':'#fdd'} : {'background':'#eee'});
 	setJoblist(setup.jobs);
 	setHostlist(setup.hosts);
 	lastMacrolist = setup.macros;

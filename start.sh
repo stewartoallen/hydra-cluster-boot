@@ -1,9 +1,12 @@
 #!/bin/sh
 
+host=${1:-$(hostname)}
+port=${2:-8007}
+
 while /bin/true; do
 
 echo "starting..."
-node --max-stack-size=4G start boothost=dev-monitor1:7070 
+node --max-stack-size=4G start boothost=${host}:${port}
 echo "sleeping..."
 sleep 1
 

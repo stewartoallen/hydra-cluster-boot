@@ -34,17 +34,17 @@ case $1 in
 		;;
 	exe)
 		shift
-		${HYDRA_CMD} ${HYDRA_EXE} $*
+		eval ${HYDRA_CMD} ${HYDRA_EXE} $*
 		exit
 		;;
 	query)
 		shift
-		${HYDRA_CMD} -Dlog4j.configuration=${HYDRA_IMAGE}/etc/log4j-quiet.conf ${HYDRA_EXE} qutil $*
+		eval ${HYDRA_CMD} -Dlog4j.configuration=${HYDRA_IMAGE}/etc/log4j-quiet.conf ${HYDRA_EXE} qutil $*
 		exit
 		;;
 	mesh)
 		shift
-		${HYDRA_CMD} -Dlog4j.configuration=${HYDRA_IMAGE}/etc/log4j-quiet.conf ${HYDRA_EXE} mesh client $*
+		eval ${HYDRA_CMD} -Dlog4j.configuration=${HYDRA_IMAGE}/etc/log4j-quiet.conf ${HYDRA_EXE} mesh client $*
 		exit
 		;;
 	task)

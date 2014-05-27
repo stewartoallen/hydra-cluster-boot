@@ -2,8 +2,10 @@
 
 host=${1:-$(hostname)}
 port=${2:-8007}
+true=/bin/true
+[ ! -f ${true} ] && true=/usr/bin/true
 
-while /bin/true; do
+while $true; do
 
 echo "starting..."
 node --max-stack-size=4G start boothost=${host}:${port}

@@ -692,6 +692,14 @@ var firstKey = function(o) {
     for (var key in o) return key;
 };
 
+function overridejQueryJSON() {
+    jQuery.ajaxSetup({
+        converters:{"text json":function(json) {
+            return eval('('+json+')');
+        }}
+    });
+}
+
 /* called on page load  */
 function init() {
     params = decodeParams();
@@ -707,6 +715,7 @@ function init() {
         }
     }
 
+    overridejQueryJSON();
     storedQueriesDecode();
     checkRPC();
 

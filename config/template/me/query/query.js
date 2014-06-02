@@ -49,71 +49,30 @@ var nav = {
     setMax : function(max) { dbSet('query.browse_max',max) }
 };
 
-function checkRPC() {
-    if (db['rpc'] == 'ajax') {
-        $('toggle-rpc').innerHTML = 'Ajax';
-    } else {
-        $('toggle-rpc').innerHTML = 'JSONp';
-    }
-}
-
-function toggleRPC() {
-    if (db['rpc'] == 'ajax') {
-        db['rpc'] = 'jsonp';
-    } else {
-        db['rpc'] = 'ajax';
-    }
-    checkRPC();
-}
-
 var cbfuncs = {};
 var nextcb = 0;
 
 function callRPC(path, args, callback, options) {
     if (!options) options = {};
-    rpcHost = options.host || rpcRoot;
-
-    if (db['rpc'] == 'ajax') {
-        jQuery.ajax({
-            url: rpcHost + path + '?' + args.join('&'),
-            type: "GET",
-            crossDomain: true,
-            data: {
-                auth: rpcAuth
-            },
-            dataType: "json",
-            success: function (response) {
-                if (callback) {
-                    callback(response);
-                } else {
-                    console.log(['OK -->', path, options]);
-                }
-            },
-            error: function (xhr, status) {
-                console.log(['ERR -->', path, options, xhr, status]);
+    jQuery.ajax({
+        url: (options.host || rpcRoot) + path + '?' + args.join('&'),
+        type: "GET",
+        crossDomain: true,
+        data: {
+            auth: rpcAuth
+        },
+        dataType: "json",
+        success: function (response) {
+            if (callback) {
+                callback(response);
+            } else {
+                console.log(['OK -->', path, options]);
             }
-        });
-        return;
-    }
-
-	var fname = 'jsonp_cb'+(nextcb++);
-	args = args || [];
-	args.push("cbfunc-arg=\""+fname+"\"");
-	args.push("cbfunc=QM.cbfuncs."+fname);
-	path = rpcRoot + path + '?' + args.join('&');
-	var script = document.createElement('script');
-	script.id = fname;
-	script.type = 'text/javascript';
-	script.src = path;
-
-	cbfuncs[fname] = function(func, data) {
-		if (callback) callback(data);
-		delete cbfuncs[func];
-		document.getElementById(func).remove();
-	};
-	
-	var head = document.getElementsByTagName("head")[0];
-	head.appendChild(script);
+        },
+        error: function (xhr, status) {
+            console.log(['ERR -->', path, options, xhr, status]);
+        }
+    });
 }
 
 /* turn rpc response into an object */
@@ -717,7 +676,6 @@ function init() {
 
     overridejQueryJSON();
     storedQueriesDecode();
-    checkRPC();
 
     // Populate query fields from URL (use hash, then query string)
     $('qname').value  = hkv.name   || '';
@@ -755,7 +713,6 @@ window.QM = {
     graphIt : graphIt,
     killLiveQuery : killLiveQuery,
     queryHostsRescan: queryHostsRescan,
-    toggleRPC: toggleRPC,
 
     show:show,
     hide:hide,

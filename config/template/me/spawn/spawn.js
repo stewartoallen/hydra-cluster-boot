@@ -105,7 +105,6 @@ function init() {
         }
 		showTab(db[tabSetting] || 'jobs');
 		checkUser();
-        checkRPC();
 		if (db[db[tabSetting]+'filter']) {
 			filter = db[db[tabSetting]+'filter'];
 			$('form_filter').value = filter;
@@ -252,48 +251,26 @@ var nextcb = 0;
 
 function callRPC(path, callback, options) {
     if (!options) options = {};
-    rpcHost = options.host || rpcRoot;
-
-    if (db['rpc'] == 'ajax') {
-        jQuery.ajax({
-            url: rpcHost + path,
-            type: "GET",
-            crossDomain: true,
-            data: {
-                user: getUser(),
-                auth: rpcAuth
-            },
-            dataType: "json",
-            success: function (response) {
-                if (callback) {
-                    callback(response);
-                } else {
-                    console.log(['OK -->', path, options]);
-                }
-            },
-            error: function (xhr, status) {
-                console.log(['ERR -->', path, options, xhr, status]);
+    jQuery.ajax({
+        url: (options.host || rpcRoot) + path,
+        type: "GET",
+        crossDomain: true,
+        data: {
+            user: getUser(),
+            auth: rpcAuth
+        },
+        dataType: "json",
+        success: function (response) {
+            if (callback) {
+                callback(response);
+            } else {
+                console.log(['OK -->', path, options]);
             }
-        });
-        return;
-    }
-
-    var fname = 'jsonp_cb'+(nextcb++);
-    callbackArg = options.cbparam || "cbfunc";
-    path = rpcHost + path + '&user='+getUser()+'&auth='+rpcAuth+'&cbfunc-arg="'+fname+'"&'+callbackArg+'=Spawn.cbfuncs.'+fname;
-	var script = document.createElement('script');
-	script.id = fname;
-	script.type = 'text/javascript';
-	script.src = path;
-
-	cbfuncs[fname] = function(data, topic, func) {
-		if (callback) callback(data);
-		delete cbfuncs[fname];
-		document.getElementById(fname).remove();
-	};
-	
-	var head = document.getElementsByTagName("head")[0];
-	head.appendChild(script);
+        },
+        error: function (xhr, status) {
+            console.log(['ERR -->', path, options, xhr, status]);
+        }
+    });
 }
 
 /* alerts on a failed rpc */
@@ -856,23 +833,6 @@ function setAuth() {
 function setHost() {
     rpcRoot = prompt('Provide Spawn HTTP Root',rpcRoot) || rpcRoot;
     refresh();
-}
-
-function checkRPC() {
-    if (db['rpc'] == 'ajax') {
-        $('toggle-rpc').innerHTML = 'Ajax';
-    } else {
-        $('toggle-rpc').innerHTML = 'JSONp';
-    }
-}
-
-function toggleRPC() {
-    if (db['rpc'] == 'ajax') {
-        db['rpc'] = 'jsonp';
-    } else {
-        db['rpc'] = 'ajax';
-    }
-    checkRPC();
 }
 
 /* stop or restart job scheduling */
@@ -2393,7 +2353,6 @@ window.Spawn = {
 	refresh : refresh,
 	parse : parse,
 
-    toggleRPC : toggleRPC,
     setHost : setHost,
     setAuth : setAuth,
 	setUser : setUser,

@@ -83,7 +83,7 @@ function init() {
 			return;
 		}
 
-        params = decodeParams();
+        params = util.getUrlParamMap();
 		if (params['nopoll']) {
 			enablePolling = false;
 		}
@@ -92,7 +92,7 @@ function init() {
             if (clusterString) {
                 clusterData = JSON.parse(clusterString);
                 if (!clusterData.isLocal && clusterData.proc.spawn) {
-                    rpcRoot = "http://"+firstKey(clusterData.proc.spawn)+":5050"
+                    rpcRoot = "http://"+util.firstKey(clusterData.proc.spawn)+":5050"
                 }
                 rpcAuth = clusterData.authKey;
                 $('status_cluster').innerHTML = clusterData.about;
@@ -134,10 +134,6 @@ function init() {
 		console.log(['init',e]);
 	}
 }
-
-var firstKey = function(o) {
-    for (var key in o) return key;
-};
 
 function refreshEditText(cm) {
 	cm.setValue(cm.getValue());
@@ -244,10 +240,6 @@ function jsonp(url) {
 	script.src = url;
 	head.appendChild(script);
 }
-
-var cbfuncs = {};
-var nextcb = 0;
-
 
 function callRPC(path, callback, options) {
     if (!options) options = {};
@@ -2217,7 +2209,7 @@ function showJobLogs(host, port, job, node) {
 		var url = 'about:blank';
         var stdout = $('job_log_stdout').checked;
         var rpc = "/job.log?id="+lastLog.job+"&node="+lastLog.node+"&offset="+offset+"&lines="+lines+"&out="+(stdout?"1":"0");
-        var rpcopt = { cbparam:"callback", host:"http://"+lastLog.host+":"+lastLog.port };
+        var rpcopt = { host:"http://"+lastLog.host+":"+lastLog.port };
         $('job_log_detail').innerHTML = '';
         callRPC(rpc+"&out=1", function(logs) {
             showHide('job_log', true);
@@ -2419,8 +2411,6 @@ window.Spawn = {
 	meshPush : meshPush,
 
 	flowGraph: flowGraph,
-
-	cbfuncs : cbfuncs
 };
 
 })();

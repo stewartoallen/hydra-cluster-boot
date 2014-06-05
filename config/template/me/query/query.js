@@ -49,9 +49,6 @@ var nav = {
     setMax : function(max) { dbSet('query.browse_max',max) }
 };
 
-var cbfuncs = {};
-var nextcb = 0;
-
 function callRPC(path, args, callback, options) {
     if (!options) options = {};
     jQuery.ajax({
@@ -647,34 +644,22 @@ function closeCompletedHosts(){
     hide('completedstatus');
 }
 
-var firstKey = function(o) {
-    for (var key in o) return key;
-};
-
-function overridejQueryJSON() {
-    jQuery.ajaxSetup({
-        converters:{"text json":function(json) {
-            return eval('('+json+')');
-        }}
-    });
-}
-
 /* called on page load  */
 function init() {
-    params = decodeParams();
+    params = util.getUrlParamMap();
 
     if (params.cluster) {
         var clusterString = db['cluster-'+params.cluster];
         if (clusterString) {
             clusterData = JSON.parse(clusterString);
-            if (!clusterData.isLocal) rpcRoot="http://"+firstKey(clusterData.proc.qmaster)+":2222"
+            if (!clusterData.isLocal) rpcRoot="http://"+util.firstKey(clusterData.proc.qmaster)+":2222"
             rpcAuth = clusterData.authKey;
             $('status_cluster').innerHTML = clusterData.about;
             $('status_job').innerHTML = jobid;
         }
     }
 
-    overridejQueryJSON();
+    util.ajaxSetup();
     storedQueriesDecode();
 
     // Populate query fields from URL (use hash, then query string)
@@ -719,7 +704,6 @@ window.QM = {
     closeRunningHosts: closeRunningHosts,
     closeCompletedHosts: closeCompletedHosts,
 
-	cbfuncs:cbfuncs,
     setPreviewLimit:function() {
         console.log({nav:nav,db:db});
         nav.setMax(prompt("Tree Preview Limit", nav.getMax()) || nav.getMax());

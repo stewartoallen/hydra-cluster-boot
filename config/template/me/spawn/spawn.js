@@ -433,8 +433,10 @@ function showEdit(e,b) {
 	$(e).style.display = b ? 'block' : 'none';
 	if (b) {
 		editing = e;
+        setPollerQueue(null, true);
 	} else {
 		editing = null;
+        setPollerLive();
 	}
 }
 
@@ -650,26 +652,29 @@ function fdate(v) {
 }
 
 /* set spawn poller to queueing mode */
-function setPollerQueue(evt) {
+function setPollerQueue(evt,disable) {
 	if (queuePoller != null) {
 		clearTimeout(queuePoller);
 		queuePoller = null;
 	}
+    if (disable === true) {
+        enablePolling = false;
+        $('event_count').innerHTML = 'paused';
+    }
 	if (enablePolling) {
 		try {
-		$('event_count').innerHTML = 'queueing';
-		queuePoller = setTimeout(setPollerLive, 500);
+    		queuePoller = setTimeout(setPollerLive, 500);
+            $('event_count').innerHTML = 'queueing';
 		} catch (e) { }
-		//console.log(['set poller queueing', queuedEvents]);
 	}
 }
 
 /* set spawn poller to live mode */
 function setPollerLive() {
+    enablePolling = true;
 	if (queuePoller != null) {
 		clearTimeout(queuePoller);
 		queuePoller = null;
-		//console.log(['set poller live', queuedEvents]);
 		$('event_count').innerHTML = 'live';
 		if (queuedEvents.length > 0) {
 			var qev = queuedEvents;

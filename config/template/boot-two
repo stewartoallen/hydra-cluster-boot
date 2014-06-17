@@ -69,7 +69,10 @@ curl -s "http://${HYDRA_BOOT}/render/hcl?cluster=${CLUSTER_ID}&hostname=${CLUSTE
 
 # launch host local processes
 for proc in ${PROCESSES}; do
-	echo -n "fetching ${proc} start... "
-	bash <(curl -s "http://${HYDRA_BOOT}/render/start-${proc}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
+	echo "${proc}" | tr ':' ' ' | while read procname procarg; do
+		echo -n "fetching ${procname} start... "
+		export PROC_ARG=${procarg}
+		bash <(curl -s "http://${HYDRA_BOOT}/render/start-${procname}?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}")
+	done
 done
 

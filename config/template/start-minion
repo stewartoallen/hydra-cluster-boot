@@ -6,5 +6,7 @@ export broker=$(get_broker)
 export zookeeper=$(get_zookeeper)
 export spawn=$(wait_nodes spawn)
 
+[ ! -z "${PROC_ARG}" ] && export type="-Dminion.type=${PROC_ARG}"
+
 register_node minion
-startProcess minion ${HYDRA_CMD} ${broker} ${zookeeper} {{ minion.cmdline }} ${HYDRA_EXE} minion minion
+startProcess minion ${HYDRA_CMD} ${broker} ${zookeeper} {{ minion.cmdline }} ${type} ${HYDRA_EXE} minion minion

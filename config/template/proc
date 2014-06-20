@@ -57,6 +57,11 @@ case $1 in
 		exec bash <(curl -s "http://${HYDRA_BOOT}/render/task?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}") $*
 		exit
 		;;
+	task-clone)
+		shift
+		exec bash <(curl -s "http://${HYDRA_BOOT}/render/task-clone?cluster=${CLUSTER_ID}&hostname=${CLUSTER_HOST}") $*
+		exit
+		;;
 esac
 
 case "$1-$2" in

@@ -20,10 +20,16 @@ jobid=$4
 cat > job.node.js << EOF
 var fs = require('fs');
 var cfg = eval('('+fs.readFileSync('${conf}')+')');
-if (cfg.hosts) {
-	for (var i in cfg.hosts) {
-		console.log(['rsync -av --delete ',cfg.hosts[i],':',(cfg.minionDir || 'hydra/minion'),'/${jobid}/${nodenum}/gold/ ./'].join(''));
-	}
+if (!cfg.jobid) {
+	console.log('echo missing source job id; exit 1');
+	process.exit(1)
+}
+if (!cfg.hosts) {
+	console.log('echo missing source host list; exit 1');
+	process.exit(1)
+}
+for (var i in cfg.hosts) {
+	console.log(['rsync -av --delete ',cfg.hosts[i],':',(cfg.minionPath || 'hydra/minion'),'/${jobid}/${nodenum}/gold/ ./'].join(''));
 }
 process.exit()
 EOF

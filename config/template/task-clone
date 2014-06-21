@@ -10,12 +10,10 @@ nodex=$(which node)
 conf=$1
 nodes=$2
 nodenum=$3
-jobid=$4
 
 [ ! -f "${conf}" ] && echo "missing config : ${conf}" && exit 1
 [ -z ${nodes} ] && echo "missing node count" && exit 1
 [ -z ${nodenum} ] && echo "missing node number" && exit 1
-[ -z ${jobid} ] && echo "missing job id" && exit 1
 
 cat > job.node.js << EOF
 var fs = require('fs');
@@ -28,12 +26,14 @@ if (!cfg.hosts) {
 	console.log('echo missing source host list; exit 1');
 	process.exit(1)
 }
+var minionPath = cfg.minionPath || 'hydra/minion';
+var dataPath = cfg.dataPath || 'data';
 for (var i in cfg.hosts) {
-	console.log(['rsync -av --delete ',cfg.hosts[i],':',(cfg.minionPath || 'hydra/minion'),'/${jobid}/${nodenum}/gold/ ./'].join(''));
+	console.log(['rsync -av --delete ',cfg.hosts[i],':',minionPath,'/',cfg.jobid,'/${nodenum}/gold/',dataPath,'/ ',dataPath,'/'].join(''));
 }
 process.exit()
 EOF
 
 ${nodex} job.node.js > job.bash
-bash job.bash
-
+source job.bash
+exit 0

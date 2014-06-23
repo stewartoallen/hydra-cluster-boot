@@ -443,6 +443,9 @@ function limit(txt,chars) {
 
 /* cache entry list render */
 function renderCacheList(list,div,kill) {
+    list.sort(function(a,b) {
+      return b.startTime - a.startTime;
+    });
     var html = '<table class="render"><tr><th>';
     html += ['submit','uuid','alias','job','path','ops','run','lines','kill'].join('</th><th>')+'</th></tr>';
     for (var i=0; i<list.length; i++) {

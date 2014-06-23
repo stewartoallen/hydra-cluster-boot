@@ -297,7 +297,7 @@ var findHostDefinition = function(cluster, hostname) {
     }
     for (var key in cluster.node) {
         var hostDef = cluster.node[key];
-        if (hostDef.hosts && hostDef.hosts.indexOf(hostname)) {
+        if (hostDef.hosts && hostDef.hosts.indexOf(hostname) >= 0) {
         debug(['fhd-h',hostname]);
             return hostDef;
         }

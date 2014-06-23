@@ -14,7 +14,8 @@ var template = {};
 var waiters = {};
 var clusterDefault = {};
 var params = {
-    boothost : [os.hostname(),8007].join(":")
+    boothost : [os.hostname(),8007].join(":"),
+    debug: false
 };
 
 if (!String.prototype.endsWith) {
@@ -210,7 +211,7 @@ var prefix = {
                 if (cluster.shortenHost) {
                     q.hostname = shortenHost(q.hostname);
                 }
-                var host = cluster.node[q.hostname] || cluster.node.defaults;
+                var host = findHostDefinition(cluster, q.hostname);//cluster.node[q.hostname] || cluster.node.defaults;
                 call(res, q, cluster, host);
             });
         }
@@ -289,6 +290,22 @@ var defaultImageRoot = function() {
     return ['http://',params.boothost,'/image/default'].join('')
 };
 
+var findHostDefinition = function(cluster, hostname) {
+    if (cluster.node[hostname]) {
+        debug(['fhd-x',hostname]);
+        return cluster.node[hostname];
+    }
+    for (var key in cluster.node) {
+        var hostDef = cluster.node[key];
+        if (hostDef.nodes && hostDef.nodes.indexOf(hostname)) {
+        debug(['fhd-n',hostname]);
+            return hostDef;
+        }
+    }
+    debug(['fhd-d',hostname]);
+    return cluster.node.defaults;
+}
+
 var oGet = function(obj, find, dv) {
     var o = obj;
     if (!Array.isArray(find)) {
@@ -332,6 +349,10 @@ var setDefaults = function(oS, oT) {
         if (typeof oT[key] == 'undefined') oT[key] = oS[key];
     }
 };
+
+var debug = function(msg) {
+    if (params.debug) console.log(msg);
+}
 
 var api = {
     wait_nodes : function(query, remote, callback) {
